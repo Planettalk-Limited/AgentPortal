@@ -1,22 +1,26 @@
-'use client'
-
 export default function PrivacyPolicyPage() {
-
   return (
     <div className="min-h-screen bg-white py-8 sm:py-12">
       <div className="container mx-auto px-4 sm:px-6">
-        <div className="prose max-w-none document-style">
-          <h1 className="document-title">Privacy and Cookies Policy</h1>
+        <div className="prose max-w-none"
+             style={{
+               backgroundColor: 'white',
+               color: '#333333',
+               fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif',
+               lineHeight: '1.6',
+               padding: '0 1rem'
+             }}>
+          <h1 className="text-2xl sm:text-3xl font-bold mb-6 text-center">Privacy and Cookies Policy</h1>
           
           <div className="max-w-5xl mx-auto">
             {/* Introduction Section */}
-            <div className="document-section">
-              <h2 className="section-title">Introduction</h2>
+            <div className="mb-6">
+              <h2 className="text-xl sm:text-2xl font-semibold mb-3">Introduction</h2>
               <div>
                 <p>At Planet Talk looking after the personal data you share with us is important to us. We want you to be confident that your data is safe and secure with us and understand how we use it to offer you a better and more personalised experience.</p>
                 <p>We are committed to doing the right thing when it comes to how we collect, use and protect your personal data. That&apos;s why we&apos;ve developed this privacy and cookies policy (&quot;Policy&quot;), which:</p>
               
-                <ul className="space-y-3 document-list">
+                <ul className="space-y-3 list-disc pl-4 mt-2 mb-4">
                   <li>Sets out the types of personal data that we collect</li>
                   <li>Explains how and why we collect and use your personal data</li>
                   <li>Details when and why we will share personal data within the Planet Talk and with third parties</li>
@@ -26,8 +30,8 @@ export default function PrivacyPolicyPage() {
             </div>
             
             {/* Coverage section */}
-            <div className="document-section">
-              <h2 className="section-title">What this Policy covers</h2>
+            <div className="mb-6">
+              <h2 className="text-xl sm:text-2xl font-semibold mb-3">What this Policy covers</h2>
               
               <div>
                 <div className="document-subsection">
@@ -198,7 +202,7 @@ export default function PrivacyPolicyPage() {
               <div className="document-footer">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
-                    <span>Last updated: {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                    <span>Last updated: January 1, 2024</span>
                   </div>
                   <a href="#" className="underline">
                     Back to top
@@ -209,295 +213,6 @@ export default function PrivacyPolicyPage() {
           </div>
         </div>
       </div>
-      
-      <style jsx>{`
-        /* Document styling - Mobile First */
-        .document-style {
-          background-color: white;
-          color: #333333;
-          font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-          line-height: 1.6;
-          padding: 0 1rem;
-        }
-        
-        .document-title {
-          font-size: 1.75rem;
-          font-weight: 700;
-          margin-bottom: 1.5rem;
-          text-align: center;
-          line-height: 1.2;
-        }
-        
-        .document-section {
-          margin-bottom: 1.5rem;
-          border: none;
-          box-shadow: none;
-          background: white;
-        }
-        
-        .section-title {
-          font-size: 1.25rem;
-          font-weight: 600;
-          margin-bottom: 0.75rem;
-          line-height: 1.3;
-          word-wrap: break-word;
-        }
-        
-        .subsection-title {
-          font-size: 1.125rem;
-          font-weight: 600;
-          margin: 1rem 0 0.5rem 0;
-          line-height: 1.3;
-        }
-        
-        .document-subsection {
-          background-color: white;
-          padding: 0;
-          border: none;
-          margin-bottom: 0.75rem;
-        }
-        
-        .document-notice {
-          background-color: white;
-          border-left: 2px solid #ddd;
-          padding: 0 0 0 0.75rem;
-          margin: 0.75rem 0;
-        }
-        
-        /* Table styling - Mobile First */
-        .document-table-wrapper {
-          width: 100%;
-          margin: 1rem 0;
-          overflow-x: auto;
-          -webkit-overflow-scrolling: touch;
-        }
-        
-        .document-table {
-          width: 100%;
-          border: 1px solid #000;
-          border-collapse: collapse;
-          min-width: 100%;
-        }
-        
-        .document-table table {
-          width: 100%;
-          border-collapse: collapse;
-          margin: 0;
-          padding: 0;
-          min-width: 320px;
-        }
-        
-        .document-table th,
-        .document-table td {
-          border: 1px solid #000;
-          padding: 0.5rem;
-          vertical-align: top;
-          margin: 0;
-          font-size: 0.875rem;
-          word-wrap: break-word;
-          hyphens: auto;
-        }
-        
-        .table-header {
-          background-color: #f8f9fa;
-          font-weight: 600;
-          border: 1px solid #000;
-          padding: 0.5rem;
-          margin: 0;
-          font-size: 0.875rem;
-        }
-        
-        /* Lists - Mobile optimized */
-        .document-list {
-          list-style-type: disc;
-          padding-left: 1rem;
-          margin-top: 0.5rem;
-          margin-bottom: 1rem;
-        }
-        
-        .document-list li {
-          margin-bottom: 0.375rem;
-          word-wrap: break-word;
-          hyphens: auto;
-        }
-        
-        /* Footer - Mobile responsive */
-        .document-footer {
-          margin-top: 2rem;
-          padding-top: 1rem;
-          border-top: 1px solid #000;
-          font-size: 0.875rem;
-        }
-        
-        .document-footer .flex {
-          flex-direction: column;
-          gap: 1rem;
-          align-items: center;
-        }
-        
-        /* Mobile-specific table layout for complex tables */
-        @media (max-width: 640px) {
-          .policy-table {
-            border: 0;
-          }
-          
-          .policy-table tr {
-            display: block;
-            margin-bottom: 1rem;
-            border: 1px solid #000;
-            border-radius: 0.25rem;
-            background: #f8f9fa;
-          }
-          
-          .policy-table td {
-            display: block;
-            text-align: left;
-            border: none;
-            border-bottom: 1px solid #ddd;
-            padding: 0.75rem;
-          }
-          
-          .policy-table td:last-child {
-            border-bottom: none;
-          }
-          
-          .policy-table .table-header {
-            background-color: #e9ecef;
-            font-weight: 700;
-            border-bottom: 2px solid #000;
-          }
-          
-          /* Add labels for mobile context */
-          .policy-table td:nth-of-type(2)::before {
-            content: "Details: ";
-            font-weight: 600;
-            display: block;
-            margin-bottom: 0.25rem;
-            color: #495057;
-          }
-          
-          .policy-table td:nth-of-type(3)::before {
-            content: "Legal basis: ";
-            font-weight: 600;
-            display: block;
-            margin-bottom: 0.25rem;
-            color: #495057;
-          }
-        }
-        
-        /* Responsive breakpoints */
-        @media (min-width: 640px) {
-          .document-style {
-            padding: 0 1.5rem;
-          }
-          
-          .document-title {
-            font-size: 2rem;
-          }
-          
-          .section-title {
-            font-size: 1.5rem;
-          }
-          
-          .subsection-title {
-            font-size: 1.25rem;
-          }
-          
-          .document-list {
-            padding-left: 1.25rem;
-          }
-          
-          .document-notice {
-            padding: 0 0 0 1rem;
-          }
-          
-          .document-table th,
-          .document-table td {
-            padding: 0.75rem;
-            font-size: 0.9rem;
-          }
-          
-          .table-header {
-            padding: 0.75rem;
-            font-size: 0.9rem;
-          }
-          
-          .document-footer .flex {
-            flex-direction: row;
-            justify-content: space-between;
-          }
-        }
-        
-        @media (min-width: 768px) {
-          .document-style {
-            padding: 0 2rem;
-          }
-          
-          .document-table th,
-          .document-table td {
-            padding: 0.75rem;
-            font-size: 1rem;
-          }
-          
-          .table-header {
-            padding: 0.75rem;
-            font-size: 1rem;
-          }
-        }
-        
-        @media (min-width: 1024px) {
-          .document-style {
-            padding: 0;
-          }
-        }
-        
-        /* Text selection and touch optimization */
-        * {
-          -webkit-tap-highlight-color: transparent;
-        }
-        
-        p, li {
-          word-wrap: break-word;
-          overflow-wrap: break-word;
-        }
-        
-        /* Improve readability on very small screens */
-        @media (max-width: 480px) {
-          .document-title {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-          }
-          
-          .section-title {
-            font-size: 1.125rem;
-            margin-bottom: 0.5rem;
-          }
-          
-          .document-section {
-            margin-bottom: 1rem;
-          }
-          
-          .document-list {
-            padding-left: 0.75rem;
-          }
-          
-          .document-notice {
-            padding: 0 0 0 0.5rem;
-            margin: 0.5rem 0;
-          }
-          
-          .document-table th,
-          .document-table td {
-            padding: 0.375rem;
-            font-size: 0.8rem;
-          }
-          
-          .table-header {
-            padding: 0.375rem;
-            font-size: 0.8rem;
-          }
-        }
-      `}</style>
     </div>
   )
 }
