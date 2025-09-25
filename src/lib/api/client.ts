@@ -35,7 +35,7 @@ export class ApiClient {
   private baseURL: string;
   private defaultHeaders: Record<string, string>;
 
-  constructor(baseURL: string = 'http://localhost:3000/api/v1') {
+  constructor(baseURL: string = 'http://138.68.155.21:3001/api/v1') {
     this.baseURL = baseURL;
     this.defaultHeaders = {
       'Content-Type': 'application/json',
