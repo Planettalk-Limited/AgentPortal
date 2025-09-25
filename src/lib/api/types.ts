@@ -368,6 +368,20 @@ export interface Earning {
   metadata?: Record<string, any>;
   createdAt: string;
   updatedAt: string;
+  // Agent information
+  agent?: {
+    agentCode?: string;
+    fullName?: string;
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    tier?: string;
+  };
+  // Referral usage information
+  referralUsage?: {
+    referredUserName?: string;
+    referredUserPhone?: string;
+  };
 }
 
 export interface CreateEarningAdjustmentRequest {

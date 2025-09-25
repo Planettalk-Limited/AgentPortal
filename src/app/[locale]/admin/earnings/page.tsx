@@ -381,7 +381,7 @@ function EarningsManagementPage() {
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-pt-light-gray">Total Value</p>
-              <p className="text-2xl font-bold text-pt-dark-gray">{formatCurrencyWithSymbol(stats.totalAmount, 'USD')}</p>
+              <p className="text-2xl font-bold text-pt-dark-gray">{formatCurrencyWithSymbol(stats.totalAmount)}</p>
             </div>
           </div>
         </div>
@@ -395,7 +395,7 @@ function EarningsManagementPage() {
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-pt-light-gray">Pending Value</p>
-              <p className="text-2xl font-bold text-pt-dark-gray">{formatCurrencyWithSymbol(stats.pendingAmount, 'USD')}</p>
+              <p className="text-2xl font-bold text-pt-dark-gray">{formatCurrencyWithSymbol(stats.pendingAmount)}</p>
             </div>
           </div>
         </div>
