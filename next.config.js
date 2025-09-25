@@ -7,9 +7,6 @@ const nextConfig = {
   images: {
     domains: ['localhost'],
   },
-  experimental: {
-    esmExternals: 'loose',
-  },
   transpilePackages: ['next-intl'],
   eslint: {
     ignoreDuringBuilds: false,
