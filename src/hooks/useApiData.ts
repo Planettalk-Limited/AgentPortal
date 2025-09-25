@@ -83,15 +83,15 @@ export function usePaginatedData<T>(
   )
 
   const updateParams = useCallback((newParams: Partial<typeof params>) => {
-    setParams(prev => ({ ...prev, ...newParams }))
+    setParams((prev: any) => ({ ...prev, ...newParams }))
   }, [])
 
   const nextPage = useCallback(() => {
-    setParams(prev => ({ ...prev, page: (prev.page || 1) + 1 }))
+    setParams((prev: any) => ({ ...prev, page: (prev.page || 1) + 1 }))
   }, [])
 
   const prevPage = useCallback(() => {
-    setParams(prev => ({ ...prev, page: Math.max((prev.page || 1) - 1, 1) }))
+    setParams((prev: any) => ({ ...prev, page: Math.max((prev.page || 1) - 1, 1) }))
   }, [])
 
   return {
