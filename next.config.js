@@ -7,6 +7,16 @@ const nextConfig = {
   images: {
     domains: ['localhost'],
   },
+  experimental: {
+    esmExternals: 'loose',
+  },
+  transpilePackages: ['next-intl'],
+  eslint: {
+    ignoreDuringBuilds: false,
+  },
+  typescript: {
+    ignoreBuildErrors: false,
+  },
 }
 
 module.exports = withNextIntl(nextConfig);

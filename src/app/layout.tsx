@@ -14,8 +14,8 @@ export const metadata: Metadata = {
     default: 'PlanetTalk Agent Portal - Join Our Global Telecommunications Network',
   },
   description: 'Join PlanetTalk\'s global telecommunications network. Earn commissions by sharing your unique agent code and helping customers with top-ups worldwide.',
-  keywords: ['PlanetTalk', 'Agent', 'Portal', 'Telecommunications', 'International Calls'],
-  authors: [{ name: 'PlanetTalk Limited' }],
+  keywords: 'PlanetTalk, Agent, Portal, Telecommunications, International Calls',
+  authors: { name: 'PlanetTalk Limited' },
   creator: 'PlanetTalk Limited',
   publisher: 'PlanetTalk Limited',
   formatDetection: {
