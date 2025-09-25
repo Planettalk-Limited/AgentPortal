@@ -66,7 +66,7 @@ export default function DashboardPage() {
       {/* Welcome Section */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-pt-dark-gray mb-2">
-          {t('welcomeBack', { name: user?.firstName })}
+          {t('welcomeBack', { name: user?.firstName || 'Agent' })}
         </h1>
             <p className="text-pt-light-gray">
               {t('agentId')}: <span className="font-mono font-medium">{agent?.agentCode || 'Loading...'}</span>
