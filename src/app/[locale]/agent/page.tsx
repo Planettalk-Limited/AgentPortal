@@ -81,13 +81,23 @@ function AgentPage() {
 
       // Set dashboard data directly from agent response (no separate API call needed)
       setDashboard({
-        totalEarnings: agentData.totalEarnings || '0.00',
-        availableBalance: agentData.availableBalance || '0.00',
-        pendingBalance: agentData.pendingBalance || '0.00',
-        totalReferrals: agentData.totalReferrals || 0,
-        activeReferrals: agentData.activeReferrals || 0,
-        commissionRate: agentData.commissionRate || '20.00',
-        recentActivity: []
+        agent: agentData,
+        earnings: [],
+        referralCodes: [],
+        summary: {
+          totalEarnings: Number(agentData.totalEarnings) || 0,
+          monthlyEarnings: 0,
+          weeklyEarnings: 0,
+          dailyEarnings: 0,
+          availableBalance: Number(agentData.availableBalance) || 0,
+          pendingBalance: Number(agentData.pendingBalance) || 0,
+          totalReferrals: agentData.totalReferrals || 0,
+          activeReferralCodes: agentData.activeReferrals || 0,
+          thisMonthReferrals: 0,
+          conversionRate: 0,
+        },
+        recentPayouts: [],
+        monthlyStats: []
       })
 
       // Load earnings with error handling
@@ -261,7 +271,7 @@ function AgentPage() {
               <div className={`px-3 py-1 rounded-full text-sm font-medium ${getTierColor(agent.tier)}`}>
                 {t(`tier.${agent.tier}`)}
               </div>
-              {parseFloat(agent.availableBalance || '0') < MINIMUM_PAYOUT_AMOUNT && (
+              {parseFloat(String(agent.availableBalance || '0')) < MINIMUM_PAYOUT_AMOUNT && (
                 <div className="text-right">
                   <p className="text-sm text-gray-500">Payout Progress</p>
                   <div className="flex items-center space-x-2">
@@ -352,7 +362,7 @@ function AgentPage() {
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">{t('stats.commissionRate')}</p>
-                <p className="text-2xl font-bold text-gray-900">{parseFloat(agent.commissionRate || '0')}%</p>
+                <p className="text-2xl font-bold text-gray-900">{parseFloat(String(agent.commissionRate || '0'))}%</p>
               </div>
             </div>
           </div>
@@ -520,7 +530,7 @@ function AgentPage() {
                       <div className="text-sm text-gray-600">{t('overview.activeReferralsCount')}</div>
                     </div>
                     <div className="text-center p-4 bg-gray-50 rounded-lg">
-                      <div className="text-3xl font-bold text-gray-900 mb-1">{parseFloat(agent.commissionRate || '0')}%</div>
+                      <div className="text-3xl font-bold text-gray-900 mb-1">{parseFloat(String(agent.commissionRate || '0'))}%</div>
                       <div className="text-sm text-gray-600">{t('overview.commissionRate')}</div>
                     </div>
                     <div className="text-center p-4 bg-gray-50 rounded-lg">
@@ -868,7 +878,7 @@ function AgentPage() {
         isOpen={showPayoutModal}
         onClose={() => setShowPayoutModal(false)}
         onSubmit={handleRequestPayout}
-        availableBalance={agent?.availableBalance || '0'}
+        availableBalance={String(agent?.availableBalance || '0')}
         isLoading={payoutLoading}
       />
 

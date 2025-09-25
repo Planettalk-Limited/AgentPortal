@@ -153,6 +153,12 @@ export interface Agent {
   user: User;
   createdAt: string;
   updatedAt: string;
+  // Additional properties that may be present in some contexts
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  activatedAt?: string;
+  lastActivityAt?: string;
 }
 
 export interface AgentApplication {
