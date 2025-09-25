@@ -169,6 +169,9 @@ export default function PayoutsPage() {
       setIsExporting(true)
       setError(null)
       
+      // Only run on client side
+      if (typeof window === 'undefined') return
+      
       const blob = await api.payout.exportPayouts({ ...filters, format: 'csv' })
       
       // Create download link
