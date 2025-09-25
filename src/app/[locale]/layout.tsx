@@ -7,15 +7,7 @@ export function generateStaticParams() {
     { locale: 'en' },
     { locale: 'es' },
     { locale: 'fr' },
-    { locale: 'de' },
-    { locale: 'it' },
-    { locale: 'pt' },
-    { locale: 'zh' },
-    { locale: 'ja' },
-    { locale: 'ko' },
-    { locale: 'ar' },
-    { locale: 'hi' },
-    { locale: 'ru' }
+    { locale: 'pt' }
   ];
 }
 
