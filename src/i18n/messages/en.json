@@ -1,0 +1,687 @@
+{
+  "navigation": {
+    "agentPortal": "Agent Portal",
+    "features": "Features",
+    "about": "About",
+    "planettalkWebsite": "PlanetTalk.com",
+    "dashboard": "Dashboard",
+    "agent": "My Agent Account",
+    "agents": "Agents",
+    "payouts": "Payouts",
+    "users": "Users",
+    "profile": "Profile",
+    "signIn": "Sign In",
+    "signOut": "Sign Out",
+    "becomeAgent": "Become an Agent",
+    "welcome": "Welcome, {name}"
+  },
+  "hero": {
+    "badge": "Agent Portal Live",
+    "title": "PlanetTalk",
+    "subtitle": "Agent Network",
+    "description": "Join our global telecommunications network. Earn commissions by sharing your unique agent code and helping customers with top-ups worldwide.",
+    "ctaPrimary": "Agent Sign In",
+    "ctaSecondary": "Become an Agent",
+    "process": {
+      "step1": {
+        "title": "Apply Online",
+        "description": "Complete our simple application form and accept terms & conditions"
+      },
+      "step2": {
+        "title": "Get Your Code",
+        "description": "Receive your unique agent code and portal access credentials via email"
+      },
+      "step3": {
+        "title": "Start Earning",
+        "description": "Share your code, track customer top-ups, and earn monthly commissions"
+      }
+    }
+  },
+  "features": {
+    "title": "Your Agent Portal Dashboard",
+    "subtitle": "Track your earnings, manage your referrals, and grow your telecommunications business with our comprehensive agent portal.",
+    "cta": "Start Your Agent Journey",
+    "items": {
+      "agentCode": {
+        "title": "Agent Code Management",
+        "description": "Your unique agent code is your key to earning. Share it easily and track its usage across all platforms.",
+        "benefits": [
+          "Unique shareable agent code",
+          "One-click copy & share",
+          "Social media integration",
+          "QR code generation"
+        ]
+      },
+      "tracking": {
+        "title": "Customer Usage Tracking",
+        "description": "See exactly how many customers have used your agent code and monitor their top-up activities.",
+        "benefits": [
+          "Customer usage statistics",
+          "Top-up activity tracking",
+          "Customer retention metrics",
+          "Growth trend analysis"
+        ]
+      },
+      "earnings": {
+        "title": "Monthly Earnings Reports",
+        "description": "Receive detailed monthly earnings reports showing your commission breakdown and payment summaries.",
+        "benefits": [
+          "Monthly commission summaries",
+          "Automated earnings updates",
+          "Payment notifications",
+          "Historical earnings data"
+        ]
+      },
+      "training": {
+        "title": "Training & Resources",
+        "description": "Access comprehensive training materials, marketing guides, and compliance documentation.",
+        "benefits": [
+          "Marketing guides & templates",
+          "Compliance documentation",
+          "Video training materials",
+          "Best practices guides"
+        ]
+      },
+      "announcements": {
+        "title": "Announcements & Updates",
+        "description": "Stay informed with important announcements, system updates, and new opportunities.",
+        "benefits": [
+          "System announcements",
+          "New feature updates",
+          "Promotional opportunities",
+          "Important notifications"
+        ]
+      },
+      "checklist": {
+        "title": "Getting Started Checklist",
+        "description": "Follow our step-by-step onboarding checklist to get your agent business up and running quickly.",
+        "benefits": [
+          "Step-by-step onboarding",
+          "Progress tracking",
+          "Required compliance steps",
+          "Success milestones"
+        ]
+      }
+    }
+  },
+  "about": {
+    "title": "Your Agent Journey",
+    "subtitle": "From application to earning monthly commissions - here's how our automated system works for you.",
+    "steps": {
+      "registration": {
+        "title": "Registration",
+        "description": "Quick and easy online application process",
+        "items": [
+          "Fill out online application form",
+          "Accept digital Terms & Conditions",
+          "Receive automated acknowledgment email/SMS"
+        ]
+      },
+      "approval": {
+        "title": "Verification & Approval",
+        "description": "Automated system vetting and approval process",
+        "items": [
+          "Automatic application vetting",
+          "Unique agent code generation",
+          "Login credentials sent via email"
+        ]
+      },
+      "portal": {
+        "title": "Portal Access",
+        "description": "Complete dashboard with all your business tools",
+        "items": [
+          "Track customers using your agent code",
+          "Monitor top-up activities and commissions",
+          "Share your code via email and social media",
+          "Access training materials and resources"
+        ]
+      }
+    },
+    "stats": {
+      "title": "Join Our Growing Network",
+      "activeAgents": "Active Agents",
+      "countries": "Countries",
+      "earningsPaid": "Earnings Paid",
+      "support": "Support"
+    }
+  },
+  "footer": {
+    "agentPortal": "Agent Portal",
+    "description": "Empowering telecommunications agents worldwide with comprehensive management tools and real-time analytics to grow their business efficiently.",
+    "downloadApp": "Download PlanetTalk App",
+    "sections": {
+      "platform": "Platform",
+      "support": "Support",
+      "company": "Company"
+    },
+    "links": {
+      "agentSignIn": "Agent Sign In",
+      "becomeAgent": "Become an Agent",
+      "dashboard": "Dashboard",
+      "helpSupport": "Help & Support",
+      "contactSupport": "Contact Support",
+      "agentResources": "Agent Resources",
+      "planettalkWebsite": "PlanetTalk.com",
+      "blog": "Blog",
+      "partnerWithUs": "Partner with Us",
+      "termsConditions": "Terms & Conditions",
+      "privacyPolicy": "Privacy Policy",
+      "cookiePolicy": "Cookie Policy"
+    },
+    "copyright": "© {year} PlanetTalk Limited. All rights reserved."
+  },
+  "admin": {
+    "agents": {
+      "title": "Agent Management",
+      "subtitle": "Manage agents, applications, and monitor performance",
+      "stats": {
+        "total": "Total Agents",
+        "active": "Active",
+        "pending": "Pending",
+        "suspended": "Suspended"
+      },
+      "tabs": {
+        "agents": "Agents",
+        "applications": "Applications"
+      },
+      "filters": {
+        "search": "Search agents...",
+        "allStatus": "All Status",
+        "allTiers": "All Tiers"
+      },
+      "status": {
+        "active": "Active",
+        "pending_application": "Pending Application",
+        "application_approved": "Application Approved",
+        "code_generated": "Code Generated",
+        "credentials_sent": "Credentials Sent",
+        "suspended": "Suspended"
+      },
+      "tiers": {
+        "bronze": "Bronze",
+        "silver": "Silver",
+        "gold": "Gold",
+        "platinum": "Platinum"
+      },
+      "actions": {
+        "approve": "Approve",
+        "sendCredentials": "Send Credentials",
+        "suspend": "Suspend",
+        "activate": "Activate",
+        "viewDetails": "View Details"
+      },
+      "empty": {
+        "title": "No {type} found",
+        "description": "Get started by adding a new agent or application."
+      }
+    },
+    "earnings": {
+      "title": "Pending Earnings",
+      "subtitle": "Review and approve agent referral commissions",
+      "loading": "Loading pending earnings...",
+      "noEarnings": "No pending earnings",
+      "noEarningsDescription": "All earnings have been reviewed.",
+      "actions": {
+        "approve": "Approve",
+        "reject": "Reject",
+        "bulkApprove": "Bulk Approve",
+        "bulkReject": "Bulk Reject",
+        "approving": "Approving...",
+        "rejecting": "Rejecting..."
+      },
+      "table": {
+        "date": "Date",
+        "agent": "Agent",
+        "customer": "Customer",
+        "amount": "Amount",
+        "commissionRate": "Commission Rate",
+        "actions": "Actions"
+      },
+      "bulk": {
+        "selected": "{count} earning{plural} selected",
+        "approveTitle": "Bulk Approve {count} Earnings",
+        "rejectTitle": "Bulk Reject {count} Earnings"
+      },
+      "reject": {
+        "title": "Reject Earning",
+        "bulkTitle": "Bulk Reject {count} Earnings",
+        "reasonLabel": "Reason for rejection",
+        "reasonRequired": "Select a reason",
+        "notesLabel": "Additional notes",
+        "notesPlaceholder": "Optional additional details...",
+        "reasons": {
+          "invalid": "Invalid referral",
+          "duplicate": "Duplicate referral",
+          "noActivity": "No customer activity",
+          "fraud": "Fraudulent activity",
+          "policy": "Policy violation",
+          "other": "Other"
+        },
+        "cancel": "Cancel",
+        "confirm": "Reject Earning",
+        "confirmBulk": "Reject {count} Earnings"
+      },
+      "messages": {
+        "approveSuccess": "Earning approved successfully",
+        "rejectSuccess": "Earning rejected successfully",
+        "bulkSuccess": "{summary}",
+        "approveError": "Failed to approve earning",
+        "rejectError": "Failed to reject earning",
+        "bulkError": "Failed to process bulk action",
+        "loadError": "Failed to load pending earnings"
+      }
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome Back",
+      "subtitle": "Sign in to your agent account",
+      "email": "Email Address",
+      "password": "Password",
+      "rememberMe": "Remember me",
+      "forgotPassword": "Forgot password?",
+      "signIn": "Sign In",
+      "signingIn": "Signing in...",
+      "noAccount": "Don't have an account?",
+      "applyLink": "Apply to become an agent"
+    },
+    "forgotPassword": {
+      "title": "Forgot Password?",
+      "subtitle": "Enter your email address and we'll send you a link to reset your password",
+      "email": "Email Address",
+      "sendReset": "Send Reset Link",
+      "sending": "Sending Reset Link...",
+      "backToSignIn": "Back to Sign In",
+      "success": {
+        "title": "Check Your Email",
+        "message": "We've sent a password reset link to {email}",
+        "note": "Didn't receive the email? Check your spam folder or try again.",
+        "tryAgain": "Try Again"
+      }
+    },
+    "resetPassword": {
+      "title": "Reset Password",
+      "subtitle": "Enter your new password below",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm New Password",
+      "passwordRequirement": "Password must be at least 8 characters long",
+      "resetPassword": "Reset Password",
+      "resetting": "Resetting Password...",
+      "success": {
+        "title": "Password Reset Successful",
+        "message": "Your password has been successfully reset. You can now sign in with your new password."
+      }
+    },
+    "apply": {
+      "title": "Apply to Become an Agent",
+      "subtitle": "Join our network of successful telecommunications agents",
+      "steps": {
+        "personal": "Personal Information",
+        "address": "Address & Experience"
+      },
+      "fields": {
+        "firstName": "First Name",
+        "lastName": "Last Name",
+        "email": "Email Address",
+        "phoneNumber": "Phone Number",
+        "dateOfBirth": "Date of Birth",
+        "address": "Street Address",
+        "city": "City",
+        "state": "State/Province",
+        "zipCode": "ZIP/Postal Code",
+        "country": "Country",
+        "experience": "Relevant Experience",
+        "experiencePlaceholder": "Describe your relevant sales, customer service, or telecommunications experience...",
+        "motivation": "Why do you want to become a PlanetTalk agent?",
+        "motivationPlaceholder": "Tell us about your motivation and goals...",
+        "hasLicense": "I have a valid telecommunications or sales license",
+        "licenseNumber": "License Number"
+      },
+      "navigation": {
+        "previous": "Previous",
+        "next": "Next",
+        "submit": "Submit Application",
+        "submitting": "Submitting..."
+      },
+      "success": {
+        "title": "Application Submitted!",
+        "message": "Thank you for your interest in becoming a PlanetTalk agent. We've received your application and will review it shortly.",
+        "nextSteps": "What's next?",
+        "nextStepsDescription": "Our team will review your application within 2-3 business days. If approved, you'll receive an email with your agent credentials and next steps.",
+        "backToHome": "Back to Home"
+      },
+      "alreadyHaveAccount": "Already have an account?"
+    },
+    "register": {
+      "title": "Create Your Agent Account",
+      "subtitle": "Join the PlanetTalk agent network and start earning today",
+      "fields": {
+        "firstName": "First Name",
+        "lastName": "Last Name",
+        "country": "Country",
+        "phone": "Phone Number",
+        "email": "Email Address",
+        "password": "Password",
+        "confirmPassword": "Confirm Password"
+      },
+      "placeholders": {
+        "firstName": "Enter your first name",
+        "lastName": "Enter your last name",
+        "country": "Select your country",
+        "email": "Enter your email address",
+        "password": "Create a secure password",
+        "confirmPassword": "Confirm your password"
+      },
+      "validation": {
+        "firstNameRequired": "First name is required",
+        "lastNameRequired": "Last name is required",
+        "countryRequired": "Country is required",
+        "countryInvalid": "Please select a valid country",
+        "phoneRequired": "Phone number is required",
+        "phoneInvalid": "Please enter a valid phone number",
+        "emailRequired": "Email is required",
+        "emailInvalid": "Please enter a valid email address",
+        "passwordRequired": "Password is required",
+        "passwordMinLength": "Password must be at least 8 characters long",
+        "passwordMismatch": "Passwords do not match",
+        "agentProgramRequired": "You must accept the Agent Program Terms & Conditions"
+      },
+      "optIn": {
+        "termsPrefix": "I agree to the",
+        "termsLink": "Terms & Conditions",
+        "and": "and",
+        "privacyLink": "Privacy Policy",
+        "newsletter": "I agree to receive newsletters and accept the data privacy statement."
+      },
+      "passwordRequirement": "Must be at least 8 characters long",
+      "submit": "Create Agent Account",
+      "submitting": "Creating Account...",
+      "success": {
+        "title": "Registration Successful!",
+        "subtitle": "What's Next?",
+        "description": "Please check your email for your login credentials. Our team will review your application and send you your temporary password and agent code.",
+        "loginButton": "Go to Login"
+      },
+      "alreadyHaveAccount": "Already have an account?",
+      "signInLink": "Sign in here",
+      "passwordRequirement": "Must be at least 8 characters long"
+    }
+  },
+  "agent": {
+    "title": "My Agent Account",
+    "subtitle": "Manage your agent account, track earnings, and view performance",
+    "stats": {
+      "totalEarnings": "Total Earnings",
+      "availableBalance": "Available Balance",
+      "commissionRate": "Commission Rate",
+      "totalReferrals": "Total Referrals",
+      "activeReferrals": "Active Referrals"
+    },
+    "tabs": {
+      "overview": "Overview",
+      "earnings": "Earnings",
+      "referrals": "Referrals",
+      "payouts": "Payouts"
+    },
+    "earnings": {
+      "title": "Recent Earnings",
+      "description": "Description",
+      "amount": "Amount",
+      "status": "Status",
+      "date": "Date",
+      "empty": "No earnings yet"
+    },
+    "referrals": {
+      "title": "Referral Codes",
+      "subtitle": "Create and manage your referral codes to earn commissions",
+      "code": "Code",
+      "status": "Status",
+      "uses": "Uses",
+      "createdAt": "Created",
+      "empty": "No referral codes yet",
+      "emptyDescription": "Create your first referral code to start earning commissions from customer referrals.",
+      "createCode": "Create New Code",
+      "createCodeTitle": "Create Referral Code",
+      "createCodeDescription": "Generate a new referral code to share with potential customers",
+      "codeGenerated": "Code Generated Successfully!",
+      "copyCode": "Copy Code",
+      "shareCode": "Share Code",
+      "viewDetails": "View Details",
+      "maxUses": "Maximum Uses",
+      "unlimited": "Unlimited",
+      "description": "Description",
+      "descriptionPlaceholder": "Describe this referral code (optional)",
+      "expiryDate": "Expiry Date",
+      "noExpiry": "No Expiry",
+      "codeType": "Code Type",
+      "standard": "Standard",
+      "promotional": "Promotional",
+      "create": "Create Code",
+      "cancel": "Cancel",
+      "copied": "Copied to clipboard!",
+      "sharableLink": "Sharable Link",
+      "qrCode": "QR Code",
+      "analytics": "Analytics",
+      "totalClicks": "Total Clicks",
+      "conversionRate": "Conversion Rate",
+      "lastUsed": "Last Used"
+    },
+    "payouts": {
+      "title": "Payouts",
+      "requestPayout": "Request Payout",
+      "amount": "Amount",
+      "method": "Method",
+      "status": "Status",
+      "date": "Date",
+      "empty": "No payouts yet"
+    },
+    "actions": {
+      "requestPayout": "Request Payout",
+      "copyCode": "Copy Code",
+      "shareCode": "Share Code",
+      "createReferralCode": "Create Referral Code"
+    },
+    "status": {
+      "active": "Active",
+      "pending": "Pending",
+      "suspended": "Suspended"
+    },
+    "tier": {
+      "bronze": "Bronze",
+      "silver": "Silver",
+      "gold": "Gold",
+      "platinum": "Platinum"
+    },
+    "overview": {
+      "accountStatus": "Account Status",
+      "accountStatusDescription": "Your agent account is active and ready to earn",
+      "agentTier": "Agent Tier",
+      "agentTierDescription": "Higher tiers earn better commission rates",
+      "activeReferrals": "Active Referrals",
+      "activeReferralsDescription": "Customers currently using your codes",
+      "performanceOverview": "Performance Overview",
+      "totalReferrals": "Total Referrals",
+      "activeReferralsCount": "Active Referrals",
+      "commissionRate": "Commission Rate",
+      "totalEarnings": "Total Earnings",
+      "accountTimeline": "Account Timeline",
+      "accountCreated": "Account Created",
+      "accountCreatedDescription": "Your agent account was successfully created",
+      "accountActivated": "Account Activated",
+      "accountActivatedDescription": "Your account was activated and ready to earn",
+      "lastActivity": "Last Activity",
+      "lastActivityDescription": "Most recent activity on your account",
+      "unknown": "Unknown",
+      "never": "Never",
+      "notActivated": "Not activated"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome to your Dashboard!",
+    "welcomeBack": "Welcome back, {name}! 👋",
+    "agentId": "Agent ID",
+    "totalEarnings": "Total Earnings",
+    "activeReferrals": "Active Referrals",
+    "availableBalance": "Available Balance",
+    "agentCode": "Agent Code",
+    "welcomeTitle": "🎉 Welcome to PlanetTalk Agent Portal!",
+    "welcomeDescription": "You've successfully logged in as {name}. Your agent dashboard is ready with all the tools you need to grow your telecommunications business.",
+    "nextSteps": "Next Steps:",
+    "shareAgentCode": "Share Your Agent Code",
+    "shareAgentCodeDescription": "Use code {code} to start earning",
+    "trackEarnings": "Track Your Earnings",
+    "trackEarningsDescription": "Monitor customer activity and commissions",
+    "accessTraining": "Access Training",
+    "accessTrainingDescription": "Learn best practices and marketing strategies",
+    "getSupport": "Get Support",
+    "getSupportDescription": "24/7 assistance for all your questions"
+  },
+  "dashboardFooter": {
+    "description": "Agent Portal - Empowering global telecommunications",
+    "support": "Support",
+    "terms": "Terms",
+    "privacy": "Privacy"
+  },
+    "referral": {
+      "loading": "Loading referral information...",
+      "invalidCode": "Invalid Referral Code",
+      "invalidMessage": "This referral code is not valid or has expired.",
+      "visitPlanetTalk": "Visit PlanetTalk",
+      "processing": "Processing...",
+      "required": "Required field"
+    },
+  "profile": {
+    "title": "Profile Settings",
+    "subtitle": "Manage your account settings and preferences",
+    "loadingProfile": "Loading profile...",
+    "saving": "Saving...",
+    "processing": "Processing...",
+    "profileUpdated": "Profile updated successfully!",
+    "preferencesUpdated": "Preferences updated successfully!",
+    "securitySettingsUpdated": "Security settings updated successfully!",
+    "notificationPreferencesUpdated": "Notification preferences updated successfully!",
+    "passwordChanged": "Password changed successfully!",
+    "failedToUpdateProfile": "Failed to update profile",
+    "failedToUpdatePreferences": "Failed to update preferences",
+    "failedToUpdateSecuritySettings": "Failed to update security settings",
+    "failedToUpdateNotificationPreferences": "Failed to update notification preferences",
+    "failedToChangePassword": "Failed to change password",
+    "passwordsDoNotMatch": "New passwords do not match",
+    "passwordTooShort": "Password must be at least 8 characters long",
+    "twoFactorEnabled": "2FA enabled! Please save your backup codes.",
+    "twoFactorEnabledNoQR": "2FA enabled successfully!",
+    "twoFactorDisabled": "2FA disabled successfully!",
+    "failedToToggle2FA": "Failed to toggle 2FA",
+    "emailNotificationsEnabled": "Email notifications enabled!",
+    "emailNotificationsDisabled": "Email notifications disabled!",
+    "failedToToggleEmailNotifications": "Failed to toggle email notifications",
+    
+    "tabs": {
+      "profile": "Profile",
+      "preferences": "Preferences", 
+      "security": "Security",
+      "notifications": "Notifications",
+      "password": "Password"
+    },
+
+    "personalInfo": {
+      "title": "Personal Information",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email Address",
+      "phoneNumber": "Phone Number",
+      "country": "Country",
+      "userId": "User ID",
+      "emailCannotBeChanged": "Email cannot be changed",
+      "userIdCannotBeChanged": "User ID cannot be changed",
+      "countryCannotBeChanged": "Country cannot be changed once set"
+    },
+
+    "preferences": {
+      "title": "General Preferences",
+      "language": "Language",
+      "timezone": "Timezone",
+      "currency": "Currency",
+      "theme": "Theme",
+      "dateFormat": "Date Format",
+      "timeFormat": "Time Format",
+      "themes": {
+        "light": "Light",
+        "dark": "Dark",
+        "auto": "Auto"
+      },
+      "timeFormats": {
+        "12hour": "12-hour",
+        "24hour": "24-hour"
+      }
+    },
+
+    "security": {
+      "title": "Security Settings",
+      "twoFactorAuth": "Two-Factor Authentication",
+      "twoFactorDescription": "Add an extra layer of security to your account",
+      "status": "Status",
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "enable2FA": "Enable 2FA",
+      "disable2FA": "Disable 2FA",
+      "scanQRCode": "Scan QR Code",
+      "backupCodes": "Backup Codes",
+      "backupCodesDescription": "Save these codes in a safe place. You can use them to access your account if you lose your phone.",
+      "loginNotifications": "Login Notifications",
+      "loginNotificationsDescription": "Get notified when someone logs into your account",
+      "requirePasswordChange": "Require Password Change",
+      "requirePasswordChangeDescription": "Force password change on next login",
+      "sessionTimeout": "Session Timeout",
+      "sessionTimeouts": {
+        "15min": "15 minutes",
+        "30min": "30 minutes", 
+        "1hour": "1 hour",
+        "2hours": "2 hours",
+        "4hours": "4 hours"
+      }
+    },
+
+    "notifications": {
+      "title": "Notification Preferences",
+      "emailNotifications": "Email Notifications",
+      "emailToggleDescription": "Quick toggle for all email notifications",
+      "toggleAll": "Toggle All Email",
+      "generalSettings": "General Settings",
+      "smsNotifications": "SMS Notifications",
+      "loginNotifications": "Login Notifications",
+      "specificNotifications": "Specific Notifications",
+      "types": {
+        "payouts": "Payout notifications",
+        "earnings": "Earnings updates",
+        "training": "Training reminders",
+        "announcements": "Announcement notifications",
+        "applications": "Application notifications",
+        "system": "System notifications"
+      }
+    },
+
+    "password": {
+      "title": "Change Password",
+      "currentPassword": "Current Password",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm New Password",
+      "requirements": "Must be at least 8 characters long",
+      "securityTips": {
+        "title": "Password Security Tips",
+        "length": "Use at least 8 characters",
+        "mixedCase": "Include uppercase and lowercase letters",
+        "numbersSpecial": "Include numbers and special characters",
+        "unique": "Don't reuse passwords from other accounts"
+      }
+    },
+
+    "saveProfile": "Save Profile",
+    "savePreferences": "Save Preferences", 
+    "saveSecuritySettings": "Save Security Settings",
+    "saveNotificationPreferences": "Save Notification Preferences",
+    "changePassword": "Change Password",
+    "changingPassword": "Changing Password..."
+  }
+}

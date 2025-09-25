@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+/* Base styles */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    font-family: 'Roboto', ui-sans-serif, system-ui;
+  }
+}
+
+/* Component styles */
+@layer components {
+  .container {
+    @apply mx-auto px-8 max-w-[1440px];
+  }
+  
+  @screen sm {
+    .container {
+      @apply px-10;
+    }
+  }
+  
+  @screen lg {
+    .container {
+      @apply px-12;
+    }
+  }
+  
+  @screen xl {
+    .container {
+      @apply px-32;
+    }
+  }
+
+  /* Button styles */
+  .btn-primary {
+    @apply bg-pt-turquoise text-white px-6 py-3 rounded-lg hover:bg-pt-turquoise-600 transition-colors duration-150 font-medium;
+  }
+  
+  .btn-secondary {
+    @apply bg-transparent text-pt-turquoise border-2 border-pt-turquoise px-6 py-3 rounded-lg hover:bg-pt-turquoise hover:text-white transition-colors duration-150 font-medium;
+  }
+  
+  /* Card styles */
+  .card {
+    @apply bg-white rounded-xl shadow-lg p-6 border border-gray-100;
+  }
+  
+  .card-hover {
+    @apply hover:shadow-xl transition-shadow duration-300;
+  }
+}
+

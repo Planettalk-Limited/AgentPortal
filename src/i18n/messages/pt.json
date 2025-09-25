@@ -1,0 +1,628 @@
+{
+  "navigation": {
+    "agentPortal": "Portal do Agente",
+    "features": "Recursos",
+    "about": "Sobre",
+    "planettalkWebsite": "PlanetTalk.com",
+    "dashboard": "Painel",
+    "agent": "Minha Conta de Agente",
+    "agents": "Agentes",
+    "payouts": "Pagamentos",
+    "users": "Usuários",
+    "profile": "Perfil",
+    "signIn": "Entrar",
+    "signOut": "Sair",
+    "becomeAgent": "Tornar-se Agente",
+    "welcome": "Bem-vindo, {name}"
+  },
+  "hero": {
+    "badge": "Portal do Agente Ao Vivo",
+    "title": "PlanetTalk",
+    "subtitle": "Rede de Agentes",
+    "description": "Junte-se à nossa rede global de telecomunicações. Ganhe comissões compartilhando seu código de agente único e ajudando clientes com recargas em todo o mundo.",
+    "ctaPrimary": "Login do Agente",
+    "ctaSecondary": "Tornar-se Agente",
+    "process": {
+      "step1": {
+        "title": "Candidatar-se Online",
+        "description": "Complete nosso formulário de candidatura simples e aceite os termos e condições"
+      },
+      "step2": {
+        "title": "Obtenha Seu Código",
+        "description": "Receba seu código de agente único e credenciais de acesso ao portal por e-mail"
+      },
+      "step3": {
+        "title": "Comece a Ganhar",
+        "description": "Compartilhe seu código, acompanhe recargas de clientes e ganhe comissões mensais"
+      }
+    }
+  },
+  "features": {
+    "title": "Seu Painel do Portal do Agente",
+    "subtitle": "Acompanhe seus ganhos, gerencie suas indicações e faça crescer seu negócio de telecomunicações com nosso portal de agente abrangente.",
+    "cta": "Inicie Sua Jornada de Agente",
+    "items": {
+      "agentCode": {
+        "title": "Gerenciamento de Código de Agente",
+        "description": "Seu código de agente único é sua chave para ganhar. Compartilhe facilmente e acompanhe seu uso em todas as plataformas.",
+        "benefits": [
+          "Código de agente único compartilhável",
+          "Copiar e compartilhar com um clique",
+          "Integração de redes sociais",
+          "Geração de código QR"
+        ]
+      },
+      "tracking": {
+        "title": "Rastreamento de Uso do Cliente",
+        "description": "Veja exatamente quantos clientes usaram seu código de agente e monitore suas atividades de recarga.",
+        "benefits": [
+          "Estatísticas de uso do cliente",
+          "Rastreamento de atividade de recarga",
+          "Métricas de retenção de cliente",
+          "Análise de tendências de crescimento"
+        ]
+      },
+      "earnings": {
+        "title": "Relatórios de Ganhos Mensais",
+        "description": "Receba relatórios detalhados de ganhos mensais mostrando sua divisão de comissões e resumos de pagamento.",
+        "benefits": [
+          "Resumos de comissões mensais",
+          "Atualizações automatizadas de ganhos",
+          "Notificações de pagamento",
+          "Dados históricos de ganhos"
+        ]
+      },
+      "training": {
+        "title": "Treinamento e Recursos",
+        "description": "Acesse materiais de treinamento abrangentes, guias de marketing e documentação de conformidade.",
+        "benefits": [
+          "Guias e modelos de marketing",
+          "Documentação de conformidade",
+          "Materiais de treinamento em vídeo",
+          "Guias de melhores práticas"
+        ]
+      },
+      "announcements": {
+        "title": "Anúncios e Atualizações",
+        "description": "Mantenha-se informado com anúncios importantes, atualizações do sistema e novas oportunidades.",
+        "benefits": [
+          "Anúncios do sistema",
+          "Atualizações de novos recursos",
+          "Oportunidades promocionais",
+          "Notificações importantes"
+        ]
+      },
+      "checklist": {
+        "title": "Lista de Verificação de Início",
+        "description": "Siga nossa lista de verificação de integração passo a passo para colocar seu negócio de agente em funcionamento rapidamente.",
+        "benefits": [
+          "Integração passo a passo",
+          "Rastreamento de progresso",
+          "Etapas de conformidade necessárias",
+          "Marcos de sucesso"
+        ]
+      }
+    }
+  },
+  "about": {
+    "title": "Sua Jornada de Agente",
+    "subtitle": "Da candidatura às comissões mensais - veja como nosso sistema automatizado funciona para você.",
+    "steps": {
+      "registration": {
+        "title": "Registro",
+        "description": "Processo de candidatura online rápido e fácil",
+        "items": [
+          "Preencher formulário de candidatura online",
+          "Aceitar Termos e Condições digitais",
+          "Receber e-mail/SMS de confirmação automatizado"
+        ]
+      },
+      "approval": {
+        "title": "Verificação e Aprovação",
+        "description": "Processo automatizado de verificação e aprovação do sistema",
+        "items": [
+          "Verificação automática da candidatura",
+          "Geração de código de agente único",
+          "Credenciais de login enviadas por e-mail"
+        ]
+      },
+      "portal": {
+        "title": "Acesso ao Portal",
+        "description": "Painel completo com todas suas ferramentas de negócio",
+        "items": [
+          "Rastrear clientes usando seu código de agente",
+          "Monitorar atividades de recarga e comissões",
+          "Compartilhar seu código via e-mail e redes sociais",
+          "Acessar materiais de treinamento e recursos"
+        ]
+      }
+    },
+    "stats": {
+      "title": "Junte-se à Nossa Rede em Crescimento",
+      "activeAgents": "Agentes Ativos",
+      "countries": "Países",
+      "earningsPaid": "Ganhos Pagos",
+      "support": "Suporte"
+    }
+  },
+  "footer": {
+    "agentPortal": "Portal do Agente",
+    "description": "Capacitando agentes de telecomunicações em todo o mundo com ferramentas de gerenciamento abrangentes e análises em tempo real para fazer crescer seus negócios de forma eficiente.",
+    "downloadApp": "Baixar App PlanetTalk",
+    "sections": {
+      "platform": "Plataforma",
+      "support": "Suporte",
+      "company": "Empresa"
+    },
+    "links": {
+      "agentSignIn": "Login do Agente",
+      "becomeAgent": "Tornar-se Agente",
+      "dashboard": "Painel",
+      "helpSupport": "Ajuda e Suporte",
+      "contactSupport": "Contatar Suporte",
+      "agentResources": "Recursos do Agente",
+      "planettalkWebsite": "PlanetTalk.com",
+      "blog": "Blog",
+      "partnerWithUs": "Seja Nosso Parceiro",
+      "termsConditions": "Termos e Condições",
+      "privacyPolicy": "Política de Privacidade",
+      "cookiePolicy": "Política de Cookies"
+    },
+    "copyright": "© {year} PlanetTalk Limited. Todos os direitos reservados."
+  },
+  "auth": {
+    "login": {
+      "title": "Bem-vindo de Volta",
+      "subtitle": "Entre na sua conta de agente",
+      "email": "Endereço de E-mail",
+      "password": "Senha",
+      "rememberMe": "Lembrar de mim",
+      "forgotPassword": "Esqueceu a senha?",
+      "signIn": "Entrar",
+      "signingIn": "Entrando...",
+      "noAccount": "Não tem uma conta?",
+      "applyLink": "Candidatar-se para ser agente"
+    },
+    "forgotPassword": {
+      "title": "Esqueceu a Senha?",
+      "subtitle": "Digite seu endereço de e-mail e enviaremos um link para redefinir sua senha",
+      "email": "Endereço de E-mail",
+      "sendReset": "Enviar Link de Redefinição",
+      "sending": "Enviando Link de Redefinição...",
+      "backToSignIn": "Voltar ao Login",
+      "success": {
+        "title": "Verifique Seu E-mail",
+        "message": "Enviamos um link de redefinição de senha para {email}",
+        "note": "Não recebeu o e-mail? Verifique sua pasta de spam ou tente novamente.",
+        "tryAgain": "Tentar Novamente"
+      }
+    },
+    "resetPassword": {
+      "title": "Redefinir Senha",
+      "subtitle": "Digite sua nova senha abaixo",
+      "newPassword": "Nova Senha",
+      "confirmPassword": "Confirmar Nova Senha",
+      "passwordRequirement": "A senha deve ter pelo menos 8 caracteres",
+      "resetPassword": "Redefinir Senha",
+      "resetting": "Redefinindo Senha...",
+      "success": {
+        "title": "Redefinição de Senha Bem-sucedida",
+        "message": "Sua senha foi redefinida com sucesso. Agora você pode entrar com sua nova senha."
+      }
+    },
+    "apply": {
+      "title": "Candidatar-se para Ser Agente",
+      "subtitle": "Junte-se à nossa rede de agentes de telecomunicações bem-sucedidos",
+      "steps": {
+        "personal": "Informações Pessoais",
+        "address": "Endereço e Experiência"
+      },
+      "fields": {
+        "firstName": "Primeiro Nome",
+        "lastName": "Sobrenome",
+        "email": "Endereço de E-mail",
+        "phoneNumber": "Número de Telefone",
+        "dateOfBirth": "Data de Nascimento",
+        "address": "Endereço",
+        "city": "Cidade",
+        "state": "Estado/Província",
+        "zipCode": "CEP/Código Postal",
+        "country": "País",
+        "experience": "Experiência Relevante",
+        "experiencePlaceholder": "Descreva sua experiência relevante em vendas, atendimento ao cliente ou telecomunicações...",
+        "motivation": "Por que você quer se tornar um agente PlanetTalk?",
+        "motivationPlaceholder": "Conte-nos sobre sua motivação e objetivos...",
+        "hasLicense": "Tenho uma licença válida de telecomunicações ou vendas",
+        "licenseNumber": "Número da Licença"
+      },
+      "navigation": {
+        "previous": "Anterior",
+        "next": "Próximo",
+        "submit": "Enviar Candidatura",
+        "submitting": "Enviando..."
+      },
+      "success": {
+        "title": "Candidatura Enviada!",
+        "message": "Obrigado pelo seu interesse em se tornar um agente PlanetTalk. Recebemos sua candidatura e a revisaremos em breve.",
+        "nextSteps": "O que vem a seguir?",
+        "nextStepsDescription": "Nossa equipe revisará sua candidatura em 2-3 dias úteis. Se aprovada, você receberá um e-mail com suas credenciais de agente e próximos passos.",
+        "backToHome": "Voltar ao Início"
+      },
+      "alreadyHaveAccount": "Já tem uma conta?"
+    },
+    "register": {
+      "title": "Crie Sua Conta de Agente",
+      "subtitle": "Junte-se à rede de agentes PlanetTalk e comece a ganhar hoje",
+      "fields": {
+        "firstName": "Primeiro Nome",
+        "lastName": "Sobrenome",
+        "country": "País",
+        "email": "Endereço de E-mail",
+        "password": "Senha",
+        "confirmPassword": "Confirmar Senha"
+      },
+      "placeholders": {
+        "firstName": "Digite seu primeiro nome",
+        "lastName": "Digite seu sobrenome",
+        "country": "Selecione seu país",
+        "email": "Digite seu endereço de e-mail",
+        "password": "Crie uma senha segura",
+        "confirmPassword": "Confirme sua senha"
+      },
+      "validation": {
+        "firstNameRequired": "O primeiro nome é obrigatório",
+        "lastNameRequired": "O sobrenome é obrigatório",
+        "countryRequired": "O país é obrigatório",
+        "countryInvalid": "Por favor selecione um país válido",
+        "emailRequired": "O e-mail é obrigatório",
+        "emailInvalid": "Por favor, digite um endereço de e-mail válido",
+        "passwordRequired": "A senha é obrigatória",
+        "passwordMinLength": "A senha deve ter pelo menos 8 caracteres",
+        "passwordMismatch": "As senhas não coincidem",
+        "termsRequired": "Você deve aceitar os termos e condições"
+      },
+      "optIn": {
+        "termsPrefix": "Concordo com os",
+        "termsLink": "Termos e Condições",
+        "and": "e a",
+        "privacyLink": "Política de Privacidade",
+        "newsletter": "Concordo em receber newsletters e aceito a declaração de privacidade de dados."
+      },
+      "submit": "Criar Conta de Agente",
+      "submitting": "Criando Conta...",
+      "success": {
+        "title": "Registro Bem-sucedido!",
+        "subtitle": "O Que Vem a Seguir?",
+        "description": "Por favor, verifique seu e-mail para suas credenciais de login. Nossa equipe revisará sua candidatura e enviará sua senha temporária e código de agente.",
+        "loginButton": "Ir para Login"
+      },
+      "alreadyHaveAccount": "Já tem uma conta?",
+      "signInLink": "Faça login aqui",
+      "passwordRequirement": "Deve ter pelo menos 8 caracteres"
+    }
+  },
+  "agent": {
+    "title": "Minha Conta de Agente",
+    "subtitle": "Gerencie sua conta de agente, acompanhe ganhos e veja o desempenho",
+    "stats": {
+      "totalEarnings": "Ganhos Totais",
+      "availableBalance": "Saldo Disponível",
+      "commissionRate": "Taxa de Comissão",
+      "totalReferrals": "Indicações Totais",
+      "activeReferrals": "Indicações Ativas"
+    },
+    "tabs": {
+      "overview": "Visão Geral",
+      "earnings": "Ganhos",
+      "referrals": "Indicações",
+      "payouts": "Pagamentos"
+    },
+    "earnings": {
+      "title": "Ganhos Recentes",
+      "description": "Descrição",
+      "amount": "Valor",
+      "status": "Status",
+      "date": "Data",
+      "empty": "Ainda não há ganhos"
+    },
+    "referrals": {
+      "title": "Códigos de Indicação",
+      "subtitle": "Crie e gerencie seus códigos de indicação para ganhar comissões",
+      "code": "Código",
+      "status": "Status",
+      "uses": "Usos",
+      "createdAt": "Criado",
+      "empty": "Ainda não há códigos de indicação",
+      "emptyDescription": "Crie seu primeiro código de indicação para começar a ganhar comissões de indicações de clientes.",
+      "createCode": "Criar Novo Código",
+      "createCodeTitle": "Criar Código de Indicação",
+      "createCodeDescription": "Gere um novo código de indicação para compartilhar com clientes potenciais",
+      "codeGenerated": "Código Gerado com Sucesso!",
+      "copyCode": "Copiar Código",
+      "shareCode": "Compartilhar Código",
+      "viewDetails": "Ver Detalhes",
+      "maxUses": "Usos Máximos",
+      "unlimited": "Ilimitado",
+      "description": "Descrição",
+      "descriptionPlaceholder": "Descreva este código de indicação (opcional)",
+      "expiryDate": "Data de Vencimento",
+      "noExpiry": "Sem Vencimento",
+      "codeType": "Tipo de Código",
+      "standard": "Padrão",
+      "promotional": "Promocional",
+      "create": "Criar Código",
+      "cancel": "Cancelar",
+      "copied": "Copiado para a área de transferência!",
+      "sharableLink": "Link Compartilhável",
+      "qrCode": "Código QR",
+      "analytics": "Análises",
+      "totalClicks": "Total de Cliques",
+      "conversionRate": "Taxa de Conversão",
+      "lastUsed": "Último Uso"
+    },
+    "payouts": {
+      "title": "Pagamentos",
+      "requestPayout": "Solicitar Pagamento",
+      "amount": "Valor",
+      "method": "Método",
+      "status": "Status",
+      "date": "Data",
+      "empty": "Ainda não há pagamentos"
+    },
+    "actions": {
+      "requestPayout": "Solicitar Pagamento",
+      "copyCode": "Copiar Código",
+      "shareCode": "Compartilhar Código",
+      "createReferralCode": "Criar Código de Indicação"
+    },
+    "status": {
+      "active": "Ativo",
+      "pending": "Pendente",
+      "suspended": "Suspenso"
+    },
+    "tier": {
+      "bronze": "Bronze",
+      "silver": "Prata",
+      "gold": "Ouro",
+      "platinum": "Platina"
+    },
+    "overview": {
+      "accountStatus": "Status da Conta",
+      "accountStatusDescription": "Sua conta de agente está ativa e pronta para ganhar",
+      "agentTier": "Nível do Agente",
+      "agentTierDescription": "Níveis mais altos ganham melhores taxas de comissão",
+      "activeReferrals": "Indicações Ativas",
+      "activeReferralsDescription": "Clientes atualmente usando seus códigos",
+      "performanceOverview": "Visão Geral do Desempenho",
+      "totalReferrals": "Indicações Totais",
+      "activeReferralsCount": "Indicações Ativas",
+      "commissionRate": "Taxa de Comissão",
+      "totalEarnings": "Ganhos Totais",
+      "accountTimeline": "Cronologia da Conta",
+      "accountCreated": "Conta Criada",
+      "accountCreatedDescription": "Sua conta de agente foi criada com sucesso",
+      "accountActivated": "Conta Ativada",
+      "accountActivatedDescription": "Sua conta foi ativada e está pronta para ganhar",
+      "lastActivity": "Última Atividade",
+      "lastActivityDescription": "Atividade mais recente em sua conta",
+      "unknown": "Desconhecido",
+      "never": "Nunca",
+      "notActivated": "Não ativada"
+    }
+  },
+  "dashboard": {
+    "title": "Painel",
+    "welcome": "Bem-vindo ao seu Painel!",
+    "welcomeBack": "Bem-vindo de volta, {name}! 👋",
+    "agentId": "ID do Agente",
+    "totalEarnings": "Ganhos Totais",
+    "activeReferrals": "Indicações Ativas",
+    "availableBalance": "Saldo Disponível",
+    "agentCode": "Código do Agente",
+    "welcomeTitle": "🎉 Bem-vindo ao Portal do Agente PlanetTalk!",
+    "welcomeDescription": "Você fez login com sucesso como {name}. Seu painel de agente está pronto com todas as ferramentas necessárias para expandir seu negócio de telecomunicações.",
+    "nextSteps": "Próximos Passos:",
+    "shareAgentCode": "Compartilhe Seu Código de Agente",
+    "shareAgentCodeDescription": "Use o código {code} para começar a ganhar",
+    "trackEarnings": "Acompanhe Seus Ganhos",
+    "trackEarningsDescription": "Monitore atividade de clientes e comissões",
+    "accessTraining": "Acesse Treinamento",
+    "accessTrainingDescription": "Aprenda melhores práticas e estratégias de marketing",
+    "getSupport": "Obtenha Suporte",
+    "getSupportDescription": "Assistência 24/7 para todas as suas perguntas"
+  },
+  "dashboardFooter": {
+    "description": "Portal do Agente - Capacitando telecomunicações globais",
+    "support": "Suporte",
+    "terms": "Termos",
+    "privacy": "Privacidade"
+  },
+    "referral": {
+      "loading": "Carregando informações de indicação...",
+      "invalidCode": "Código de Indicação Inválido",
+      "invalidMessage": "Este código de indicação não é válido ou expirou.",
+      "visitPlanetTalk": "Visitar PlanetTalk",
+      "processing": "Processando...",
+      "required": "Campo obrigatório"
+    },
+  "profile": {
+    "title": "Configurações do Perfil",
+    "subtitle": "Gerencie as configurações da sua conta e preferências",
+    "loading": "Carregando seu perfil...",
+    "loadingProfile": "Carregando perfil...",
+    "saving": "Salvando...",
+    "processing": "Processando...",
+    "unableToLoad": "Não foi possível carregar os dados do perfil.",
+    "profileUpdated": "Perfil atualizado com sucesso!",
+    "preferencesUpdated": "Preferências atualizadas com sucesso!",
+    "securitySettingsUpdated": "Configurações de segurança atualizadas com sucesso!",
+    "notificationPreferencesUpdated": "Preferências de notificação atualizadas com sucesso!",
+    "passwordChanged": "Senha alterada com sucesso!",
+    "saveProfile": "Salvar Perfil",
+    "savePreferences": "Salvar Preferências",
+    "saveSecuritySettings": "Salvar Configurações de Segurança",
+    "saveNotificationPreferences": "Salvar Preferências de Notificação",
+    "changePassword": "Alterar Senha",
+    "changingPassword": "Alterando senha...",
+    "failedToUpdateProfile": "Falha ao atualizar o perfil",
+    "failedToUpdatePreferences": "Falha ao atualizar as preferências",
+    "failedToUpdateSecuritySettings": "Falha ao atualizar as configurações de segurança",
+    "failedToUpdateNotificationPreferences": "Falha ao atualizar as preferências de notificação",
+    "failedToChangePassword": "Falha ao alterar a senha",
+    "passwordsDoNotMatch": "As novas senhas não coincidem",
+    "passwordTooShort": "A senha deve ter pelo menos 8 caracteres",
+    "twoFactorEnabled": "2FA ativado! Salve seus códigos de backup.",
+    "twoFactorEnabledNoQR": "2FA ativado com sucesso!",
+    "twoFactorDisabled": "2FA desativado com sucesso!",
+    "failedToToggle2FA": "Falha ao alternar 2FA",
+    "emailNotificationsEnabled": "Notificações por e-mail ativadas!",
+    "emailNotificationsDisabled": "Notificações por e-mail desativadas!",
+    "failedToToggleEmailNotifications": "Falha ao alternar notificações por e-mail",
+    "tabs": {
+      "profile": "Perfil",
+      "preferences": "Preferências",
+      "security": "Segurança",
+      "notifications": "Notificações",
+      "password": "Senha"
+    },
+
+    "personalInfo": {
+      "title": "Informações Pessoais",
+      "firstName": "Nome",
+      "lastName": "Sobrenome",
+      "email": "Endereço de E-mail",
+      "phoneNumber": "Número de Telefone",
+      "country": "País",
+      "userId": "ID do Usuário",
+      "emailCannotBeChanged": "O e-mail não pode ser alterado",
+      "userIdCannotBeChanged": "O ID do usuário não pode ser alterado",
+      "countryCannotBeChanged": "O país não pode ser alterado uma vez definido"
+    },
+
+    "preferences": {
+      "title": "Preferências Gerais",
+      "language": "Idioma",
+      "timezone": "Fuso Horário",
+      "currency": "Moeda",
+      "theme": "Tema",
+      "dateFormat": "Formato de Data",
+      "timeFormat": "Formato de Hora",
+      "themes": {
+        "light": "Claro",
+        "dark": "Escuro",
+        "auto": "Automático"
+      },
+      "timeFormats": {
+        "12hour": "12 horas",
+        "24hour": "24 horas"
+      }
+    },
+
+    "security": {
+      "title": "Configurações de Segurança",
+      "twoFactorAuth": "Autenticação de Dois Fatores",
+      "twoFactorDescription": "Adicione uma camada extra de segurança à sua conta",
+      "status": "Status",
+      "enabled": "Ativado",
+      "disabled": "Desativado",
+      "enable2FA": "Ativar 2FA",
+      "disable2FA": "Desativar 2FA",
+      "scanQRCode": "Escanear Código QR",
+      "backupCodes": "Códigos de Backup",
+      "backupCodesDescription": "Guarde estes códigos em um local seguro. Você pode usá-los para acessar sua conta se perder seu telefone.",
+      "loginNotifications": "Notificações de Login",
+      "loginNotificationsDescription": "Receba notificações quando alguém fizer login na sua conta",
+      "requirePasswordChange": "Exigir Alteração de Senha",
+      "requirePasswordChangeDescription": "Forçar alteração de senha no próximo login",
+      "sessionTimeout": "Tempo Limite da Sessão",
+      "sessionTimeouts": {
+        "15min": "15 minutos",
+        "30min": "30 minutos",
+        "1hour": "1 hora",
+        "2hours": "2 horas",
+        "4hours": "4 horas"
+      }
+    },
+
+    "notifications": {
+      "title": "Preferências de Notificação",
+      "emailNotifications": "Notificações por E-mail",
+      "emailToggleDescription": "Alternar rapidamente todas as notificações por e-mail",
+      "toggleAll": "Alternar Todos os E-mails",
+      "generalSettings": "Configurações Gerais",
+      "smsNotifications": "Notificações por SMS",
+      "loginNotifications": "Notificações de Login",
+      "specificNotifications": "Notificações Específicas",
+      "types": {
+        "payouts": "Notificações de pagamento",
+        "earnings": "Atualizações de ganhos",
+        "training": "Lembretes de treinamento",
+        "announcements": "Notificações de anúncios",
+        "applications": "Notificações de aplicações",
+        "system": "Notificações do sistema"
+      }
+    },
+
+    "password": {
+      "title": "Alterar Senha",
+      "currentPassword": "Senha Atual",
+      "newPassword": "Nova Senha",
+      "confirmPassword": "Confirmar Nova Senha",
+      "requirements": "Deve ter pelo menos 8 caracteres",
+      "securityTips": {
+        "title": "Dicas de Segurança da Senha",
+        "length": "Use pelo menos 8 caracteres",
+        "mixedCase": "Inclua letras maiúsculas e minúsculas",
+        "numbersSpecial": "Inclua números e caracteres especiais",
+        "unique": "Não reutilize senhas de outras contas"
+      }
+    },
+
+    "personalInformation": "Informações Pessoais",
+    "personalInformationDescription": "Atualize seus detalhes pessoais e informações de contato.",
+    "accountInformation": "Informações da Conta",
+    "quickStats": "Estatísticas Rápidas",
+    "regionalSettings": "Configurações Regionais",
+    "notificationSettings": "Configurações de Notificação",
+    "passwordSecurity": "Segurança da Senha",
+    "passwordSecurityDescription": "Gerencie sua senha e preferências de segurança.",
+    "preferencesDescription": "Personalize sua experiência no painel, configurações de notificação e preferências da conta.",
+    "firstName": "Nome",
+    "lastName": "Sobrenome",
+    "username": "Nome de Usuário",
+    "email": "Endereço de E-mail",
+    "phoneNumber": "Número de Telefone",
+    "agentId": "ID do Agente",
+    "accountStatus": "Status da Conta",
+    "role": "Função",
+    "memberSince": "Membro desde",
+    "lastUpdated": "Última Atualização",
+    "totalEarnings": "Ganhos Totais",
+    "activeCustomers": "Clientes Ativos",
+    "referrals": "Indicações",
+    "conversionRate": "Taxa de Conversão",
+    "language": "Idioma",
+    "timezone": "Fuso Horário",
+    "currency": "Moeda",
+    "emailNotifications": "Notificações por E-mail",
+    "smsNotifications": "Notificações SMS",
+    "twoFactorAuthentication": "Autenticação de Dois Fatores",
+    "loginNotifications": "Notificações de Login",
+    "currentPassword": "Senha Atual",
+    "newPassword": "Nova Senha",
+    "confirmNewPassword": "Confirmar Nova Senha",
+    "passwordHint": "Escolha uma senha forte com uma mistura de letras, números e símbolos.",
+    "passwordMinLength": "Deve ter pelo menos 8 caracteres",
+    "activeAgent": "Agente Ativo",
+    "updateProfile": "Atualizar Perfil",
+    "changePassword": "Alterar Senha",
+    "updatePassword": "Atualizar Senha",
+    "saveChanges": "Salvar Alterações",
+    "resetForm": "Redefinir Formulário",
+    "profileUpdated": "Perfil atualizado com sucesso!",
+    "passwordUpdated": "Senha atualizada com sucesso!",
+    "failedToUpdateProfile": "Falha ao atualizar o perfil",
+    "failedToChangePassword": "Falha ao alterar a senha",
+    "passwordsDoNotMatch": "As novas senhas não coincidem"
+  }
+}
