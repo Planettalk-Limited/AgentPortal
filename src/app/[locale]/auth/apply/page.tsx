@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import Link from 'next/link'
 import { useTranslations, useLocale } from 'next-intl'
 import { api, ApiError } from '@/lib/api'
@@ -22,7 +22,7 @@ interface FormData {
   licenseNumber: string
 }
 
-export default function ApplyPage() {
+function ApplyPageContent() {
   const [formData, setFormData] = useState<FormData>({
     firstName: '',
     lastName: '',
@@ -482,5 +482,17 @@ export default function ApplyPage() {
         </p>
       </div>
     </div>
+  )
+}
+
+export default function ApplyPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pt-turquoise"></div>
+      </div>
+    }>
+      <ApplyPageContent />
+    </Suspense>
   )
 }
