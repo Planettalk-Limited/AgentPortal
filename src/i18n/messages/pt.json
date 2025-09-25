@@ -257,6 +257,7 @@
         "firstName": "Primeiro Nome",
         "lastName": "Sobrenome",
         "country": "País",
+        "phone": "Número de Telefone",
         "email": "Endereço de E-mail",
         "password": "Senha",
         "confirmPassword": "Confirmar Senha"
@@ -615,14 +616,9 @@
     "passwordMinLength": "Deve ter pelo menos 8 caracteres",
     "activeAgent": "Agente Ativo",
     "updateProfile": "Atualizar Perfil",
-    "changePassword": "Alterar Senha",
     "updatePassword": "Atualizar Senha",
     "saveChanges": "Salvar Alterações",
     "resetForm": "Redefinir Formulário",
-    "profileUpdated": "Perfil atualizado com sucesso!",
-    "passwordUpdated": "Senha atualizada com sucesso!",
-    "failedToUpdateProfile": "Falha ao atualizar o perfil",
-    "failedToChangePassword": "Falha ao alterar a senha",
-    "passwordsDoNotMatch": "As novas senhas não coincidem"
+    "passwordUpdated": "Senha atualizada com sucesso!"
   }
 }

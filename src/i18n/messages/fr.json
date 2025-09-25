@@ -257,6 +257,7 @@
         "firstName": "Prénom",
         "lastName": "Nom de famille",
         "country": "Pays",
+        "phone": "Numéro de Téléphone",
         "email": "Adresse E-mail",
         "password": "Mot de Passe",
         "confirmPassword": "Confirmer le Mot de Passe"

@@ -18,7 +18,7 @@ export interface User {
   isFirstLogin?: boolean;
   metadata?: {
     twoFactorEnabled?: boolean;
-    [key: string]: any;
+    [key: string]: string | number | boolean | null | undefined;
   };
   preferences?: {
     emailNotifications?: boolean;
@@ -26,20 +26,20 @@ export interface User {
     language?: string;
     timezone?: string;
     currency?: string;
-    [key: string]: any;
+    [key: string]: string | number | boolean | null | undefined;
   };
   settings?: {
     twoFactorEnabled?: boolean;
     requirePasswordChange?: boolean;
     loginNotifications?: boolean;
     sessionTimeout?: number;
-    [key: string]: any;
+    [key: string]: string | number | boolean | null | undefined;
   };
   adminSettings?: {
     permissions?: string[];
-    [key: string]: any;
+    [key: string]: string | number | boolean | string[] | null | undefined;
   };
-  agents?: any[]; // Can be refined later if needed
+  agents?: Array<{ id: string; agentCode: string; status: string; [key: string]: unknown }>;
   createdAt: string;
   updatedAt: string;
   fullName?: string;
@@ -463,12 +463,12 @@ export interface Payout {
       lastLoginAt?: string;
       emailVerifiedAt?: string;
       isFirstLogin: boolean;
-      metadata?: Record<string, any>;
+      metadata?: Record<string, string | number | boolean | null | undefined>;
       createdAt: string;
       updatedAt: string;
     };
   };
-  processor?: any;
+  processor?: { id: string; name: string; type: string; [key: string]: unknown };
 }
 
 export interface CreatePayoutRequest {
@@ -636,13 +636,13 @@ export interface BulkEarningsActionResponse {
 export interface BulkUserActionRequest {
   userIds: string[];
   action: 'updateStatus' | 'updateRole' | 'delete';
-  parameters: Record<string, any>;
+  parameters: Record<string, string | number | boolean | null | undefined>;
 }
 
 export interface BulkPayoutActionRequest {
   payoutIds: string[];
   action: 'approve' | 'reject' | 'process';
-  parameters?: Record<string, any>;
+  parameters?: Record<string, string | number | boolean | null | undefined>;
 }
 
 // Email Templates
@@ -655,14 +655,14 @@ export interface EmailTemplate {
 
 export interface EmailPreviewRequest {
   templateName: string;
-  templateData: Record<string, any>;
+  templateData: Record<string, string | number | boolean | null | undefined>;
 }
 
 export interface SendTestEmailRequest {
   templateName: string;
   testEmail: string;
   subject: string;
-  templateData: Record<string, any>;
+  templateData: Record<string, string | number | boolean | null | undefined>;
 }
 
 // System Settings
@@ -695,7 +695,7 @@ export interface AuditLog {
   action: string;
   resource: string;
   resourceId?: string;
-  details: Record<string, any>;
+  details: Record<string, string | number | boolean | null | undefined>;
   ipAddress: string;
   userAgent: string;
   createdAt: string;
