@@ -933,7 +933,7 @@ export default function PayoutsPage() {
                   <div>
                     <h4 className="font-medium text-yellow-900 mb-1">Processing Payment</h4>
                     <p className="text-sm text-yellow-800">
-                      This will mark the payout as "processing" and initiate the payment workflow. 
+                      This will mark the payout as &quot;processing&quot; and initiate the payment workflow. 
                       The agent will be notified that their payment is being processed.
                     </p>
                   </div>

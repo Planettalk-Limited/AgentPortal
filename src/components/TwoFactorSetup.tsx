@@ -89,7 +89,7 @@ export default function TwoFactorSetup({ onSetupComplete, onCancel }: TwoFactorS
           </div>
 
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-left">
-            <h4 className="font-semibold text-blue-900 mb-2">What you'll need:</h4>
+            <h4 className="font-semibold text-blue-900 mb-2">What you&apos;ll need:</h4>
             <ul className="text-sm text-blue-800 space-y-1">
               <li>• Google Authenticator, Authy, or similar app</li>
               <li>• Your smartphone or tablet</li>
@@ -135,7 +135,7 @@ export default function TwoFactorSetup({ onSetupComplete, onCancel }: TwoFactorS
             />
             
             <div className="text-xs text-pt-light-gray">
-              <p className="mb-2">Can't scan? Enter this code manually:</p>
+              <p className="mb-2">Can&apos;t scan? Enter this code manually:</p>
               <code className="bg-gray-100 px-2 py-1 rounded text-xs break-all">
                 {manualKey}
               </code>

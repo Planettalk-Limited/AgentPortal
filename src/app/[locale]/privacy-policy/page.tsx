@@ -14,7 +14,7 @@ export default function PrivacyPolicyPage() {
               <h2 className="section-title">Introduction</h2>
               <div>
                 <p>At Planet Talk looking after the personal data you share with us is important to us. We want you to be confident that your data is safe and secure with us and understand how we use it to offer you a better and more personalised experience.</p>
-                <p>We are committed to doing the right thing when it comes to how we collect, use and protect your personal data. That's why we've developed this privacy and cookies policy ("Policy"), which:</p>
+                <p>We are committed to doing the right thing when it comes to how we collect, use and protect your personal data. That&apos;s why we&apos;ve developed this privacy and cookies policy (&quot;Policy&quot;), which:</p>
               
                 <ul className="space-y-3 document-list">
                   <li>Sets out the types of personal data that we collect</li>
@@ -31,8 +31,8 @@ export default function PrivacyPolicyPage() {
               
               <div>
                 <div className="document-subsection">
-                  <p className="font-medium mb-2">The Data Controller is Planettalk Limited (collectively referred to as "we" or "us" in this Policy).</p>
-                  <p>We offer different products and services, so we want you to be clear about what the Policy covers. If you use any website ("our Website") or mobile applications ("our Mobile Apps") where this Policy is posted (collectively known as "our Services"), then this Policy applies to you.</p>
+                  <p className="font-medium mb-2">The Data Controller is Planettalk Limited (collectively referred to as &quot;we&quot; or &quot;us&quot; in this Policy).</p>
+                  <p>We offer different products and services, so we want you to be clear about what the Policy covers. If you use any website (&quot;our Website&quot;) or mobile applications (&quot;our Mobile Apps&quot;) where this Policy is posted (collectively known as &quot;our Services&quot;), then this Policy applies to you.</p>
                 </div>
                 
                 <div>

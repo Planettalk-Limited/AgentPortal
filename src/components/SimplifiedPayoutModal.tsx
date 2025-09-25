@@ -331,7 +331,7 @@ const SimplifiedPayoutModal: React.FC<SimplifiedPayoutModalProps> = ({
     }
 
     // Build payment details based on selected method
-    let paymentDetails: any = {}
+    const paymentDetails: any = {}
     
     if (method === 'bank_transfer') {
       if (!bankDetails.accountNumber || !bankDetails.routingNumber || !bankDetails.accountName || !bankDetails.bankName) {
@@ -587,7 +587,7 @@ const SimplifiedPayoutModal: React.FC<SimplifiedPayoutModalProps> = ({
                               ))
                             ) : (
                               <div className="px-4 py-3 text-gray-500 text-sm text-center">
-                                No countries found matching "{countrySearch}"
+                                No countries found matching &quot;{countrySearch}&quot;
                               </div>
                             )}
                           </div>

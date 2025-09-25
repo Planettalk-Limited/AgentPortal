@@ -126,7 +126,7 @@ export default function ReferralPage() {
           </div>
           <h2 className="text-2xl font-bold text-pt-dark-gray mb-2">Perfect! 🎉</h2>
           <p className="text-pt-light-gray mb-6">
-            You're all set! Taking you to PlanetTalk now to get your amazing airtime savings...
+            You&apos;re all set! Taking you to PlanetTalk now to get your amazing airtime savings...
           </p>
           <div className="animate-pulse">
             <div className="h-2 bg-pt-turquoise-200 rounded-full">
@@ -169,7 +169,7 @@ export default function ReferralPage() {
                 </p>
                 <div className="bg-white bg-opacity-15 rounded-xl p-4 max-w-md mx-auto">
                   <p className="text-sm text-pt-turquoise-100 mb-2">
-                    🎉 You're just one step away from amazing savings!
+                    🎉 You&apos;re just one step away from amazing savings!
                   </p>
                 </div>
               </div>
@@ -183,7 +183,7 @@ export default function ReferralPage() {
                     Almost there! Just 2 quick details
                   </h2>
                   <p className="text-pt-light-gray mb-4">
-                    We'll take you straight to PlanetTalk after this to complete your airtime top-up
+                    We&apos;ll take you straight to PlanetTalk after this to complete your airtime top-up
                   </p>
                   <div className="bg-pt-turquoise-50 border border-pt-turquoise-200 rounded-lg p-4 text-left">
                     <div className="flex items-start space-x-3">
@@ -260,7 +260,7 @@ export default function ReferralPage() {
                   
                   <div className="text-center">
                     <p className="text-xs text-pt-light-gray">
-                      By continuing, you agree to PlanetTalk's terms and privacy policy
+                      By continuing, you agree to PlanetTalk&apos;s terms and privacy policy
                     </p>
                   </div>
                 </form>
@@ -279,7 +279,7 @@ export default function ReferralPage() {
                     <div className="flex items-start space-x-3">
                       <div className="w-6 h-6 bg-pt-turquoise text-white rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold">1</div>
                       <p className="text-pt-turquoise-700">
-                        <span className="font-medium">We'll redirect you to PlanetTalk</span> - our secure platform for airtime top-ups
+                        <span className="font-medium">We&apos;ll redirect you to PlanetTalk</span> - our secure platform for airtime top-ups
                       </p>
                     </div>
                     <div className="flex items-start space-x-3">
@@ -296,7 +296,7 @@ export default function ReferralPage() {
                     </div>
                     <div className="mt-4 pt-4 border-t border-pt-turquoise-200">
                       <p className="text-center text-xs text-pt-turquoise-600">
-                        💝 <strong>Special:</strong> You'll get the best rates because {agent?.firstName} recommended you!
+                        💝 <strong>Special:</strong> You&apos;ll get the best rates because {agent?.firstName} recommended you!
                       </p>
                     </div>
                   </div>

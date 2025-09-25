@@ -82,7 +82,7 @@ export default function CookiesPage() {
                 </ul>
                 
                 <h3 className="subsection-title">Third-party cookies</h3>
-                <p>When you visit our website, you may receive cookies that are set by third parties. These are typically used for advertising and analytics purposes. For more information about these cookies and how to opt out, please visit the third party's website directly.</p>
+                <p>When you visit our website, you may receive cookies that are set by third parties. These are typically used for advertising and analytics purposes. For more information about these cookies and how to opt out, please visit the third party&apos;s website directly.</p>
               </div>
             </div>
             

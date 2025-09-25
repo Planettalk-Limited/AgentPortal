@@ -441,7 +441,7 @@ export default function PhoneNumberInput({
                   ))
                 ) : (
                   <div className="px-4 py-3 text-pt-light-gray text-sm text-center">
-                    No countries found matching "{countrySearch}"
+                    No countries found matching &quot;{countrySearch}&quot;
                   </div>
                 )}
               </div>

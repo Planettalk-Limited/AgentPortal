@@ -117,7 +117,7 @@ export default function TwoFactorManagement({ isEnabled, onToggle }: TwoFactorMa
               Disable Two-Factor Authentication
             </h4>
             <p className="text-sm text-red-800 mb-4">
-              This will make your account less secure. You'll only need your password to sign in.
+              This will make your account less secure. You&apos;ll only need your password to sign in.
             </p>
 
             {/* Error Alert */}

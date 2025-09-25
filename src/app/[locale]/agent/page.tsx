@@ -688,11 +688,11 @@ function AgentPage() {
                     <div className="text-gray-400 text-6xl mb-4">💰</div>
                     <h3 className="text-lg font-medium text-gray-900 mb-2">No Earnings Yet</h3>
                     <p className="text-gray-500 mb-4 max-w-md mx-auto">
-                      You haven't earned any commissions yet. Start by creating referral codes and sharing them with customers.
+                      You haven&apos;t earned any commissions yet. Start by creating referral codes and sharing them with customers.
                     </p>
                     <div className="bg-blue-50 rounded-lg p-4 max-w-md mx-auto">
                       <p className="text-sm text-blue-800">
-                        <strong>💡 Tip:</strong> When customers use your referral codes to top up, you'll earn commissions that appear here.
+                        <strong>💡 Tip:</strong> When customers use your referral codes to top up, you&apos;ll earn commissions that appear here.
                       </p>
                     </div>
                   </div>
@@ -843,7 +843,7 @@ function AgentPage() {
                     <div className="text-gray-400 text-6xl mb-4">💳</div>
                     <h3 className="text-lg font-medium text-gray-900 mb-2">No Payouts Yet</h3>
                     <p className="text-gray-500 mb-4 max-w-md mx-auto">
-                      You haven't requested any payouts yet. Build your balance to at least ${MINIMUM_PAYOUT_AMOUNT} to request your first payout.
+                      You haven&apos;t requested any payouts yet. Build your balance to at least ${MINIMUM_PAYOUT_AMOUNT} to request your first payout.
                     </p>
                     <div className="bg-amber-50 rounded-lg p-4 max-w-md mx-auto">
                       <p className="text-sm text-amber-800">

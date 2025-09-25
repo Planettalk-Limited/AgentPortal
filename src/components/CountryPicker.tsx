@@ -405,7 +405,7 @@ const CountryPicker: React.FC<CountryPickerProps> = ({
               ))
             ) : (
               <div className="px-4 py-3 text-gray-500 text-center">
-                No countries found matching "{searchTerm}"
+                No countries found matching &quot;{searchTerm}&quot;
               </div>
             )}
           </div>

@@ -666,7 +666,7 @@ export interface SystemSettings {
   };
 }
 
-export interface UpdateSystemSettingsRequest extends Partial<SystemSettings> {}
+export type UpdateSystemSettingsRequest = Partial<SystemSettings>
 
 // Audit Logs
 export interface AuditLog {

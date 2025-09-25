@@ -13,10 +13,10 @@ export default function TermsAndConditionsPage() {
             <div className="document-section">
               <h2 className="section-title">Planet Talk Services</h2>
               <div>
-                <p>These Terms & Conditions set out the terms under which Planettalk Limited ("Planet Talk"), provides you with the ability to:</p>
-                <p>(i) Make calls using the Planet Talk mobile phone application (the "App"); and</p>
-                <p>(ii) Purchase prepaid mobile and/or data airtime ("Mobile Top up"), prepaid vouchers ("Vouchers") and prepaid utilities ("Bill Pay") through the App or the Planet Talk website www.planettalk.com ("the Website").</p>
-                <p>Together referred to throughout these terms as the "Planet Talk Services" or the "Services".</p>
+                <p>These Terms & Conditions set out the terms under which Planettalk Limited (&quot;Planet Talk&quot;), provides you with the ability to:</p>
+                <p>(i) Make calls using the Planet Talk mobile phone application (the &quot;App&quot;); and</p>
+                <p>(ii) Purchase prepaid mobile and/or data airtime (&quot;Mobile Top up&quot;), prepaid vouchers (&quot;Vouchers&quot;) and prepaid utilities (&quot;Bill Pay&quot;) through the App or the Planet Talk website www.planettalk.com (&quot;the Website&quot;).</p>
+                <p>Together referred to throughout these terms as the &quot;Planet Talk Services&quot; or the &quot;Services&quot;.</p>
                 
                 <p>You cannot accept these terms if you are not lawfully entitled to use Planet Talk Services in the country in which you are located or resident or if you are not of age to form a binding agreement with Planet Talk.</p>
                 
@@ -35,7 +35,7 @@ export default function TermsAndConditionsPage() {
                 
                 <p>If you have any queries, please contact us by sending e-mail to care@planettalk.com. Alternatively, please read our FAQs to see if you can find the answer your query there.</p>
                 
-                <p>References to "we", "us" and "our" are to Planet Talk and we refer to you as "you" and "your", while words that begin with capital letters are used across these terms as definitions.</p>
+                <p>References to &quot;we&quot;, &quot;us&quot; and &quot;our&quot; are to Planet Talk and we refer to you as &quot;you&quot; and &quot;your&quot;, while words that begin with capital letters are used across these terms as definitions.</p>
               </div>
             </div>
             
@@ -46,13 +46,13 @@ export default function TermsAndConditionsPage() {
               <div>
                 <p>1.1 Planet Talk Services can be accessed using the App or the Website. To utilise the Services and make calls around the world you must first purchase Credits or top-up by purchasing a voucher of a certain monetary value which will be applied towards a specific App. To top-up the App, visit the home screen of the App using a credit card, Apple Pay, Google Pay, pre-purchased voucher or redeeming a promotion code.</p>
                 
-                <p>1.2 Planet Talk Services top-up comes in a variety of monetary values ("Credit(s)"). Please see the FAQs on our website www.planettalk.com for the details of the top-up amounts we currently offer.</p>
+                <p>1.2 Planet Talk Services top-up comes in a variety of monetary values (&quot;Credit(s)&quot;). Please see the FAQs on our website www.planettalk.com for the details of the top-up amounts we currently offer.</p>
                 
                 <p>1.3 Generally there are three parts to the process of making a call, but how this is achieved may vary by service:</p>
                 <ul className="document-list">
                   <li>a) Connection Charge: this is a one off charge each time you use the App which covers the costs of our switching equipment. The connection charge is applicable to calls lasting longer than 4 minutes where the 5th minute is billed as 2 minutes.</li>
-                  <li>b) 033 Access Number Charge: this is a UK geographical number, which will be automatically dialled when using the App. We do not charge you for this part of the call, but your phone provider may, as they would if you were making a call to a UK landline. These calls are commonly included in your inclusive minute bundles from your provider. This component does not apply to use of Planet Talk Services using the 'Wi-Fi feature on the App.</li>
-                  <li>c) Destination Rates: these are minute plus minute rates charged for calling the specified country and will vary depending on whether you are calling a mobile or landline. Please see the 'Rates' section of the App for the current Destination Rates as published and updated from time to time.</li>
+                  <li>b) 033 Access Number Charge: this is a UK geographical number, which will be automatically dialled when using the App. We do not charge you for this part of the call, but your phone provider may, as they would if you were making a call to a UK landline. These calls are commonly included in your inclusive minute bundles from your provider. This component does not apply to use of Planet Talk Services using the &apos;Wi-Fi feature on the App.</li>
+                  <li>c) Destination Rates: these are minute plus minute rates charged for calling the specified country and will vary depending on whether you are calling a mobile or landline. Please see the &apos;Rates&apos; section of the App for the current Destination Rates as published and updated from time to time.</li>
                 </ul>
                 
                 <p>1.4 To utilise the Planet Talk Services for the purchase of Mobile Top up, Vouchers and Bill pay, you can pay using Visa, MasterCard, Diners, PayPal, Google Pay, Apple Pay or any other payment methods available on the App or the Website from time to time. Any credit card, debit card or other payment method which may be used on the App, or the Website must have a valid billing address and valid issuing bank or other payment services provider.</p>
@@ -70,7 +70,7 @@ export default function TermsAndConditionsPage() {
             <div className="document-section">
               <h2 className="section-title">2. Validity Period</h2>
               <div>
-                <p>2.1 Credits purchased as a Top-up via the App are valid for 180 days from the time of purchase or the date of your last top-up within the 180 days ("Validity Period"). This means that if you top-up within 180 days of your previous top-up, your Validity Period will re-start from the new date of top-up. You can top-up the App as many times as you like. After the Validity Period, you will still be able to access your App, but you will lose any remaining Credit. For the App you will need to top-up to use chargeable services, such as international calling.</p>
+                <p>2.1 Credits purchased as a Top-up via the App are valid for 180 days from the time of purchase or the date of your last top-up within the 180 days (&quot;Validity Period&quot;). This means that if you top-up within 180 days of your previous top-up, your Validity Period will re-start from the new date of top-up. You can top-up the App as many times as you like. After the Validity Period, you will still be able to access your App, but you will lose any remaining Credit. For the App you will need to top-up to use chargeable services, such as international calling.</p>
               </div>
             </div>
 

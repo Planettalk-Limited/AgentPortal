@@ -153,7 +153,7 @@ function SlideCarousel({ content }: { content: any }) {
 
               {/* Success testimonial */}
               <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
-                <p className="text-white/90 italic mb-2">"I've earned over $5,000 in my first 6 months as a PlanetTalk agent!"</p>
+                <p className="text-white/90 italic mb-2">&quot;I&apos;ve earned over $5,000 in my first 6 months as a PlanetTalk agent!&quot;</p>
                 <p className="text-white/70 text-sm">- Sarah M., London Agent</p>
               </div>
             </div>

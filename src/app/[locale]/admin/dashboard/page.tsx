@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import { api } from '@/lib/api'
 import { formatCurrencyWithSymbol } from '@/lib/utils/currency'
 
@@ -450,7 +451,7 @@ function AdminDashboardPage() {
             <p className="text-sm text-gray-500 mt-1">Navigate to key management areas</p>
           </div>
           <div className="p-6 space-y-3">
-            <a
+            <Link
               href="/admin/users"
               className="group flex items-center p-4 text-gray-700 hover:bg-pt-turquoise hover:text-white rounded-xl transition-all duration-200 border border-transparent hover:border-pt-turquoise hover:shadow-lg"
             >
@@ -463,8 +464,8 @@ function AdminDashboardPage() {
                 <p className="font-semibold">Manage Users</p>
                 <p className="text-sm opacity-70">View and edit user accounts</p>
               </div>
-            </a>
-            <a
+            </Link>
+            <Link
               href="/admin/agents"
               className="group flex items-center p-4 text-gray-700 hover:bg-pt-turquoise hover:text-white rounded-xl transition-all duration-200 border border-transparent hover:border-pt-turquoise hover:shadow-lg"
             >
@@ -477,8 +478,8 @@ function AdminDashboardPage() {
                 <p className="font-semibold">Manage Agents</p>
                 <p className="text-sm opacity-70">Oversee agent network</p>
               </div>
-            </a>
-            <a
+            </Link>
+            <Link
               href="/admin/payouts"
               className="group flex items-center p-4 text-gray-700 hover:bg-pt-turquoise hover:text-white rounded-xl transition-all duration-200 border border-transparent hover:border-pt-turquoise hover:shadow-lg"
             >
@@ -491,7 +492,7 @@ function AdminDashboardPage() {
                 <p className="font-semibold">Review Payouts</p>
                 <p className="text-sm opacity-70">Process agent payments</p>
               </div>
-            </a>
+            </Link>
           </div>
         </div>
       </div>
