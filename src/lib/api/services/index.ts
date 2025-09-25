@@ -42,6 +42,15 @@ export type {
   BulkPayoutActionRequest
 } from './payout.service';
 
+// Import service instances directly for the services object
+import { authService } from './auth.service';
+import { userService } from './user.service';
+import { agentService } from './agent.service';
+import { adminService } from './admin.service';
+import { notificationService } from './notification.service';
+import { trainingService } from './training.service';
+import { payoutService } from './payout.service';
+
 // Re-export commonly used service instances for easy access
 export const services = {
   auth: authService,
