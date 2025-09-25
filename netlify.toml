@@ -4,5 +4,3 @@
 
 [build.environment]
   NODE_VERSION = "22"
-  NPM_FLAGS = "--prefer-offline"
-  NETLIFY_NEXT_PLUGIN_SKIP = "false"
