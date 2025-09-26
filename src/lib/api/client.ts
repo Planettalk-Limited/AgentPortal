@@ -36,7 +36,7 @@ export class ApiClient {
   private defaultHeaders: Record<string, string>;
 
   constructor(baseURL?: string) {
-    this.baseURL = baseURL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
+    this.baseURL = baseURL || process.env.NEXT_PUBLIC_API_URL || 'https://api.planettalk.com/api/v1';
     this.defaultHeaders = {
       'Content-Type': 'application/json',
     };
