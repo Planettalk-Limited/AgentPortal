@@ -61,6 +61,8 @@ RUN mkdir .next && chown nextjs:nodejs .next
 # Copy built application from builder stage
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+# Copy public directory if it exists
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 
 # Switch to non-root user
