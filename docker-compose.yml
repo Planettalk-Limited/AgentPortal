@@ -1,0 +1,75 @@
+version: '3.8'
+
+networks:
+  web:
+    external: true
+  agent-network:
+    driver: bridge
+
+services:
+  # Agent Portal Frontend (Production)
+  agent-frontend-prod:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    image: planettalk/agent-portal-frontend:latest
+    container_name: agent-frontend-prod
+    restart: unless-stopped
+    profiles: ["prod"]
+    networks:
+      - web
+      - agent-network
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - NEXT_TELEMETRY_DISABLED=1
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-https://api.planettalk.com/api/v1}
+      - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL:-https://portal.planettalk.com}
+    expose:
+      - "3000"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.agent-frontend-prod.rule=Host(`portal.planettalk.com`)"
+      - "traefik.http.routers.agent-frontend-prod.entrypoints=websecure"
+      - "traefik.http.routers.agent-frontend-prod.tls.certresolver=letsencrypt"
+      - "traefik.http.services.agent-frontend-prod.loadbalancer.server.port=3000"
+      - "traefik.http.routers.agent-frontend-prod.middlewares=global-sec-headers@file,global-compress@file"
+      - "traefik.docker.network=web"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Agent Portal Frontend (Development)
+  agent-frontend-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: agent-frontend-dev
+    restart: unless-stopped
+    profiles: ["dev"]
+    networks:
+      - agent-network
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - NEXT_TELEMETRY_DISABLED=1
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:3001/api/v1}
+      - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
+      - WATCHPACK_POLLING=true
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s

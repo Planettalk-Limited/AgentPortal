@@ -35,8 +35,8 @@ export class ApiClient {
   private baseURL: string;
   private defaultHeaders: Record<string, string>;
 
-  constructor(baseURL: string = 'http://138.68.155.21:3001/api/v1') {
-    this.baseURL = baseURL;
+  constructor(baseURL?: string) {
+    this.baseURL = baseURL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
     this.defaultHeaders = {
       'Content-Type': 'application/json',
     };
