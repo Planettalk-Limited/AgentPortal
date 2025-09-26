@@ -14,7 +14,7 @@ export function getBaseUrl(): string {
   }
   
   // In production, use the environment variable
-  return process.env.NEXT_PUBLIC_BASE_URL || 'https://agent-portal.planettalk.com'
+  return process.env.NEXT_PUBLIC_BASE_URL || 'https://portal.planettalk.com'
 }
 
 /**
