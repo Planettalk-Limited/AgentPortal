@@ -123,7 +123,7 @@ const Features = () => {
         
         <div className="text-center mt-16">
           <Link 
-            href={createLocalizedPath('/auth/apply')}
+            href={createLocalizedPath('/auth/register')}
             className="inline-block bg-pt-turquoise text-white text-lg px-8 py-4 rounded-lg font-semibold hover:bg-pt-turquoise-600 transition-colors duration-200"
           >
             {t('cta')}

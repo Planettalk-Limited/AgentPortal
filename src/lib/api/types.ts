@@ -268,7 +268,7 @@ export interface PublicReferralResponse {
     lastName: string;
     fullName: string;
     agentCode: string;
-    tier: string;
+    tier: 'bronze' | 'silver' | 'gold' | 'platinum';
   };
   program?: {
     title: string;
@@ -278,12 +278,18 @@ export interface PublicReferralResponse {
   };
   personalizedMessage?: string;
   codeDetails?: {
-    code: string;
-    type: 'standard' | 'promotional';
+    agentCode: string;
+    type: 'agent_code' | 'standard' | 'promotional';
     description: string;
-    bonusRate: number;
-    remainingUses: number;
-    expiresAt: string;
+    commissionRate: string;
+    tier: 'bronze' | 'silver' | 'gold' | 'platinum';
+    totalReferrals: number;
+    activeSince: string | null;
+    // Legacy fields for backward compatibility
+    code?: string;
+    bonusRate?: number;
+    remainingUses?: number;
+    expiresAt?: string;
   };
   callToAction?: {
     primary: string;

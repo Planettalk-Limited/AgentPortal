@@ -204,7 +204,7 @@ const Header = () => {
                           {t('signIn')}
                         </Link>
                         <Link
-                          href={createLocalizedPath('/auth/apply')}
+                          href={createLocalizedPath('/auth/register')}
                           className="block w-full border-2 border-pt-turquoise text-pt-turquoise py-3 px-4 rounded-lg font-semibold hover:bg-pt-turquoise hover:text-white transition-colors duration-200 text-center"
                           onClick={() => setMobileMenuOpen(false)}
                         >
@@ -269,7 +269,7 @@ const Header = () => {
                         {t('signIn')}
                       </Link>
                       <Link
-                        href={createLocalizedPath('/auth/apply')}
+                        href={createLocalizedPath('/auth/register')}
                         className="bg-pt-turquoise text-white px-4 py-2 rounded-lg font-medium hover:bg-pt-turquoise-600 transition-colors duration-200"
                       >
                         {t('becomeAgent')}

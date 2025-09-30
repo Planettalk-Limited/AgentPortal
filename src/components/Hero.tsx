@@ -56,7 +56,7 @@ const Hero = () => {
             </Link>
             
             <Link 
-              href={createLocalizedPath('/auth/apply')}
+              href={createLocalizedPath('/auth/register')}
               className="group border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white/10 transition-all duration-300 hover:scale-105 w-full sm:w-auto"
             >
               <span className="flex items-center justify-center">
