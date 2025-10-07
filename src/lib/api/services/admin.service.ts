@@ -255,6 +255,56 @@ export class AdminService extends BaseService {
     );
   }
 
+  /**
+   * Bulk upload earnings
+   */
+  async bulkUploadEarnings(payload: {
+    earnings: Array<{
+      agentCode: string
+      amount: number
+      type: 'referral_commission' | 'bonus' | 'penalty' | 'adjustment' | 'promotion_bonus'
+      description: string
+      referenceId?: string
+      commissionRate?: number
+      earnedAt?: string
+      currency?: string
+    }>
+    batchDescription?: string
+    autoConfirm?: boolean
+    metadata?: any
+  }): Promise<{
+    totalProcessed: number
+    successful: number
+    failed: number
+    skipped: number
+    totalAmount: number
+    updatedAgents: string[]
+    details: Array<{
+      agentCode: string
+      status: 'success' | 'failed' | 'skipped'
+      earningId?: string
+      amount: number
+      message?: string
+      error?: string
+    }>
+    errorSummary: {
+      invalidAgentCodes: string[]
+      duplicateReferences: string[]
+      validationErrors: string[]
+      otherErrors: string[]
+    }
+    batchInfo: {
+      batchId: string
+      processedAt: string
+      processingTimeMs: number
+      uploadedBy: string
+    }
+  }> {
+    return this.execute(() => 
+      this.client.post('admin/earnings/bulk-upload', payload)
+    );
+  }
+
   // ===== System Management =====
 
   /**

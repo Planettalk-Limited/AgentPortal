@@ -79,7 +79,6 @@ const Header = () => {
       // Public navigation
       return [
         { href: '#features', label: t('features'), external: false },
-        { href: '#about', label: t('about'), external: false },
         { href: 'https://planettalk.com', label: t('planettalkWebsite'), external: true },
       ]
     }

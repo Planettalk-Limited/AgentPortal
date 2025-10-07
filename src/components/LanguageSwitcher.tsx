@@ -50,7 +50,7 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
       document.cookie = `preferred_locale=${newLocale}; path=/; max-age=${365 * 24 * 60 * 60}; samesite=lax`
     }
     
-    router.push(newPath)
+    window.location.href = newPath
   }
 
   if (variant === 'buttons') {
@@ -66,7 +66,6 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
                 : 'border-gray-200 text-pt-dark-gray hover:border-pt-turquoise hover:text-pt-turquoise'
             }`}
           >
-            <span className="text-lg mr-2">{language.flag}</span>
             <span className="text-sm font-medium">{language.name}</span>
           </button>
         ))}
@@ -98,7 +97,6 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
   return (
     <div className={`relative group ${className}`}>
       <button className="flex items-center space-x-2 px-3 py-2 text-pt-dark-gray hover:text-pt-turquoise transition-colors duration-150 border border-gray-200 rounded-lg hover:border-pt-turquoise">
-        <span className="text-lg">{currentLanguage.flag}</span>
         <span className="font-medium text-sm">{currentLanguage.shortName}</span>
         <svg className="w-4 h-4 transition-transform duration-200 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
@@ -116,7 +114,6 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
                 : 'text-pt-dark-gray hover:bg-gray-50'
             }`}
           >
-            <span className="text-lg mr-3">{language.flag}</span>
             <span className="font-medium">{language.name}</span>
             {language.code === locale && (
               <svg className="w-4 h-4 ml-auto text-pt-turquoise" fill="currentColor" viewBox="0 0 20 20">

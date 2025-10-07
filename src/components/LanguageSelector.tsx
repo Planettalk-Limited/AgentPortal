@@ -16,10 +16,10 @@ const LanguageSelector = () => {
 
 
   const languages = [
-    { code: 'en', name: 'English', flag: '🇺🇸' },
-    { code: 'fr', name: 'Français', flag: '🇫🇷' },
-    { code: 'pt', name: 'Português', flag: '🇧🇷' },
-    { code: 'es', name: 'Español', flag: '🇪🇸' },
+    { code: 'en', name: 'English' },
+    { code: 'fr', name: 'Français' },
+    { code: 'pt', name: 'Português' },
+    { code: 'es', name: 'Español' },
   ]
 
   const currentLanguage = languages.find(lang => lang.code === locale) || languages[0]
@@ -38,7 +38,8 @@ const LanguageSelector = () => {
     // Store language preference
     storeLanguagePreference(newLocale as any)
     
-    router.push(newPath)
+    // Force a hard navigation to ensure locale changes
+    window.location.href = newPath
     setIsOpen(false)
   }
 
@@ -49,7 +50,6 @@ const LanguageSelector = () => {
         className="flex items-center space-x-2 text-pt-dark-gray hover:text-pt-turquoise transition-colors duration-150 relative pr-6"
         aria-expanded={isOpen}
       >
-        <span className="text-lg">{currentLanguage.flag}</span>
         <span className="font-medium hidden sm:block">{currentLanguage.name}</span>
         <svg 
           className={`w-4 h-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
@@ -73,7 +73,6 @@ const LanguageSelector = () => {
                   : 'text-pt-dark-gray hover:bg-gray-50'
               }`}
             >
-              <span className="text-lg mr-3">{language.flag}</span>
               <span className="font-medium">{language.name}</span>
               {language.code === locale && (
                 <svg className="w-4 h-4 ml-auto text-pt-turquoise" fill="currentColor" viewBox="0 0 20 20">

@@ -79,7 +79,7 @@ export default function UsersPage() {
     lastName: '',
     email: '',
     phoneNumber: '',
-    role: 'agent' as 'admin' | 'agent',
+    role: 'admin' as 'admin' | 'pt_admin',
     password: ''
   })
 
@@ -237,7 +237,7 @@ export default function UsersPage() {
         lastName: '',
         email: '',
         phoneNumber: '',
-        role: 'agent',
+        role: 'admin',
         password: ''
       })
       setShowAddModal(false)
@@ -278,8 +278,8 @@ export default function UsersPage() {
     <div className="max-w-7xl mx-auto">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-pt-dark-gray mb-2">Users Management</h1>
-        <p className="text-pt-light-gray">Manage user accounts, roles, and permissions</p>
+        <h1 className="text-3xl font-bold text-pt-dark-gray mb-2">Admin Management</h1>
+        <p className="text-pt-light-gray">Manage admin accounts and permissions</p>
       </div>
 
       {/* Success/Error Alerts */}
@@ -442,10 +442,9 @@ export default function UsersPage() {
               onChange={(e) => setFilters(prev => ({ ...prev, role: e.target.value, page: 1 }))}
               className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-pt-turquoise focus:border-pt-turquoise transition-all duration-200"
             >
-              <option value="">All Roles</option>
+              <option value="">All Admin Types</option>
               <option value="admin">Admin</option>
               <option value="pt_admin">PT Admin</option>
-              <option value="agent">Agent</option>
             </select>
           </div>
 
@@ -479,12 +478,12 @@ export default function UsersPage() {
       {/* Users Table */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-pt-dark-gray">User Accounts</h2>
+          <h2 className="text-xl font-semibold text-pt-dark-gray">Admin Accounts</h2>
           <button 
             onClick={() => setShowAddModal(true)}
             className="bg-pt-turquoise text-white px-4 py-2 rounded-lg font-medium hover:bg-pt-turquoise-600 transition-colors duration-200"
           >
-            + Add User
+            + Add Admin
           </button>
         </div>
 
@@ -601,16 +600,6 @@ export default function UsersPage() {
                           </button>
                         )}
 
-                        {/* Role Actions */}
-                        {user.role === 'agent' && (
-                          <button
-                            onClick={() => handleRoleUpdate(user.id, 'admin')}
-                            disabled={updating === user.id}
-                            className="px-3 py-1 bg-purple-100 text-purple-700 rounded-lg text-xs font-medium hover:bg-purple-200 transition-colors duration-200 disabled:opacity-50"
-                          >
-                            {updating === user.id ? '...' : 'Make Admin'}
-                          </button>
-                        )}
 
                         <button 
                           onClick={() => handleViewUser(user)}
@@ -704,7 +693,7 @@ export default function UsersPage() {
           <div className="bg-white rounded-2xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
-                <h3 className="text-xl font-semibold text-pt-dark-gray">Add New User</h3>
+                <h3 className="text-xl font-semibold text-pt-dark-gray">Add New Admin</h3>
                 <button
                   onClick={() => setShowAddModal(false)}
                   className="text-gray-400 hover:text-gray-600 transition-colors duration-200"
@@ -790,8 +779,8 @@ export default function UsersPage() {
                   onChange={handleNewUserChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pt-turquoise focus:border-pt-turquoise transition-colors duration-200"
                 >
-                  <option value="agent">Agent</option>
                   <option value="admin">Admin</option>
+                  <option value="pt_admin">PT Admin</option>
                 </select>
               </div>
               
@@ -822,7 +811,7 @@ export default function UsersPage() {
                   disabled={saving}
                   className="bg-pt-turquoise text-white px-6 py-2 rounded-lg font-medium hover:bg-pt-turquoise-600 transition-colors duration-200 disabled:opacity-50"
                 >
-                  {saving ? 'Creating...' : 'Create User'}
+                  {saving ? 'Creating...' : 'Create Admin'}
                 </button>
               </div>
             </form>

@@ -40,7 +40,7 @@ const LanguageSelectorAuth = () => {
       document.cookie = `preferred_locale=${newLocale}; path=/; max-age=${365 * 24 * 60 * 60}; samesite=lax`
     }
     
-    router.push(newPath)
+    window.location.href = newPath
   }
 
   return (
@@ -55,7 +55,6 @@ const LanguageSelectorAuth = () => {
               : 'text-white/70 hover:text-white hover:bg-white/10'
           }`}
         >
-          <span className="mr-1">{language.flag}</span>
           {language.shortName}
         </button>
       ))}

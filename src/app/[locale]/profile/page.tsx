@@ -6,8 +6,6 @@ import { useLocale, useTranslations } from 'next-intl'
 import { useAuth } from '@/contexts/AuthContext'
 import { api, User, UpdateProfileRequest, ApiError } from '@/lib/api'
 import { ErrorAlert, SuccessAlert, LoadingSpinner } from '@/components/ErrorBoundary'
-import TwoFactorSetup from '@/components/TwoFactorSetup'
-import TwoFactorManagement from '@/components/TwoFactorManagement'
 import CountryPicker from '@/components/CountryPicker'
 
 // Helper function to get country display info
@@ -31,62 +29,7 @@ const getCountryInfo = (countryCode: string) => {
   return countryMap[countryCode] || { name: countryCode, flag: '🌍' }
 }
 
-// Comprehensive timezone list
-const TIMEZONES = [
-  { value: 'UTC', label: 'UTC - Coordinated Universal Time' },
-  { value: 'America/New_York', label: 'Eastern Time (US & Canada)' },
-  { value: 'America/Chicago', label: 'Central Time (US & Canada)' },
-  { value: 'America/Denver', label: 'Mountain Time (US & Canada)' },
-  { value: 'America/Los_Angeles', label: 'Pacific Time (US & Canada)' },
-  { value: 'America/Anchorage', label: 'Alaska Time (US)' },
-  { value: 'Pacific/Honolulu', label: 'Hawaii Time (US)' },
-  { value: 'America/Toronto', label: 'Toronto (Canada)' },
-  { value: 'America/Vancouver', label: 'Vancouver (Canada)' },
-  { value: 'America/Mexico_City', label: 'Mexico City (Mexico)' },
-  { value: 'America/Sao_Paulo', label: 'São Paulo (Brazil)' },
-  { value: 'America/Buenos_Aires', label: 'Buenos Aires (Argentina)' },
-  { value: 'Europe/London', label: 'London (UK)' },
-  { value: 'Europe/Dublin', label: 'Dublin (Ireland)' },
-  { value: 'Europe/Paris', label: 'Paris (France)' },
-  { value: 'Europe/Berlin', label: 'Berlin (Germany)' },
-  { value: 'Europe/Madrid', label: 'Madrid (Spain)' },
-  { value: 'Europe/Rome', label: 'Rome (Italy)' },
-  { value: 'Europe/Amsterdam', label: 'Amsterdam (Netherlands)' },
-  { value: 'Europe/Brussels', label: 'Brussels (Belgium)' },
-  { value: 'Europe/Zurich', label: 'Zurich (Switzerland)' },
-  { value: 'Europe/Vienna', label: 'Vienna (Austria)' },
-  { value: 'Europe/Stockholm', label: 'Stockholm (Sweden)' },
-  { value: 'Europe/Copenhagen', label: 'Copenhagen (Denmark)' },
-  { value: 'Europe/Oslo', label: 'Oslo (Norway)' },
-  { value: 'Europe/Helsinki', label: 'Helsinki (Finland)' },
-  { value: 'Europe/Warsaw', label: 'Warsaw (Poland)' },
-  { value: 'Europe/Prague', label: 'Prague (Czech Republic)' },
-  { value: 'Europe/Budapest', label: 'Budapest (Hungary)' },
-  { value: 'Europe/Moscow', label: 'Moscow (Russia)' },
-  { value: 'Asia/Tokyo', label: 'Tokyo (Japan)' },
-  { value: 'Asia/Seoul', label: 'Seoul (South Korea)' },
-  { value: 'Asia/Shanghai', label: 'Shanghai (China)' },
-  { value: 'Asia/Hong_Kong', label: 'Hong Kong' },
-  { value: 'Asia/Singapore', label: 'Singapore' },
-  { value: 'Asia/Bangkok', label: 'Bangkok (Thailand)' },
-  { value: 'Asia/Jakarta', label: 'Jakarta (Indonesia)' },
-  { value: 'Asia/Manila', label: 'Manila (Philippines)' },
-  { value: 'Asia/Kuala_Lumpur', label: 'Kuala Lumpur (Malaysia)' },
-  { value: 'Asia/Mumbai', label: 'Mumbai (India)' },
-  { value: 'Asia/Kolkata', label: 'Kolkata (India)' },
-  { value: 'Asia/Dubai', label: 'Dubai (UAE)' },
-  { value: 'Asia/Riyadh', label: 'Riyadh (Saudi Arabia)' },
-  { value: 'Africa/Cairo', label: 'Cairo (Egypt)' },
-  { value: 'Africa/Lagos', label: 'Lagos (Nigeria)' },
-  { value: 'Africa/Nairobi', label: 'Nairobi (Kenya)' },
-  { value: 'Africa/Johannesburg', label: 'Johannesburg (South Africa)' },
-  { value: 'Australia/Sydney', label: 'Sydney (Australia)' },
-  { value: 'Australia/Melbourne', label: 'Melbourne (Australia)' },
-  { value: 'Australia/Perth', label: 'Perth (Australia)' },
-  { value: 'Pacific/Auckland', label: 'Auckland (New Zealand)' }
-]
-
-// Comprehensive currency list
+// Currency list for profile
 const CURRENCIES = [
   { value: 'USD', label: 'USD - US Dollar', symbol: '$' },
   { value: 'EUR', label: 'EUR - Euro', symbol: '€' },
@@ -122,20 +65,6 @@ const CURRENCIES = [
   { value: 'NZD', label: 'NZD - New Zealand Dollar', symbol: 'NZ$' }
 ]
 
-// Language options
-const LANGUAGES = [
-  { value: 'en', label: 'English' },
-  { value: 'es', label: 'Español' },
-  { value: 'fr', label: 'Français' },
-  { value: 'de', label: 'Deutsch' },
-  { value: 'it', label: 'Italiano' },
-  { value: 'pt', label: 'Português' },
-  { value: 'ru', label: 'Русский' },
-  { value: 'ja', label: '日本語' },
-  { value: 'ko', label: '한국어' },
-  { value: 'zh', label: '中文' }
-]
-
 export default function ProfilePage() {
   const { user: authUser, refreshUser } = useAuth()
   const [user, setUser] = useState<User | null>(null)
@@ -145,41 +74,19 @@ export default function ProfilePage() {
   const [error, setError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState('profile')
 
-  // Profile Data
+  // Profile Data (includes personal info, currency, and notifications)
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     email: '',
     phoneNumber: '',
-    country: ''
+    country: '',
+    currency: 'USD'
   })
 
-  // General Preferences
-  const [preferences, setPreferences] = useState({
-    language: 'en',
-    timezone: 'UTC',
-    currency: 'USD',
-    theme: 'light',
-    dateFormat: 'MM/DD/YYYY',
-    timeFormat: '12'
-  })
-
-  // Security Settings
-  const [securitySettings, setSecuritySettings] = useState({
-    twoFactorEnabled: false,
-    requirePasswordChange: false,
-    loginNotifications: true,
-    sessionTimeout: 30
-  })
-
-  // 2FA Setup State
-  const [show2FASetup, setShow2FASetup] = useState(false)
-
-  // Notification Preferences - Updated to match API format
+  // Notification Preferences (simplified - email only, default enabled)
   const [notificationPreferences, setNotificationPreferences] = useState({
-    emailNotifications: true,
-    smsNotifications: false,
-    loginNotifications: true,
+    emailNotifications: true, // Default enabled
     specificNotifications: {
       payoutNotifications: true,
       earningsNotifications: true,
@@ -196,13 +103,6 @@ export default function ProfilePage() {
     confirmPassword: ''
   })
 
-  // Two-Factor Authentication
-  const [twoFactorData, setTwoFactorData] = useState({
-    qrCode: '',
-    backupCodes: [] as string[],
-    verificationCode: ''
-  })
-
   const router = useRouter()
   const locale = useLocale()
   const t = useTranslations('profile')
@@ -210,7 +110,6 @@ export default function ProfilePage() {
   useEffect(() => {
     loadProfile()
   }, [])
-
 
   const loadProfile = async () => {
     try {
@@ -227,51 +126,34 @@ export default function ProfilePage() {
       
       setUser(profileData)
       
-      // Update form data with proper type checking and debugging
+      // Update form data with proper type checking
       const safeFormData = {
         firstName: typeof profileData.firstName === 'string' ? profileData.firstName : (profileData.firstName ? String(profileData.firstName) : ''),
         lastName: typeof profileData.lastName === 'string' ? profileData.lastName : (profileData.lastName ? String(profileData.lastName) : ''),
         email: typeof profileData.email === 'string' ? profileData.email : (profileData.email ? String(profileData.email) : ''),
         phoneNumber: typeof profileData.phoneNumber === 'string' ? profileData.phoneNumber : (profileData.phoneNumber ? String(profileData.phoneNumber) : ''),
-        country: typeof profileData.country === 'string' ? profileData.country : (profileData.country ? String(profileData.country) : '')
+        country: typeof profileData.country === 'string' ? profileData.country : (profileData.country ? String(profileData.country) : ''),
+        currency: profileData.preferences?.currency || 'USD'
       }
       
       setFormData(safeFormData)
 
-      // Check if profile already contains preferences and settings
-      if (profileData.preferences) {
-        setPreferences(prev => ({ ...prev, ...profileData.preferences }))
-      }
-
-      if (profileData.settings) {
-        setSecuritySettings(prev => ({ ...prev, ...profileData.settings }))
-      }
-
-      // Load preferences, security settings, and notifications separately
+      // Load notification preferences
       try {
-        const [prefsData, securityData, notificationData] = await Promise.allSettled([
-          api.auth.getPreferences(),
-          api.auth.getSecuritySettings(),
-          api.auth.getNotificationPreferences()
-        ])
-
-        if (prefsData.status === 'fulfilled' && prefsData.value) {
-          setPreferences(prev => ({ ...prev, ...prefsData.value }))
-        }
-
-        if (securityData.status === 'fulfilled' && securityData.value) {
-          setSecuritySettings(prev => ({ ...prev, ...securityData.value }))
-        }
-
-        if (notificationData.status === 'fulfilled' && notificationData.value) {
-          setNotificationPreferences(prev => ({ ...prev, ...notificationData.value }))
+        const notificationData = await api.auth.getNotificationPreferences()
+        if (notificationData) {
+          setNotificationPreferences(prev => ({ 
+            ...prev, 
+            ...notificationData,
+            emailNotifications: notificationData.emailNotifications !== false // Default to true
+          }))
         }
       } catch (err) {
-        // Silently handle preference loading errors
+        // Use defaults if loading fails
+        console.warn('Failed to load notification preferences, using defaults')
       }
 
     } catch (error) {
-      // Failed to load profile
       setError('Failed to load profile data')
     } finally {
       setLoading(false)
@@ -284,6 +166,7 @@ export default function ProfilePage() {
       setSaving(true)
       setError(null)
 
+      // Update profile info
       const updateData: UpdateProfileRequest = {
         firstName: formData.firstName,
         lastName: formData.lastName,
@@ -292,6 +175,13 @@ export default function ProfilePage() {
       }
 
       await api.auth.updateProfile(updateData)
+
+      // Update currency preference
+      await api.auth.updatePreferences({ currency: formData.currency })
+
+      // Update notification preferences
+      await api.auth.updateNotificationPreferences(notificationPreferences)
+
       await refreshUser()
       setSuccess(t('profileUpdated'))
       setTimeout(() => setSuccess(null), 3000)
@@ -299,60 +189,6 @@ export default function ProfilePage() {
     } catch (error) {
       const apiError = error as ApiError
       setError(apiError.error || t('failedToUpdateProfile'))
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  const handlePreferencesSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    try {
-      setSaving(true)
-      setError(null)
-
-      await api.auth.updatePreferences(preferences)
-      setSuccess(t('preferencesUpdated'))
-      setTimeout(() => setSuccess(null), 3000)
-
-    } catch (error) {
-      const apiError = error as ApiError
-      setError(apiError.error || t('failedToUpdatePreferences'))
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  const handleSecuritySubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    try {
-      setSaving(true)
-      setError(null)
-
-      await api.auth.updateSecuritySettings(securitySettings)
-      setSuccess(t('securitySettingsUpdated'))
-      setTimeout(() => setSuccess(null), 3000)
-
-    } catch (error) {
-      const apiError = error as ApiError
-      setError(apiError.error || t('failedToUpdateSecuritySettings'))
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  const handleNotificationsSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    try {
-      setSaving(true)
-      setError(null)
-
-      await api.auth.updateNotificationPreferences(notificationPreferences)
-      setSuccess(t('notificationPreferencesUpdated'))
-      setTimeout(() => setSuccess(null), 3000)
-
-    } catch (error) {
-      const apiError = error as ApiError
-      setError(apiError.error || t('failedToUpdateNotificationPreferences'))
     } finally {
       setSaving(false)
     }
@@ -397,59 +233,6 @@ export default function ProfilePage() {
     }
   }
 
-  const handle2FAToggle = (enabled: boolean) => {
-    if (enabled) {
-      setShow2FASetup(true)
-    } else {
-      // Handle disable - update state immediately since TwoFactorManagement handles the API call
-      setSecuritySettings(prev => ({
-        ...prev,
-        twoFactorEnabled: false
-      }))
-      setSuccess('Two-factor authentication has been disabled.')
-      setTimeout(() => setSuccess(null), 3000)
-      // Refresh user data
-      refreshUser()
-    }
-  }
-
-  const handle2FASetupComplete = (backupCodes: string[]) => {
-    setSecuritySettings(prev => ({
-      ...prev,
-      twoFactorEnabled: true
-    }))
-    setShow2FASetup(false)
-    setSuccess('Two-factor authentication has been enabled successfully!')
-    setTimeout(() => setSuccess(null), 5000)
-    // Refresh user data
-    refreshUser()
-  }
-
-  const handleToggleEmailNotifications = async () => {
-    try {
-      setSaving(true)
-      setError(null)
-
-      const allEmailEnabled = notificationPreferences.emailNotifications
-      const result = await api.auth.toggleEmailNotifications(!allEmailEnabled)
-      
-      // Update email notification preference
-      setNotificationPreferences(prev => ({
-        ...prev,
-        emailNotifications: result.enabled
-      }))
-
-      setSuccess(result.enabled ? t('emailNotificationsEnabled') : t('emailNotificationsDisabled'))
-      setTimeout(() => setSuccess(null), 3000)
-
-    } catch (error) {
-      const apiError = error as ApiError
-      setError(apiError.error || t('failedToToggleEmailNotifications'))
-    } finally {
-      setSaving(false)
-    }
-  }
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-cyan-50 flex items-center justify-center">
@@ -460,11 +243,9 @@ export default function ProfilePage() {
     )
   }
 
+  // Simplified tabs - only Profile and Password
   const tabs = [
     { id: 'profile', label: t('tabs.profile'), icon: '👤', color: 'bg-blue-500' },
-    { id: 'preferences', label: t('tabs.preferences'), icon: '⚙️', color: 'bg-purple-500' },
-    { id: 'security', label: t('tabs.security'), icon: '🔒', color: 'bg-green-500' },
-    { id: 'notifications', label: t('tabs.notifications'), icon: '🔔', color: 'bg-orange-500' },
     { id: 'password', label: t('tabs.password'), icon: '🔑', color: 'bg-red-500' }
   ]
 
@@ -526,7 +307,7 @@ export default function ProfilePage() {
         <SuccessAlert message={success} onClose={() => setSuccess(null)} />
         <ErrorAlert error={error} onClose={() => setError(null)} />
 
-        {/* Enhanced Tab Navigation - Mobile Responsive */}
+        {/* Simplified Tab Navigation - Only Profile and Password */}
         <div className="bg-white rounded-2xl shadow-lg mb-6 overflow-hidden">
           <div className="border-b border-gray-200">
             {/* Mobile Dropdown Menu */}
@@ -545,21 +326,20 @@ export default function ProfilePage() {
             </div>
             
             {/* Desktop Tab Navigation */}
-            <nav className="hidden sm:flex overflow-x-auto">
+            <nav className="hidden sm:flex">
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex-shrink-0 px-4 lg:px-6 py-4 border-b-2 font-medium text-sm transition-all duration-200 ${
+                  className={`flex-1 px-6 py-4 border-b-2 font-medium text-sm transition-all duration-200 ${
                     activeTab === tab.id
                       ? 'border-blue-500 text-blue-600 bg-blue-50'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'
                   }`}
                 >
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center justify-center space-x-2">
                     <span className="text-lg">{tab.icon}</span>
-                    <span className="hidden lg:inline">{tab.label}</span>
-                    <span className="lg:hidden">{tab.label.split(' ')[0]}</span>
+                    <span>{tab.label}</span>
                   </div>
                 </button>
               ))}
@@ -569,18 +349,20 @@ export default function ProfilePage() {
 
         {/* Tab Content */}
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-          {/* Profile Tab */}
+          {/* Profile Tab - Includes personal info, currency, and notifications */}
           {activeTab === 'profile' && (
             <div className="p-4 sm:p-6 lg:p-8">
-              <div className="max-w-2xl">
-                <div className="flex items-center space-x-3 mb-6">
-                  <div className="h-8 w-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <span className="text-blue-600">👤</span>
-                  </div>
-                  <h3 className="text-xl font-semibold text-gray-900">{t('personalInfo.title')}</h3>
-                </div>
+              <form onSubmit={handleProfileSubmit} className="space-y-8">
                 
-                <form onSubmit={handleProfileSubmit} className="space-y-4 sm:space-y-6">
+                {/* Personal Information Section */}
+                <div className="max-w-2xl">
+                  <div className="flex items-center space-x-3 mb-6">
+                    <div className="h-8 w-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                      <span className="text-blue-600">👤</span>
+                    </div>
+                    <h3 className="text-xl font-semibold text-gray-900">{t('personalInfo.title')}</h3>
+                  </div>
+                  
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                     <div className="space-y-2">
                       <label className="block text-sm font-medium text-gray-700">
@@ -659,82 +441,11 @@ export default function ProfilePage() {
 
                     <div className="space-y-2">
                       <label className="block text-sm font-medium text-gray-700">
-                        {t('personalInfo.userId')}
-                      </label>
-                      <input
-                        type="text"
-                        value={user?.id || ''}
-                        disabled
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-500 font-mono text-sm"
-                      />
-                      <p className="text-xs text-gray-500">{t('personalInfo.userIdCannotBeChanged')}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex justify-end pt-4">
-                    <button
-                      type="submit"
-                      disabled={saving}
-                      className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-3 rounded-xl hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium"
-                    >
-                      {saving ? t('saving') : t('saveProfile')}
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          )}
-
-          {/* Preferences Tab */}
-          {activeTab === 'preferences' && (
-            <div className="p-4 sm:p-6 lg:p-8">
-              <div className="max-w-2xl">
-                <div className="flex items-center space-x-3 mb-4 sm:mb-6">
-                  <div className="h-8 w-8 bg-purple-100 rounded-lg flex items-center justify-center">
-                    <span className="text-purple-600">⚙️</span>
-                  </div>
-                  <h3 className="text-lg sm:text-xl font-semibold text-gray-900">{t('preferences.title')}</h3>
-                </div>
-                
-                <form onSubmit={handlePreferencesSubmit} className="space-y-4 sm:space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-                    <div className="space-y-2">
-                      <label className="block text-sm font-medium text-gray-700">
-                        {t('preferences.language')}
+                        {t('personalInfo.currency')}
                       </label>
                       <select
-                        value={preferences.language}
-                        onChange={(e) => setPreferences(prev => ({ ...prev, language: e.target.value }))}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                      >
-                        {LANGUAGES.map(lang => (
-                          <option key={lang.value} value={lang.value}>{lang.label}</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="block text-sm font-medium text-gray-700">
-                        {t('preferences.timezone')}
-                      </label>
-                      <select
-                        value={preferences.timezone}
-                        onChange={(e) => setPreferences(prev => ({ ...prev, timezone: e.target.value }))}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                      >
-                        {TIMEZONES.map(tz => (
-                          <option key={tz.value} value={tz.value}>{tz.label}</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="block text-sm font-medium text-gray-700">
-                        {t('preferences.currency')}
-                      </label>
-                      <select
-                        value={preferences.currency}
-                        onChange={(e) => setPreferences(prev => ({ ...prev, currency: e.target.value }))}
+                        value={formData.currency}
+                        onChange={(e) => setFormData(prev => ({ ...prev, currency: e.target.value }))}
                         className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                       >
                         {CURRENCIES.map(curr => (
@@ -744,204 +455,29 @@ export default function ProfilePage() {
                         ))}
                       </select>
                     </div>
-
-                    <div className="space-y-2">
-                      <label className="block text-sm font-medium text-gray-700">
-                        {t('preferences.theme')}
-                      </label>
-                      <select
-                        value={preferences.theme}
-                        onChange={(e) => setPreferences(prev => ({ ...prev, theme: e.target.value }))}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                      >
-                        <option value="light">{t('preferences.themes.light')}</option>
-                        <option value="dark">{t('preferences.themes.dark')}</option>
-                        <option value="auto">{t('preferences.themes.auto')}</option>
-                      </select>
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="block text-sm font-medium text-gray-700">
-                        {t('preferences.dateFormat')}
-                      </label>
-                      <select
-                        value={preferences.dateFormat}
-                        onChange={(e) => setPreferences(prev => ({ ...prev, dateFormat: e.target.value }))}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                      >
-                        <option value="MM/DD/YYYY">MM/DD/YYYY</option>
-                        <option value="DD/MM/YYYY">DD/MM/YYYY</option>
-                        <option value="YYYY-MM-DD">YYYY-MM-DD</option>
-                        <option value="DD.MM.YYYY">DD.MM.YYYY</option>
-                      </select>
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="block text-sm font-medium text-gray-700">
-                        {t('preferences.timeFormat')}
-                      </label>
-                      <select
-                        value={preferences.timeFormat}
-                        onChange={(e) => setPreferences(prev => ({ ...prev, timeFormat: e.target.value }))}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                      >
-                        <option value="12">{t('preferences.timeFormats.12hour')}</option>
-                        <option value="24">{t('preferences.timeFormats.24hour')}</option>
-                      </select>
-                    </div>
                   </div>
-
-                  <div className="flex justify-end pt-4">
-                    <button
-                      type="submit"
-                      disabled={saving}
-                      className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-8 py-3 rounded-xl hover:from-purple-700 hover:to-purple-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium"
-                    >
-                      {saving ? t('saving') : t('savePreferences')}
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          )}
-
-          {/* Security Tab */}
-          {activeTab === 'security' && (
-            <div className="p-4 sm:p-6 lg:p-8">
-              <div className="max-w-3xl">
-                <div className="flex items-center space-x-3 mb-6">
-                  <div className="h-8 w-8 bg-green-100 rounded-lg flex items-center justify-center">
-                    <span className="text-green-600">🔒</span>
-                  </div>
-                  <h3 className="text-xl font-semibold text-gray-900">{t('security.title')}</h3>
                 </div>
-                
-                <form onSubmit={handleSecuritySubmit} className="space-y-8">
-                  {/* Two-Factor Authentication */}
-                  <div className="space-y-6">
-                    {show2FASetup ? (
-                      <div className="bg-white rounded-2xl p-6 border border-gray-200">
-                        <TwoFactorSetup
-                          onSetupComplete={handle2FASetupComplete}
-                          onCancel={() => setShow2FASetup(false)}
-                        />
-                      </div>
-                    ) : (
-                      <TwoFactorManagement
-                        isEnabled={securitySettings.twoFactorEnabled}
-                        onToggle={handle2FAToggle}
-                      />
-                    )}
-                  </div>
 
-                  {/* Other Security Settings */}
-                  <div className="space-y-6">
-                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                      <div>
-                        <label className="text-sm font-medium text-gray-900">{t('security.loginNotifications')}</label>
-                        <p className="text-sm text-gray-600">{t('security.loginNotificationsDescription')}</p>
-                      </div>
-                      <input
-                        type="checkbox"
-                        checked={securitySettings.loginNotifications}
-                        onChange={(e) => setSecuritySettings(prev => ({ 
-                          ...prev, 
-                          loginNotifications: e.target.checked 
-                        }))}
-                        className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                      />
+                {/* Notification Preferences Section */}
+                <div className="max-w-3xl border-t pt-8">
+                  <div className="flex items-center space-x-3 mb-6">
+                    <div className="h-8 w-8 bg-orange-100 rounded-lg flex items-center justify-center">
+                      <span className="text-orange-600">🔔</span>
                     </div>
-
-                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                      <div>
-                        <label className="text-sm font-medium text-gray-900">{t('security.requirePasswordChange')}</label>
-                        <p className="text-sm text-gray-600">{t('security.requirePasswordChangeDescription')}</p>
-                      </div>
-                      <input
-                        type="checkbox"
-                        checked={securitySettings.requirePasswordChange}
-                        onChange={(e) => setSecuritySettings(prev => ({ 
-                          ...prev, 
-                          requirePasswordChange: e.target.checked 
-                        }))}
-                        className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="block text-sm font-medium text-gray-700">
-                        {t('security.sessionTimeout')}
-                      </label>
-                      <select
-                        value={securitySettings.sessionTimeout}
-                        onChange={(e) => setSecuritySettings(prev => ({ 
-                          ...prev, 
-                          sessionTimeout: parseInt(e.target.value) 
-                        }))}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                      >
-                        <option value="15">{t('security.sessionTimeouts.15min')}</option>
-                        <option value="30">{t('security.sessionTimeouts.30min')}</option>
-                        <option value="60">{t('security.sessionTimeouts.1hour')}</option>
-                        <option value="120">{t('security.sessionTimeouts.2hours')}</option>
-                        <option value="240">{t('security.sessionTimeouts.4hours')}</option>
-                      </select>
-                    </div>
+                    <h3 className="text-xl font-semibold text-gray-900">{t('notifications.title')}</h3>
                   </div>
 
-                  <div className="flex justify-end pt-4">
-                    <button
-                      type="submit"
-                      disabled={saving}
-                      className="bg-gradient-to-r from-green-600 to-green-700 text-white px-8 py-3 rounded-xl hover:from-green-700 hover:to-green-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium"
-                    >
-                      {saving ? t('saving') : t('saveSecuritySettings')}
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          )}
-
-          {/* Notifications Tab */}
-          {activeTab === 'notifications' && (
-            <div className="p-4 sm:p-6 lg:p-8">
-              <div className="max-w-3xl">
-                <div className="flex items-center space-x-3 mb-6">
-                  <div className="h-8 w-8 bg-orange-100 rounded-lg flex items-center justify-center">
-                    <span className="text-orange-600">🔔</span>
-                  </div>
-                  <h3 className="text-xl font-semibold text-gray-900">{t('notifications.title')}</h3>
-                </div>
-                
-                <form onSubmit={handleNotificationsSubmit} className="space-y-8">
-                  {/* Quick Toggle */}
-                  <div className="bg-gradient-to-r from-orange-50 to-amber-50 rounded-2xl p-6 border border-orange-200">
+                  {/* Email Notifications - Always enabled, just show status */}
+                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-6 border border-green-200 mb-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <h4 className="text-lg font-medium text-gray-900">{t('notifications.emailNotifications')}</h4>
-                        <p className="text-sm text-gray-600">{t('notifications.emailToggleDescription')}</p>
+                        <h4 className="text-lg font-medium text-gray-900 flex items-center">
+                          <span className="mr-2">📧</span>
+                          {t('notifications.emailNotifications')}
+                        </h4>
+                        <p className="text-sm text-gray-600">{t('notifications.emailDescription')}</p>
                       </div>
-                      <button
-                        type="button"
-                        onClick={handleToggleEmailNotifications}
-                        disabled={saving}
-                        className="bg-gradient-to-r from-orange-600 to-orange-700 text-white px-6 py-3 rounded-xl hover:from-orange-700 hover:to-orange-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium"
-                      >
-                        {saving ? t('processing') : t('notifications.toggleAll')}
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* General Settings */}
-                  <div className="space-y-4">
-                    <h4 className="text-md font-medium text-gray-900 flex items-center">
-                      <span className="mr-2">📧</span>
-                      {t('notifications.generalSettings')}
-                    </h4>
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                        <label className="text-sm font-medium text-gray-700">{t('notifications.emailNotifications')}</label>
+                      <div className="flex items-center">
                         <input
                           type="checkbox"
                           checked={notificationPreferences.emailNotifications}
@@ -949,39 +485,16 @@ export default function ProfilePage() {
                             ...prev,
                             emailNotifications: e.target.checked
                           }))}
-                          className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                          className="h-5 w-5 text-green-600 focus:ring-green-500 border-gray-300 rounded"
                         />
-                      </div>
-                      
-                      <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                        <label className="text-sm font-medium text-gray-700">{t('notifications.smsNotifications')}</label>
-                        <input
-                          type="checkbox"
-                          checked={notificationPreferences.smsNotifications}
-                          onChange={(e) => setNotificationPreferences(prev => ({
-                            ...prev,
-                            smsNotifications: e.target.checked
-                          }))}
-                          className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                        />
-                      </div>
-
-                      <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                        <label className="text-sm font-medium text-gray-700">{t('notifications.loginNotifications')}</label>
-                        <input
-                          type="checkbox"
-                          checked={notificationPreferences.loginNotifications}
-                          onChange={(e) => setNotificationPreferences(prev => ({
-                            ...prev,
-                            loginNotifications: e.target.checked
-                          }))}
-                          className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                        />
+                        <span className="ml-2 text-sm font-medium text-green-700">
+                          {notificationPreferences.emailNotifications ? 'Enabled' : 'Disabled'}
+                        </span>
                       </div>
                     </div>
                   </div>
 
-                  {/* Specific Notifications */}
+                  {/* Specific Notification Types */}
                   <div className="space-y-4">
                     <h4 className="text-md font-medium text-gray-900 flex items-center">
                       <span className="mr-2">🎯</span>
@@ -1016,18 +529,18 @@ export default function ProfilePage() {
                       ))}
                     </div>
                   </div>
+                </div>
 
-                  <div className="flex justify-end pt-4">
-                    <button
-                      type="submit"
-                      disabled={saving}
-                      className="bg-gradient-to-r from-orange-600 to-orange-700 text-white px-8 py-3 rounded-xl hover:from-orange-700 hover:to-orange-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium"
-                    >
-                      {saving ? t('saving') : t('saveNotificationPreferences')}
-                    </button>
-                  </div>
-                </form>
-              </div>
+                <div className="flex justify-end pt-4">
+                  <button
+                    type="submit"
+                    disabled={saving}
+                    className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-3 rounded-xl hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium"
+                  >
+                    {saving ? t('saving') : t('saveProfile')}
+                  </button>
+                </div>
+              </form>
             </div>
           )}
 

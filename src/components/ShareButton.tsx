@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { shareReferralLink, generateReferralUrl, copyToClipboard } from '@/lib/utils/config'
 
 interface ShareButtonProps {
@@ -24,6 +24,7 @@ export default function ShareButton({
   showCode = false
 }: ShareButtonProps) {
   const locale = useLocale()
+  const t = useTranslations('dashboard')
   const [isSharing, setIsSharing] = useState(false)
   const [shareResult, setShareResult] = useState<{ success: boolean; method: string; error?: string } | null>(null)
 
@@ -43,7 +44,7 @@ export default function ShareButton({
       setShareResult({ 
         success: false, 
         method: 'clipboard', 
-        error: 'Failed to share link' 
+        error: t('failedToShareLink') 
       })
     } finally {
       setIsSharing(false)
@@ -56,7 +57,7 @@ export default function ShareButton({
       setShareResult({ success: true, method: 'clipboard' })
       setTimeout(() => setShareResult(null), 2000)
     } catch (error) {
-      setShareResult({ success: false, method: 'clipboard', error: 'Failed to copy code' })
+      setShareResult({ success: false, method: 'clipboard', error: t('failedToShareLink') })
     }
   }
 
@@ -156,14 +157,14 @@ export default function ShareButton({
         {isSharing ? (
           <>
             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
-            <span>Sharing...</span>
+            <span>{t('sharing')}</span>
           </>
         ) : (
           <>
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
             </svg>
-            <span>Share Referral Link</span>
+            <span>{t('shareReferralLink')}</span>
           </>
         )}
       </button>
@@ -172,7 +173,7 @@ export default function ShareButton({
       {showUrl && (
         <div className="bg-pt-light-gray-50 border border-pt-light-gray-200 rounded-lg p-3">
           <label className="block text-xs font-medium text-pt-dark-gray mb-1">
-            Referral URL:
+            {t('referralUrl')}
           </label>
           <div className="flex items-center space-x-2">
             <input

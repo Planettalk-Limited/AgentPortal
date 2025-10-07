@@ -18,14 +18,14 @@ export function getBaseUrl(): string {
 }
 
 /**
- * Generate a referral URL for sharing
- * @param code - The referral code
+ * Generate the PlanetTalk app share URL
+ * @param code - The agent code (included in share message, not URL)
  * @param locale - The language locale (en, fr, pt, es)
- * @returns Complete referral URL
+ * @returns PlanetTalk app share URL
  */
 export function generateReferralUrl(code: string, locale: string = 'en'): string {
-  const baseUrl = getBaseUrl()
-  return `${baseUrl}/${locale}/referral/${code}`
+  // Use the official PlanetTalk app share link
+  return 'https://app.planettalk.com/Jxk8/shareapp'
 }
 
 /**
@@ -55,8 +55,8 @@ export async function copyToClipboard(text: string): Promise<void> {
 }
 
 /**
- * Share referral link using Web Share API or fallback to clipboard
- * @param code - The referral code
+ * Share the PlanetTalk app with agent code using Web Share API or fallback to clipboard
+ * @param code - The agent code to include in the message
  * @param agentName - Name of the agent for the share message
  * @param locale - The language locale
  */
@@ -66,21 +66,42 @@ export async function shareReferralLink(
   locale: string = 'en'
 ): Promise<{ success: boolean; method: 'share' | 'clipboard'; error?: string }> {
   const url = generateReferralUrl(code, locale)
-  const title = `Join PlanetTalk with ${agentName}'s referral code`
-  const text = `Use my referral code ${code} to join PlanetTalk and start saving on international calls and top-ups!`
+  
+  // Localized messages
+  const messages = {
+    en: {
+      title: `Download PlanetTalk - Agent Code: ${code}`,
+      text: `Hi! Download the PlanetTalk app for great international calls & top-ups. Use my agent code: ${code} when you sign up!`
+    },
+    es: {
+      title: `Descarga PlanetTalk - Código de Agente: ${code}`,
+      text: `¡Hola! Descarga la app PlanetTalk para llamadas internacionales y recargas económicas. ¡Usa mi código de agente: ${code} al registrarte!`
+    },
+    fr: {
+      title: `Téléchargez PlanetTalk - Code d'Agent: ${code}`,
+      text: `Salut! Téléchargez l'app PlanetTalk pour des appels internationaux et recharges pas chers. Utilisez mon code d'agent: ${code} lors de votre inscription!`
+    },
+    pt: {
+      title: `Baixe o PlanetTalk - Código de Agente: ${code}`,
+      text: `Oi! Baixe o app PlanetTalk para chamadas internacionais e recargas baratas. Use meu código de agente: ${code} ao se cadastrar!`
+    }
+  }
+  
+  const message = messages[locale as keyof typeof messages] || messages.en
 
   try {
     // Try Web Share API first (mobile devices)
     if (navigator.share && /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
       await navigator.share({
-        title,
-        text,
+        title: message.title,
+        text: message.text,
         url
       })
       return { success: true, method: 'share' }
     } else {
-      // Fallback to clipboard
-      await copyToClipboard(url)
+      // Fallback to clipboard - copy the full message with URL
+      const fullMessage = `${message.text}\\n\\n${url}`
+      await copyToClipboard(fullMessage)
       return { success: true, method: 'clipboard' }
     }
   } catch (error) {

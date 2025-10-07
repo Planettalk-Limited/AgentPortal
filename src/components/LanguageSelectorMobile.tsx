@@ -40,7 +40,7 @@ const LanguageSelectorMobile = () => {
       document.cookie = `preferred_locale=${newLocale}; path=/; max-age=${365 * 24 * 60 * 60}; samesite=lax`
     }
     
-    router.push(newPath)
+    window.location.href = newPath
   }
 
   return (
@@ -55,7 +55,6 @@ const LanguageSelectorMobile = () => {
               : 'border-gray-200 text-pt-dark-gray hover:border-pt-turquoise hover:text-pt-turquoise'
           }`}
         >
-          <span className="text-lg mr-2">{language.flag}</span>
           <span className="text-sm font-medium">{language.name}</span>
         </button>
       ))}
