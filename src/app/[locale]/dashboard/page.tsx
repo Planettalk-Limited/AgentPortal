@@ -48,14 +48,14 @@ export default function DashboardPage() {
         referralCodes: [],
         summary: {
           totalEarnings: Number(agentData.totalEarnings) || 0,
-          monthlyEarnings: Number(agentData.monthlyEarnings) || 0,
+          monthlyEarnings: 0, // This would need to be calculated from earnings data
           weeklyEarnings: 0,
           dailyEarnings: 0,
           availableBalance: Number(agentData.availableBalance) || 0,
           pendingBalance: Number(agentData.pendingBalance) || 0,
           totalReferrals: agentData.totalReferrals || 0,
           activeReferralCodes: agentData.activeReferrals || 0,
-          thisMonthReferrals: Number(agentData.monthlyReferrals) || 0,
+          thisMonthReferrals: 0, // This would need to be calculated from referrals data
           conversionRate: 0,
         },
         recentPayouts: [],
@@ -257,7 +257,7 @@ export default function DashboardPage() {
                 </svg>
               </div>
               <div className="text-right">
-                <div className="text-2xl font-bold text-gray-900">{formatCurrencyWithSymbol(agent.monthlyEarnings || 0)}</div>
+                <div className="text-2xl font-bold text-gray-900">$0.00</div>
                 <div className="text-sm text-gray-500">{getCurrentMonth()}</div>
               </div>
                 </div>
@@ -283,7 +283,7 @@ export default function DashboardPage() {
               </div>
             </div>
             <div className="flex items-center text-purple-600">
-              <span className="text-sm font-medium">{agent.monthlyReferrals || 0} {t('thisMonth')}</span>
+              <span className="text-sm font-medium">0 {t('thisMonth')}</span>
           </div>
         </div>
 
