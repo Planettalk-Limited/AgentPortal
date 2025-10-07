@@ -62,16 +62,38 @@ export default function DashboardPage() {
         monthlyStats: []
       })
       
-      // Load recent earnings
+      // Load recent earnings and calculate monthly totals
       try {
-        const earningsResponse = await api.agent.getAgentEarnings(agentData.id, { limit: 5 })
+        const earningsResponse = await api.agent.getAgentEarnings(agentData.id, { limit: 100 }) // Get more to calculate monthly
         let earningsData = []
         if (Array.isArray(earningsResponse)) {
           earningsData = earningsResponse
         } else if (earningsResponse && typeof earningsResponse === 'object') {
           earningsData = (earningsResponse as any).earnings || earningsResponse.data || []
         }
-        setEarnings(Array.isArray(earningsData) ? earningsData : [])
+        
+        const earnings = Array.isArray(earningsData) ? earningsData : []
+        setEarnings(earnings.slice(0, 5)) // Keep only 5 for display
+        
+        // Calculate current month earnings
+        const currentMonth = new Date().getMonth()
+        const currentYear = new Date().getFullYear()
+        const monthlyEarnings = earnings
+          .filter(earning => {
+            const earningDate = new Date(earning.createdAt || earning.earnedAt || Date.now())
+            return earningDate.getMonth() === currentMonth && earningDate.getFullYear() === currentYear
+          })
+          .reduce((sum, earning) => sum + (Number(earning.amount) || 0), 0)
+        
+        // Update dashboard with calculated monthly earnings
+        setDashboard(prev => prev ? {
+          ...prev,
+          summary: {
+            ...prev.summary,
+            monthlyEarnings
+          }
+        } : null)
+        
       } catch (error) {
         setEarnings([])
       }
@@ -257,7 +279,7 @@ export default function DashboardPage() {
                 </svg>
               </div>
               <div className="text-right">
-                <div className="text-2xl font-bold text-gray-900">$0.00</div>
+                <div className="text-2xl font-bold text-gray-900">{formatCurrencyWithSymbol(dashboard?.summary.monthlyEarnings || 0)}</div>
                 <div className="text-sm text-gray-500">{getCurrentMonth()}</div>
               </div>
                 </div>
@@ -283,7 +305,7 @@ export default function DashboardPage() {
               </div>
             </div>
             <div className="flex items-center text-purple-600">
-              <span className="text-sm font-medium">0 {t('thisMonth')}</span>
+              <span className="text-sm font-medium">{parseFloat(String(agent.commissionRate || '0'))}% rate</span>
           </div>
         </div>
 
@@ -513,8 +535,8 @@ export default function DashboardPage() {
                   <span className="font-semibold">{agent.activeReferrals || 0}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-600">This Month</span>
-                  <span className="font-semibold">{agent.monthlyReferrals || 0} referrals</span>
+                  <span className="text-gray-600">Commission Rate</span>
+                  <span className="font-semibold">{parseFloat(String(agent.commissionRate || '0'))}%</span>
                 </div>
               </div>
             </div>
