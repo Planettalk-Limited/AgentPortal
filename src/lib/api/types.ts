@@ -75,10 +75,17 @@ export interface RegisterResponse {
 }
 
 export interface LoginResponse {
-  access_token: string;
-  user: User;
+  success?: boolean;
+  access_token?: string;
+  user?: User;
   // 2FA fields
   requires2FA?: boolean;
+  // Email verification fields
+  requiresEmailVerification?: boolean;
+  emailVerified?: boolean;
+  email?: string;
+  otpSent?: boolean;
+  otpMessage?: string;
   message?: string;
 }
 
@@ -560,6 +567,112 @@ export interface SystemStats {
     memoryUsage: number;
     cpuUsage: number;
   };
+}
+
+// Resource Management Types
+export interface Resource {
+  id: string;
+  title: string;
+  description: string;
+  fileName: string;
+  originalName: string;
+  mimeType: string;
+  fileSize: number;
+  type: 'document' | 'image' | 'video' | 'audio' | 'archive' | 'other';
+  category: 'training' | 'marketing' | 'compliance' | 'policy' | 'guide' | 'template' | 'other';
+  visibility: 'public' | 'private' | 'restricted';
+  s3Key: string;
+  s3Url: string;
+  s3Bucket?: string;
+  externalUrl?: string;
+  embeddedContent?: string;
+  isEmbedded: boolean;
+  isExternal: boolean;
+  isActive: boolean;
+  isFeatured: boolean;
+  downloadCount: number;
+  viewCount: number;
+  publishedAt?: string;
+  expiresAt?: string;
+  tags: string[];
+  metadata?: Record<string, any>;
+  uploadedById: string;
+  createdAt: string;
+  updatedAt: string;
+  uploadedBy?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+  };
+}
+
+export interface ResourceQueryParams {
+  category?: string;
+  type?: string;
+  visibility?: string;
+  isActive?: boolean;
+  isFeatured?: boolean;
+  search?: string;
+  tags?: string;
+  page?: number;
+  limit?: number;
+  sortBy?: 'createdAt' | 'title' | 'category' | 'type' | 'downloadCount' | 'viewCount';
+  sortOrder?: 'ASC' | 'DESC';
+}
+
+export interface UploadResourceRequest {
+  file: File;
+  title: string;
+  description: string;
+  type: 'document' | 'image' | 'video' | 'audio' | 'archive' | 'other';
+  category: 'training' | 'marketing' | 'compliance' | 'policy' | 'guide' | 'template' | 'other';
+  visibility: 'public' | 'private' | 'restricted';
+  isFeatured?: boolean;
+  publishedAt?: string;
+  expiresAt?: string;
+  tags?: string[];
+  metadata?: Record<string, any>;
+}
+
+export interface UpdateResourceRequest {
+  title?: string;
+  description?: string;
+  visibility?: 'public' | 'private' | 'restricted';
+  isFeatured?: boolean;
+  isActive?: boolean;
+  tags?: string[];
+  expiresAt?: string;
+  metadata?: Record<string, any>;
+}
+
+export interface BulkResourceUpdateRequest {
+  resourceIds: string[];
+  updates: {
+    visibility?: 'public' | 'private' | 'restricted';
+    isActive?: boolean;
+    category?: string;
+    isFeatured?: boolean;
+    tags?: string[];
+  };
+}
+
+export interface BulkResourceDeleteRequest {
+  resourceIds: string[];
+}
+
+export interface ResourceStats {
+  total: number;
+  byCategory: Record<string, number>;
+  byType: Record<string, number>;
+  totalDownloads: number;
+  totalViews: number;
+  recentUploads: number;
+}
+
+export interface ResourceDownloadResponse {
+  url: string;
+  fileName?: string;
+  expiresIn?: number;
 }
 
 // Query Parameters

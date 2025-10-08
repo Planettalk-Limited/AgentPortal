@@ -36,6 +36,33 @@ export class AuthService extends BaseService {
   }
 
   /**
+   * Verify email with verification code
+   */
+  async verifyEmail(data: { email: string; code: string }): Promise<{
+    success: boolean;
+    message: string;
+    user?: {
+      id: string;
+      email: string;
+      firstName: string;
+      lastName: string;
+      status: string;
+      emailVerified: boolean;
+    };
+  }> {
+    const response = await this.execute(() => 
+      this.client.post('auth/verify-email', data)
+    );
+    
+    // If verification is successful and we get a user with token, store it
+    if (response.success && response.user && response.access_token) {
+      this.client.setAuthToken(response.access_token);
+    }
+    
+    return response;
+  }
+
+  /**
    * Login user (Step 1 of 2FA flow)
    */
   async login(credentials: LoginRequest): Promise<LoginResponse> {

@@ -21,7 +21,8 @@
     "main": "Principal",
     "administration": "Administration",
     "chatWithUs": "Chattez avec Nous",
-    "support": "Support"
+    "support": "Support",
+    "media": "Médias et Ressources"
   },
   "hero": {
     "badge": "Portail Agent En Direct",
@@ -213,6 +214,7 @@
       "passwordRequirement": "Le mot de passe doit contenir au moins 8 caractères",
       "resetPassword": "Réinitialiser le Mot de Passe",
       "resetting": "Réinitialisation du Mot de Passe...",
+      "backToSignIn": "Retour à la Connexion",
       "success": {
         "title": "Réinitialisation du Mot de Passe Réussie",
         "message": "Votre mot de passe a été réinitialisé avec succès. Vous pouvez maintenant vous connecter avec votre nouveau mot de passe."
@@ -308,6 +310,31 @@
       "alreadyHaveAccount": "Vous avez déjà un compte ?",
       "signInLink": "Connectez-vous ici",
       "passwordRequirement": "Doit contenir au moins 8 caractères"
+    },
+    "verifyEmail": {
+      "title": "Vérifiez votre Email",
+      "subtitle": "Nous avons envoyé un code de vérification à 6 chiffres à votre adresse email",
+      "emailLabel": "Adresse Email",
+      "emailPlaceholder": "Entrez votre adresse email",
+      "codeLabel": "Code de Vérification",
+      "codeHint": "Entrez le code à 6 chiffres de votre email",
+      "verifyButton": "Vérifier Email",
+      "verifying": "Vérification...",
+      "didntReceive": "Vous n'avez pas reçu le code ?",
+      "resendCode": "Renvoyer le Code",
+      "resending": "Renvoi...",
+      "backToLogin": "← Retour à la Connexion",
+      "allFieldsRequired": "Veuillez entrer à la fois l'email et le code de vérification",
+      "emailRequired": "L'adresse email est requise",
+      "codeLength": "Le code de vérification doit contenir 6 chiffres",
+      "verificationFailed": "Vérification échouée. Veuillez vérifier votre code et réessayer",
+      "resendSuccess": "Code de vérification envoyé avec succès !",
+      "resendFailed": "Échec de l'envoi du code. Veuillez réessayer",
+      "success": {
+        "title": "Email Vérifié !",
+        "message": "Votre email a été vérifié avec succès. Votre compte est maintenant actif !",
+        "redirecting": "Redirection vers votre tableau de bord..."
+      }
     }
   },
   "agent": {
@@ -387,7 +414,11 @@
     "status": {
       "active": "Actif",
       "pending": "En Attente",
-      "suspended": "Suspendu"
+      "suspended": "Suspendu",
+      "pending_application": "Candidature en Attente",
+      "application_approved": "Candidature Approuvée",
+      "code_generated": "Code Généré",
+      "credentials_sent": "Identifiants Envoyés"
     },
     "tier": {
       "bronze": "Bronze",
@@ -489,6 +520,43 @@
     "progressTo": "Progression vers",
     "sharing": "Partage...",
     "failedToShareLink": "Échec du partage du lien"
+  },
+  "media": {
+    "title": "Médias et Ressources",
+    "subtitle": "Accédez aux matériels de formation, formulaires et documents importants",
+    "loading": "Chargement des ressources...",
+    "loadingCategory": "Chargement des ressources de catégorie...",
+    "summary": {
+      "totalResources": "Total des Ressources",
+      "newThisMonth": "Nouvelles Ce Mois",
+      "featured": "En Vedette"
+    },
+    "categories": {
+      "featured": "En Vedette",
+      "training": "Matériels de Formation",
+      "bankForms": "Formulaires Bancaires",
+      "termsConditions": "Termes et Conditions",
+      "compliance": "Conformité",
+      "marketing": "Matériels Marketing",
+      "announcements": "Annonces",
+      "media": "Médias et Vidéos",
+      "other": "Autres Ressources"
+    },
+    "actions": {
+      "openLink": "Ouvrir le Lien",
+      "viewContent": "Voir le Contenu",
+      "download": "Télécharger"
+    },
+    "views": "vues",
+    "featured": "En Vedette",
+    "empty": {
+      "title": "Aucune Ressource Disponible",
+      "description": "Il n'y a pas encore de ressources dans cette catégorie."
+    },
+    "error": {
+      "title": "Échec du Chargement des Ressources",
+      "retry": "Réessayer"
+    }
   },
   "dashboardFooter": {
     "description": "Portail Agent - Autonomiser les télécommunications mondiales",

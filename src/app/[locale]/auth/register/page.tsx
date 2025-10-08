@@ -159,8 +159,8 @@ export default function RegisterPage() {
       })
       
       if (result.success) {
-        setSuccess(true)
-        setSuccessMessage(result.message)
+        // Redirect to email verification with the registered email
+        router.push(`/${locale}/auth/verify-email?email=${encodeURIComponent(formData.email)}`)
       }
     } catch (error) {
       // Error is handled by the auth context

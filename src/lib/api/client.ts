@@ -141,6 +141,27 @@ export class ApiClient {
     headers?: Record<string, string>
   ): Promise<T> {
     const url = this.buildUrl(endpoint);
+    
+    // Handle FormData differently - don't stringify and don't set Content-Type
+    if (data instanceof FormData) {
+      console.log('Sending FormData request to:', url);
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          // Remove Content-Type header for FormData - browser will set it with boundary
+          ...Object.fromEntries(
+            Object.entries(this.defaultHeaders).filter(([key]) => key !== 'Content-Type')
+          ),
+          ...Object.fromEntries(
+            Object.entries(headers || {}).filter(([key]) => key !== 'Content-Type')
+          )
+        },
+        body: data,
+      });
+      return this.handleResponse<T>(response);
+    }
+    
+    // Handle regular JSON data
     const response = await fetch(url, {
       method: 'POST',
       headers: { ...this.defaultHeaders, ...headers },

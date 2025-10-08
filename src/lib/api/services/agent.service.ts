@@ -27,6 +27,9 @@ import {
   Payout,
   CreatePayoutRequest,
   PayoutQueryParams,
+  Resource,
+  ResourceQueryParams,
+  ResourceDownloadResponse,
 } from '../types';
 
 export class AgentService extends BaseService {
@@ -239,14 +242,15 @@ export class AgentService extends BaseService {
    * try {
    *   const referralData = await agentService.getPublicReferralData('DIASPORA2024');
    *   if (referralData.valid) {
-   *     console.log(`Agent: ${referralData.agent?.fullName}`);
-   *     console.log(`Message: ${referralData.personalizedMessage}`);
-   *     console.log(`Remaining uses: ${referralData.codeDetails?.remainingUses}`);
+   *     // Process referral data
+   *     // Agent: ${referralData.agent?.fullName}
+   *     // Message: ${referralData.personalizedMessage}
+   *     // Remaining uses: ${referralData.codeDetails?.remainingUses}
    *   } else {
-   *     console.log(`Error: ${referralData.message}`);
+   *     // Handle error: ${referralData.message}
    *   }
    * } catch (error) {
-   *   console.error('Failed to get referral data:', error);
+   *   // Handle error: Failed to get referral data
    * }
    * ```
    */
@@ -299,11 +303,11 @@ export class AgentService extends BaseService {
    *     }
    *   });
    *   
-   *   console.log(`Usage confirmed: ${result.id}`);
-   *   console.log(`Commission created: $${result.automaticEarnings.amount}`);
-   *   console.log(`Agent notified: ${result.agentNotification.emailSent}`);
+   *   // Usage confirmed: ${result.id}
+   *   // Commission created: $${result.automaticEarnings.amount}
+   *   // Agent notified: ${result.agentNotification.emailSent}
    * } catch (error) {
-   *   console.error('Failed to use referral code:', error);
+   *   // Handle error: Failed to use referral code
    * }
    * ```
    */
@@ -375,6 +379,206 @@ export class AgentService extends BaseService {
    */
   async cancelPayout(id: string): Promise<void> {
     await this.delete(`agents/payouts/${id}`);
+  }
+
+  // ===== Resource Access =====
+
+  /**
+   * Get public resources for agents
+   */
+  async getPublicResources(params?: ResourceQueryParams): Promise<PaginatedResponse<Resource>> {
+    return this.getPaginated<Resource>('resources', this.cleanParams(params || {}));
+  }
+
+  /**
+   * Get featured resources for dashboard
+   */
+  async getFeaturedResources(limit: number = 5): Promise<Resource[]> {
+    return this.getMany<Resource>(`resources/featured?limit=${limit}`);
+  }
+
+  /**
+   * Get resource details and increment view count
+   */
+  async getResource(id: string): Promise<Resource> {
+    return this.getOne<Resource>(`resources/${id}`);
+  }
+
+  /**
+   * Get resource download URL and increment download count
+   */
+  async downloadResource(id: string): Promise<ResourceDownloadResponse> {
+    return this.getOne<ResourceDownloadResponse>(`resources/${id}/download`);
+  }
+
+  /**
+   * Search resources
+   */
+  async searchResources(query: string, params?: ResourceQueryParams): Promise<Resource[]> {
+    return this.getMany<Resource>(`resources/search/${encodeURIComponent(query)}`, this.cleanParams(params || {}));
+  }
+
+  /**
+   * Get resources by category
+   */
+  async getResourcesByCategory(category: string, params?: ResourceQueryParams): Promise<Resource[]> {
+    return this.getMany<Resource>(`resources/category/${category}`, this.cleanParams(params || {}));
+  }
+
+  /**
+   * Get resources by type
+   */
+  async getResourcesByType(type: string, params?: ResourceQueryParams): Promise<Resource[]> {
+    return this.getMany<Resource>(`resources/type/${type}`, this.cleanParams(params || {}));
+  }
+
+  // ===== Agent Media Resources =====
+
+  /**
+   * Get all agent media resources organized by category
+   */
+  async getAgentMedia(): Promise<{
+    trainingMaterials: Resource[];
+    bankForms: Resource[];
+    termsAndConditions: Resource[];
+    compliance: Resource[];
+    marketing: Resource[];
+    policies: Resource[];
+    guides: Resource[];
+    templates: Resource[];
+    media: Resource[];
+    announcements: Resource[];
+    other: Resource[];
+    summary: {
+      totalResources: number;
+      newThisMonth: number;
+      featuredCount: number;
+    };
+  }> {
+    try {
+      const result = await this.execute(() => 
+        this.client.get('agents/media')
+      );
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  /**
+   * Get resources by specific category with pagination
+   */
+  async getMediaByCategory(category: string, params?: { page?: number; limit?: number }): Promise<{
+    resources: Resource[];
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  }> {
+    const queryParams = this.cleanParams(params || {});
+    return this.getOne(`agents/media/${category}`, queryParams);
+  }
+
+  /**
+   * Get featured resources for agent dashboard
+   */
+  async getFeaturedMedia(limit: number = 5): Promise<Resource[]> {
+    return this.getMany<Resource>(`agents/media/featured?limit=${limit}`);
+  }
+
+  /**
+   * Get recent resources
+   */
+  async getRecentMedia(limit: number = 10, days: number = 30): Promise<Resource[]> {
+    return this.getMany<Resource>(`agents/media/recent?limit=${limit}&days=${days}`);
+  }
+
+  /**
+   * Get resource content (embedded, external, or download URL)
+   */
+  async getResourceContent(id: string): Promise<{
+    type: 'embedded' | 'external' | 'file';
+    content?: string;
+    url?: string;
+    fileName?: string;
+    mimeType?: string;
+    fileSize?: number;
+    expiresIn?: number;
+  }> {
+    // Use direct client call since this endpoint returns content directly, not wrapped in ApiResponse
+    return this.execute(() => 
+      this.client.get<{
+        type: 'embedded' | 'external' | 'file';
+        content?: string;
+        url?: string;
+        fileName?: string;
+        mimeType?: string;
+        fileSize?: number;
+        expiresIn?: number;
+      }>(`agents/media/${id}/content`)
+    );
+  }
+
+  /**
+   * Get specific resource details
+   */
+  async getMediaResource(id: string): Promise<Resource> {
+    return this.getOne<Resource>(`agents/media/${id}`);
+  }
+
+  /**
+   * Download resource (generates secure URL and increments download count)
+   */
+  async downloadMediaResource(id: string): Promise<{
+    url: string;
+    fileName: string;
+  }> {
+    return this.getOne(`agents/media/${id}/download`);
+  }
+
+  /**
+   * Track resource access for compliance
+   */
+  async trackResourceAccess(id: string): Promise<{
+    success: boolean;
+    message: string;
+  }> {
+    return this.execute(() => 
+      this.client.post(`agents/media/${id}/track-access`, {})
+    );
+  }
+
+  /**
+   * Search media resources
+   */
+  async searchMediaResources(searchTerm: string, params?: { page?: number; limit?: number }): Promise<{
+    resources: Resource[];
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  }> {
+    const queryParams = this.cleanParams(params || {});
+    return this.getOne(`agents/media/search/${encodeURIComponent(searchTerm)}`, queryParams);
+  }
+
+  /**
+   * Get categories summary with resource counts
+   */
+  async getMediaCategoriesSummary(): Promise<{
+    training: number;
+    bank_forms: number;
+    terms_conditions: number;
+    compliance: number;
+    marketing: number;
+    policy: number;
+    guide: number;
+    template: number;
+    media: number;
+    announcement: number;
+    other: number;
+  }> {
+    return this.getOne('agents/media/categories/summary');
   }
 }
 

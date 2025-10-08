@@ -21,7 +21,8 @@
     "main": "Principal",
     "administration": "Administración",
     "chatWithUs": "Chatea con Nosotros",
-    "support": "Soporte"
+    "support": "Soporte",
+    "media": "Medios y Recursos"
   },
   "hero": {
     "badge": "Portal de Agentes En Vivo",
@@ -213,6 +214,7 @@
       "passwordRequirement": "La contraseña debe tener al menos 8 caracteres",
       "resetPassword": "Restablecer Contraseña",
       "resetting": "Restableciendo Contraseña...",
+      "backToSignIn": "Volver al Inicio de Sesión",
       "success": {
         "title": "Restablecimiento de Contraseña Exitoso",
         "message": "Su contraseña ha sido restablecida exitosamente. Ahora puede iniciar sesión con su nueva contraseña."
@@ -310,6 +312,31 @@
       "alreadyHaveAccount": "¿Ya tiene una cuenta?",
       "signInLink": "Inicie sesión aquí",
       "passwordRequirement": "Debe tener al menos 8 caracteres"
+    },
+    "verifyEmail": {
+      "title": "Verifica tu Email",
+      "subtitle": "Hemos enviado un código de verificación de 6 dígitos a tu dirección de correo",
+      "emailLabel": "Dirección de Email",
+      "emailPlaceholder": "Ingresa tu dirección de email",
+      "codeLabel": "Código de Verificación",
+      "codeHint": "Ingresa el código de 6 dígitos de tu email",
+      "verifyButton": "Verificar Email",
+      "verifying": "Verificando...",
+      "didntReceive": "¿No recibiste el código?",
+      "resendCode": "Reenviar Código",
+      "resending": "Reenviando...",
+      "backToLogin": "← Volver al Login",
+      "allFieldsRequired": "Por favor ingresa tanto el email como el código de verificación",
+      "emailRequired": "La dirección de email es requerida",
+      "codeLength": "El código de verificación debe tener 6 dígitos",
+      "verificationFailed": "Verificación falló. Por favor verifica tu código e intenta de nuevo",
+      "resendSuccess": "¡Código de verificación enviado exitosamente!",
+      "resendFailed": "Error al reenviar código. Por favor intenta de nuevo",
+      "success": {
+        "title": "¡Email Verificado!",
+        "message": "Tu email ha sido verificado exitosamente. ¡Tu cuenta está ahora activa!",
+        "redirecting": "Redirigiendo a tu panel..."
+      }
     }
   },
   "agent": {
@@ -389,6 +416,10 @@
     "status": {
       "active": "Activo",
       "pending": "Pendiente",
+      "pending_application": "Solicitud Pendiente",
+      "application_approved": "Solicitud Aprobada",
+      "code_generated": "Código Generado",
+      "credentials_sent": "Credenciales Enviadas",
       "suspended": "Suspendido"
     },
     "tier": {
@@ -491,6 +522,43 @@
     "progressTo": "Progreso a",
     "sharing": "Compartiendo...",
     "failedToShareLink": "Error al compartir enlace"
+  },
+  "media": {
+    "title": "Medios y Recursos",
+    "subtitle": "Accede a materiales de entrenamiento, formularios y documentos importantes",
+    "loading": "Cargando recursos...",
+    "loadingCategory": "Cargando recursos de categoría...",
+    "summary": {
+      "totalResources": "Total de Recursos",
+      "newThisMonth": "Nuevos Este Mes",
+      "featured": "Destacados"
+    },
+    "categories": {
+      "featured": "Destacados",
+      "training": "Materiales de Entrenamiento",
+      "bankForms": "Formularios Bancarios",
+      "termsConditions": "Términos y Condiciones",
+      "compliance": "Cumplimiento",
+      "marketing": "Materiales de Marketing",
+      "announcements": "Anuncios",
+      "media": "Medios y Videos",
+      "other": "Otros Recursos"
+    },
+    "actions": {
+      "openLink": "Abrir Enlace",
+      "viewContent": "Ver Contenido",
+      "download": "Descargar"
+    },
+    "views": "vistas",
+    "featured": "Destacado",
+    "empty": {
+      "title": "No Hay Recursos Disponibles",
+      "description": "No hay recursos en esta categoría aún."
+    },
+    "error": {
+      "title": "Error al Cargar Recursos",
+      "retry": "Intentar de Nuevo"
+    }
   },
   "dashboardFooter": {
     "description": "Portal del Agente - Potenciando las telecomunicaciones globales",

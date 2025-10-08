@@ -32,6 +32,14 @@ import {
   EmailTemplate,
   EmailPreviewRequest,
   SendTestEmailRequest,
+  Resource,
+  ResourceQueryParams,
+  UploadResourceRequest,
+  UpdateResourceRequest,
+  BulkResourceUpdateRequest,
+  BulkResourceDeleteRequest,
+  ResourceStats,
+  ResourceDownloadResponse,
 } from '../types';
 
 export class AdminService extends BaseService {
@@ -302,6 +310,106 @@ export class AdminService extends BaseService {
   }> {
     return this.execute(() => 
       this.client.post('admin/earnings/bulk-upload', payload)
+    );
+  }
+
+  // ===== Resource Management =====
+
+  /**
+   * Upload a new resource file
+   */
+  async uploadResource(data: UploadResourceRequest): Promise<Resource> {
+    // Validate required fields before creating FormData
+    if (!data.title || typeof data.title !== 'string' || data.title.trim().length === 0) {
+      throw new Error('Title is required and must be a non-empty string');
+    }
+    if (!data.description || typeof data.description !== 'string' || data.description.trim().length === 0) {
+      throw new Error('Description is required and must be a non-empty string');
+    }
+    if (data.title.length > 255) {
+      throw new Error('Title must be 255 characters or less');
+    }
+
+    const formData = new FormData();
+    formData.append('file', data.file);
+    formData.append('title', data.title.trim());
+    formData.append('description', data.description.trim());
+    formData.append('type', data.type);
+    formData.append('category', data.category);
+    formData.append('visibility', data.visibility);
+    
+    // Send boolean as "true"/"false" string for API compatibility
+    formData.append('isFeatured', data.isFeatured ? "true" : "false");
+    
+    if (data.publishedAt) formData.append('publishedAt', data.publishedAt);
+    if (data.expiresAt) formData.append('expiresAt', data.expiresAt);
+    if (data.tags && data.tags.length > 0) {
+      // Send as JSON string for array data
+      formData.append('tags', JSON.stringify(data.tags));
+    }
+    if (data.metadata) formData.append('metadata', JSON.stringify(data.metadata));
+
+    return this.execute(() => 
+      this.client.post<Resource>('admin/resources/upload', formData)
+    );
+  }
+
+  /**
+   * Get all resources with filtering and pagination
+   */
+  async getResources(params?: ResourceQueryParams): Promise<PaginatedResponse<Resource>> {
+    return this.getPaginated<Resource>('admin/resources', this.cleanParams(params || {}));
+  }
+
+  /**
+   * Update resource metadata
+   */
+  async updateResource(id: string, data: UpdateResourceRequest): Promise<Resource> {
+    return this.update<Resource>(`admin/resources/${id}`, data);
+  }
+
+  /**
+   * Delete resource
+   */
+  async deleteResource(id: string): Promise<{ success: boolean; message: string }> {
+    return this.execute(() => 
+      this.client.delete(`admin/resources/${id}`)
+    );
+  }
+
+  /**
+   * Get resource download URL
+   */
+  async getResourceDownloadUrl(id: string): Promise<ResourceDownloadResponse> {
+    return this.execute(() => 
+      this.client.get<ResourceDownloadResponse>(`admin/resources/${id}/download-url`)
+    );
+  }
+
+  /**
+   * Bulk update resources
+   */
+  async bulkUpdateResources(data: BulkResourceUpdateRequest): Promise<{ updated: number; failed: number }> {
+    return this.execute(() => 
+      this.client.post('admin/resources/bulk-update', data)
+    );
+  }
+
+  /**
+   * Bulk delete resources
+   */
+  async bulkDeleteResources(data: BulkResourceDeleteRequest): Promise<{ deleted: number; failed: number }> {
+    return this.execute(() => 
+      this.client.post('admin/resources/bulk-delete', data)
+    );
+  }
+
+  /**
+   * Get resource statistics
+   */
+  async getResourceStats(): Promise<ResourceStats> {
+    return this.execute(() => 
+      this.client.get<ResourceStats>('admin/resources/stats')
     );
   }
 

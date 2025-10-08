@@ -21,7 +21,8 @@
     "main": "Principal",
     "administration": "Administração",
     "chatWithUs": "Converse Conosco",
-    "support": "Suporte"
+    "support": "Suporte",
+    "media": "Mídia e Recursos"
   },
   "hero": {
     "badge": "Portal do Agente Ao Vivo",
@@ -213,6 +214,7 @@
       "passwordRequirement": "A senha deve ter pelo menos 8 caracteres",
       "resetPassword": "Redefinir Senha",
       "resetting": "Redefinindo Senha...",
+      "backToSignIn": "Voltar ao Login",
       "success": {
         "title": "Redefinição de Senha Bem-sucedida",
         "message": "Sua senha foi redefinida com sucesso. Agora você pode entrar com sua nova senha."
@@ -308,6 +310,31 @@
       "alreadyHaveAccount": "Já tem uma conta?",
       "signInLink": "Faça login aqui",
       "passwordRequirement": "Deve ter pelo menos 8 caracteres"
+    },
+    "verifyEmail": {
+      "title": "Verifique seu Email",
+      "subtitle": "Enviamos um código de verificação de 6 dígitos para seu endereço de email",
+      "emailLabel": "Endereço de Email",
+      "emailPlaceholder": "Digite seu endereço de email",
+      "codeLabel": "Código de Verificação",
+      "codeHint": "Digite o código de 6 dígitos do seu email",
+      "verifyButton": "Verificar Email",
+      "verifying": "Verificando...",
+      "didntReceive": "Não recebeu o código?",
+      "resendCode": "Reenviar Código",
+      "resending": "Reenviando...",
+      "backToLogin": "← Voltar ao Login",
+      "allFieldsRequired": "Por favor digite tanto o email quanto o código de verificação",
+      "emailRequired": "Endereço de email é obrigatório",
+      "codeLength": "Código de verificação deve ter 6 dígitos",
+      "verificationFailed": "Verificação falhou. Por favor verifique seu código e tente novamente",
+      "resendSuccess": "Código de verificação enviado com sucesso!",
+      "resendFailed": "Falha ao reenviar código. Por favor tente novamente",
+      "success": {
+        "title": "Email Verificado!",
+        "message": "Seu email foi verificado com sucesso. Sua conta está agora ativa!",
+        "redirecting": "Redirecionando para seu painel..."
+      }
     }
   },
   "agent": {
@@ -387,6 +414,10 @@
     "status": {
       "active": "Ativo",
       "pending": "Pendente",
+      "pending_application": "Candidatura Pendente",
+      "application_approved": "Candidatura Aprovada",
+      "code_generated": "Código Gerado",
+      "credentials_sent": "Credenciais Enviadas",
       "suspended": "Suspenso"
     },
     "tier": {
@@ -489,6 +520,43 @@
     "progressTo": "Progresso para",
     "sharing": "Compartilhando...",
     "failedToShareLink": "Falha ao compartilhar link"
+  },
+  "media": {
+    "title": "Mídia e Recursos",
+    "subtitle": "Acesse materiais de treinamento, formulários e documentos importantes",
+    "loading": "Carregando recursos...",
+    "loadingCategory": "Carregando recursos da categoria...",
+    "summary": {
+      "totalResources": "Total de Recursos",
+      "newThisMonth": "Novos Este Mês",
+      "featured": "Destaque"
+    },
+    "categories": {
+      "featured": "Destaque",
+      "training": "Materiais de Treinamento",
+      "bankForms": "Formulários Bancários",
+      "termsConditions": "Termos e Condições",
+      "compliance": "Conformidade",
+      "marketing": "Materiais de Marketing",
+      "announcements": "Anúncios",
+      "media": "Mídia e Vídeos",
+      "other": "Outros Recursos"
+    },
+    "actions": {
+      "openLink": "Abrir Link",
+      "viewContent": "Ver Conteúdo",
+      "download": "Baixar"
+    },
+    "views": "visualizações",
+    "featured": "Destaque",
+    "empty": {
+      "title": "Nenhum Recurso Disponível",
+      "description": "Ainda não há recursos nesta categoria."
+    },
+    "error": {
+      "title": "Falha ao Carregar Recursos",
+      "retry": "Tentar Novamente"
+    }
   },
   "dashboardFooter": {
     "description": "Portal do Agente - Capacitando telecomunicações globais",

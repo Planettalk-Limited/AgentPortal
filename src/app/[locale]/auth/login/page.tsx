@@ -47,11 +47,22 @@ export default function LoginPage() {
 
     try {
       const result = await login(formData.email, formData.password)
+      
+      // Check if email verification is required
+      if (result.requiresEmailVerification) {
+        // Redirect to email verification page with email pre-filled
+        router.push(`/${locale}/auth/verify-email?email=${encodeURIComponent(formData.email)}`)
+        return
+      }
+      
+      // Check if 2FA is required
       if (result.requires2FA) {
         setUserEmail(result.email || formData.email)
         setLoginStep('2fa')
+        return
       }
-      // If no 2FA required, navigation is handled by the auth context
+      
+      // If no 2FA or email verification required, navigation is handled by the auth context
     } catch (error) {
       // Error is handled by the auth context
       // Login failed

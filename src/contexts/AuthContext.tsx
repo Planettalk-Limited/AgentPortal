@@ -11,7 +11,7 @@ interface AuthContextType {
   loading: boolean
   error: string | null
   isAuthenticated: boolean
-  login: (email: string, password: string) => Promise<{ requires2FA: boolean; email?: string }>
+  login: (email: string, password: string) => Promise<{ requires2FA: boolean; requiresEmailVerification?: boolean; email?: string }>
   register: (data: RegisterRequest) => Promise<{ success: boolean; message: string }>
   verify2FA: (email: string, code: string) => Promise<void>
   logout: () => Promise<void>
@@ -35,6 +35,7 @@ const PUBLIC_ROUTES = [
   '/auth/apply',
   '/auth/forgot-password',
   '/auth/reset-password',
+  '/auth/verify-email',
   '/public',
   '/about',
   '/contact',
@@ -153,7 +154,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           router.push(createPath('/admin/dashboard'))
           break
         case 'agent':
-          router.push(createPath('/agent'))
+          router.push(createPath('/dashboard'))
           break
         default:
           router.push(createPath('/dashboard'))
@@ -169,7 +170,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           router.push(createPath('/admin/dashboard'))
           break
         case 'agent':
-          router.push(createPath('/agent'))
+          router.push(createPath('/dashboard'))
           break
         default:
           router.push(createPath('/dashboard'))
@@ -202,35 +203,43 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }
 
-  const login = async (email: string, password: string): Promise<{ requires2FA: boolean; email?: string }> => {
+  const login = async (email: string, password: string): Promise<{ requires2FA: boolean; requiresEmailVerification?: boolean; email?: string }> => {
     try {
       setLoading(true)
       setError(null)
 
       const response = await api.auth.login({ email, password })
       
+      // Check if email verification is required
+      if (response.requiresEmailVerification) {
+        return { requires2FA: false, requiresEmailVerification: true, email: email }
+      }
+      
       // Check if 2FA is required
       if (response.requires2FA) {
         return { requires2FA: true, email: email }
       }
 
-      // Normal login - set user and redirect
-      setUser(response.user)
+      // Normal login - only proceed if success is true and we have a user
+      if (response.success && response.user) {
+        const user = response.user
+        setUser(user)
 
-      // Redirect based on user role
-      switch (response.user.role) {
-        case 'admin':
-        case 'pt_admin':
-          router.push(createPath('/admin/dashboard'))
-          break
-        case 'agent':
-          router.push(createPath('/agent'))
-          break
-        default:
-          router.push(createPath('/dashboard'))
+        // Redirect based on user role
+        switch (user.role) {
+          case 'admin':
+          case 'pt_admin':
+            router.push(createPath('/admin/dashboard'))
+            break
+          case 'agent':
+            router.push(createPath('/dashboard')) // Updated to use merged dashboard
+            break
+          default:
+            router.push(createPath('/dashboard'))
+        }
       }
 
-      return { requires2FA: false }
+      return { requires2FA: false, requiresEmailVerification: false }
     } catch (error) {
       const apiError = error as ApiError
       // Provide user-friendly error message for 401 (invalid credentials)
@@ -251,19 +260,24 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setError(null)
 
       const response = await api.auth.verify2FA({ email, code })
-      setUser(response.user)
-
-      // Redirect based on user role after successful 2FA
-      switch (response.user.role) {
-        case 'admin':
-        case 'pt_admin':
-          router.push(createPath('/admin/dashboard'))
-          break
-        case 'agent':
-          router.push(createPath('/agent'))
-          break
-        default:
-          router.push(createPath('/dashboard'))
+      
+      // Set user and redirect only if we have a user
+      if (response.user) {
+        const user = response.user
+        setUser(user)
+        
+        // Redirect based on user role after successful 2FA
+        switch (user.role) {
+          case 'admin':
+          case 'pt_admin':
+            router.push(createPath('/admin/dashboard'))
+            break
+          case 'agent':
+            router.push(createPath('/dashboard'))
+            break
+          default:
+            router.push(createPath('/dashboard'))
+        }
       }
     } catch (error) {
       const apiError = error as ApiError

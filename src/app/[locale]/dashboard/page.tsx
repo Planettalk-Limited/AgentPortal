@@ -184,7 +184,7 @@ export default function DashboardPage() {
             {t('tryAgain')}
               </button>
             </div>
-      </div>
+          </div>
     )
   }
 
@@ -229,8 +229,8 @@ export default function DashboardPage() {
             </p>
       </div>
               </div>
-            </div>
-            
+      </div>
+
             <div className="flex items-center space-x-6">
               <div className="text-center">
                 <div className="text-3xl font-bold text-white">{parseFloat(String(agent.commissionRate || '0'))}%</div>
@@ -240,8 +240,8 @@ export default function DashboardPage() {
               <div className="text-center">
                 <div className="text-3xl font-bold text-white">{formatCurrencyWithSymbol(agent.availableBalance)}</div>
                 <div className="text-pt-turquoise-100 text-sm">{t('available')}</div>
-                </div>
             </div>
+                </div>
             </div>
           </div>
         </div>
@@ -276,8 +276,8 @@ export default function DashboardPage() {
               <div className="p-3 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-              </div>
+              </svg>
+            </div>
               <div className="text-right">
                 <div className="text-2xl font-bold text-gray-900">{formatCurrencyWithSymbol(dashboard?.summary.monthlyEarnings || 0)}</div>
                 <div className="text-sm text-gray-500">{getCurrentMonth()}</div>
@@ -298,11 +298,11 @@ export default function DashboardPage() {
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
                 </svg>
-              </div>
+                </div>
               <div className="text-right">
                 <div className="text-2xl font-bold text-gray-900">{agent.totalReferrals || 0}</div>
                 <div className="text-sm text-gray-500">{t('totalReferrals')}</div>
-              </div>
+            </div>
             </div>
             <div className="flex items-center text-purple-600">
               <span className="text-sm font-medium">{parseFloat(String(agent.commissionRate || '0'))}% rate</span>
@@ -316,7 +316,7 @@ export default function DashboardPage() {
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
-              </div>
+            </div>
               <div className="text-right">
                 <div className="text-2xl font-bold text-gray-900">{formatCurrencyWithSymbol(agent.availableBalance)}</div>
                 <div className="text-sm text-gray-500">Available</div>
@@ -341,8 +341,8 @@ export default function DashboardPage() {
                 </svg>
                 <span className="text-sm font-medium">{t('readyForPayoutShort')}</span>
               </div>
-            )}
-          </div>
+              )}
+            </div>
         </div>
         
         {/* Main Content Grid */}
@@ -376,10 +376,10 @@ export default function DashboardPage() {
                         </svg>
                         <span>{t('copyCode')}</span>
                       </button>
-                    </div>
-                  </div>
-                </div>
-                
+          </div>
+        </div>
+      </div>
+
                 {/* Enhanced Share Options */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
                   <button
@@ -441,8 +441,8 @@ export default function DashboardPage() {
                     size="lg"
                     showUrl={true}
                     className="w-full"
-                  />
-                </div>
+                      />
+                    </div>
               </div>
                 </div>
                 </div>
@@ -518,9 +518,9 @@ export default function DashboardPage() {
                       {t('requestPayout')}
                     </button>
                 </div>
-                )}
+                  )}
+                </div>
               </div>
-            </div>
             
             {/* Quick Stats */}
             <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6">
@@ -566,8 +566,8 @@ export default function DashboardPage() {
                           <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
-                        </div>
-                        <div>
+                </div>
+                <div>
                           <p className="font-medium text-gray-900">
                             {earning.description || t('commissionEarned')}
                           </p>
@@ -587,8 +587,8 @@ export default function DashboardPage() {
                         }`}>
                           {earning.status === 'confirmed' ? t('confirmed') : t('pending')}
                         </span>
-                      </div>
-                    </div>
+                </div>
+              </div>
                   ))}
                 </div>
               ) : (
@@ -602,8 +602,8 @@ export default function DashboardPage() {
                   <p className="text-gray-500">{t('startSharing')}</p>
                 </div>
               )}
-            </div>
-          </div>
+                </div>
+              </div>
           
           {/* Recent Payouts */}
           <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
@@ -626,8 +626,8 @@ export default function DashboardPage() {
                           <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                           </svg>
-                        </div>
-                        <div>
+                </div>
+                <div>
                           <p className="font-medium text-gray-900">
                             {payout.method || t('bankTransfer')}
                           </p>
@@ -643,8 +643,8 @@ export default function DashboardPage() {
                         <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
                           {t('pending')}
                         </span>
-                      </div>
-                    </div>
+                </div>
+              </div>
                   ))}
                 </div>
               ) : (
