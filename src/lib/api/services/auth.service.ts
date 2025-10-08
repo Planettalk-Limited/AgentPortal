@@ -63,6 +63,18 @@ export class AuthService extends BaseService {
   }
 
   /**
+   * Resend email verification code
+   */
+  async resendVerificationCode(email: string): Promise<{
+    success: boolean;
+    message: string;
+  }> {
+    return this.execute(() => 
+      this.client.post('auth/resend-verification', { email })
+    );
+  }
+
+  /**
    * Login user (Step 1 of 2FA flow)
    */
   async login(credentials: LoginRequest): Promise<LoginResponse> {
