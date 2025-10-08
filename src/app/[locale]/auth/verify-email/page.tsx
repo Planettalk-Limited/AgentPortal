@@ -1,12 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useTranslations, useLocale } from 'next-intl'
 import { api } from '@/lib/api'
 import Link from 'next/link'
 
-export default function VerifyEmailPage() {
+function VerifyEmailContent() {
   const [verificationCode, setVerificationCode] = useState('')
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
@@ -212,5 +212,45 @@ export default function VerifyEmailPage() {
         </Link>
       </div>
     </div>
+  )
+}
+
+function VerifyEmailLoading() {
+  const t = useTranslations('auth.verifyEmail')
+  
+  return (
+    <div>
+      {/* Header */}
+      <div className="text-center mb-8">
+        <div className="w-12 h-12 bg-pt-turquoise/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+          <svg className="w-6 h-6 text-pt-turquoise" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </svg>
+        </div>
+        <h1 className="text-3xl font-bold text-pt-dark-gray mb-2">{t('title')}</h1>
+        <p className="text-pt-light-gray">{t('subtitle')}</p>
+      </div>
+
+      {/* Loading skeleton */}
+      <div className="space-y-6">
+        <div>
+          <div className="h-4 bg-gray-200 rounded w-20 mb-2"></div>
+          <div className="h-12 bg-gray-200 rounded-2xl"></div>
+        </div>
+        <div>
+          <div className="h-4 bg-gray-200 rounded w-32 mb-2"></div>
+          <div className="h-12 bg-gray-200 rounded-2xl"></div>
+        </div>
+        <div className="h-14 bg-gray-200 rounded-2xl"></div>
+      </div>
+    </div>
+  )
+}
+
+export default function VerifyEmailPage() {
+  return (
+    <Suspense fallback={<VerifyEmailLoading />}>
+      <VerifyEmailContent />
+    </Suspense>
   )
 }
