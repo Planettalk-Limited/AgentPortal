@@ -36,7 +36,6 @@ export type {
 // Export all types from payout service
 export type {
   Payout,
-  CreatePayoutRequest,
   PayoutQueryParams,
   PayoutStats,
   BulkPayoutActionRequest
