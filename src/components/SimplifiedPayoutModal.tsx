@@ -130,15 +130,15 @@ export default function SimplifiedPayoutModal({
     } catch (error) {
       console.error('Payout request failed:', error)
       console.error('Error details:', {
-        message: error?.message,
-        status: error?.status,
-        statusText: error?.statusText,
-        response: error?.response,
-        data: error?.response?.data
+        message: (error as any)?.message,
+        status: (error as any)?.status,
+        statusText: (error as any)?.statusText,
+        response: (error as any)?.response,
+        data: (error as any)?.response?.data
       })
       
       // Show user-friendly error message
-      const errorMessage = error?.message || error?.response?.data?.message || 'An unexpected error occurred'
+      const errorMessage = (error as any)?.message || (error as any)?.response?.data?.message || 'An unexpected error occurred'
       alert(`Payout request failed: ${errorMessage}`)
     }
   }
