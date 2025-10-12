@@ -44,7 +44,6 @@ export type {
   TrainingQueryParams,
   TrainingStats,
   Payout,
-  CreatePayoutRequest,
   PayoutQueryParams,
   PayoutStats,
   BulkPayoutActionRequest
