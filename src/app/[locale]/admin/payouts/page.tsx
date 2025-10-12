@@ -1,8 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { api, UpdatePayoutStatusRequest, ApiError } from '@/lib/api'
-import type { Payout } from '@/lib/api/types'
+import { api, Payout, ApiError } from '@/lib/api'
 import { formatCurrencyWithSymbol } from '@/lib/utils/currency'
 import type { PayoutQueryParams } from '@/lib/api/services/payout.service'
 
@@ -13,14 +12,27 @@ export default function PayoutsPage() {
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   const [selectedPayout, setSelectedPayout] = useState<Payout | null>(null)
-  const [processingPayout, setProcessingPayout] = useState<Payout | null>(null)
-  const [processNotes, setProcessNotes] = useState('')
   const [selectedPayouts, setSelectedPayouts] = useState<string[]>([])
   const [showBulkModal, setShowBulkModal] = useState(false)
-  const [bulkAction, setBulkAction] = useState<'approve' | 'reject'>('approve')
+  const [bulkAction, setBulkAction] = useState<'approve' | 'review'>('approve')
   const [bulkNotes, setBulkNotes] = useState('')
   const [isExporting, setIsExporting] = useState(false)
   const [filtersExpanded, setFiltersExpanded] = useState(false)
+  const [showApprovalWarning, setShowApprovalWarning] = useState(false)
+  const [pendingApproval, setPendingApproval] = useState<{payoutId: string, notes?: string} | null>(null)
+  const [showCsvImport, setShowCsvImport] = useState(false)
+  const [csvFile, setCsvFile] = useState<File | null>(null)
+  const [csvImportAction, setCsvImportAction] = useState<'approve' | 'review'>('approve')
+  const [csvImportNotes, setCsvImportNotes] = useState('')
+  const [lastBulkActionReport, setLastBulkActionReport] = useState<{
+    timestamp: string;
+    action: string;
+    totalProcessed: number;
+    successful: number;
+    failed: number;
+    successfulPayouts: any[];
+    failedPayouts: any[];
+  } | null>(null)
   const [filters, setFilters] = useState<PayoutQueryParams>({
     page: 1,
     limit: 20,
@@ -64,25 +76,18 @@ export default function PayoutsPage() {
         totalPages: paginationData.totalPages || 1
       })
       
-      // Update stats from API metrics if available, otherwise calculate from payouts
-      if ((response as any).metrics) {
-        const metrics = (response as any).metrics
-        setStats({
-          total: metrics.overview?.totalPayouts || 0,
-          pending: metrics.statusSummary?.pending?.count || 0,
-          completed: metrics.statusSummary?.completed?.count || 0,
-          totalAmount: metrics.overview?.totalAmount || 0
-        })
-      } else {
-        // Fallback: calculate stats from payouts data
-        const payouts = Array.isArray(payoutsData) ? payoutsData : []
-        setStats({
-          total: payouts.length,
-          pending: payouts.filter((p: any) => ['requested', 'pending_review', 'approved', 'processing'].includes(p.status)).length,
-          completed: payouts.filter((p: any) => p.status === 'completed').length,
-          totalAmount: payouts.reduce((sum: number, p: any) => sum + (typeof p.amount === 'string' ? parseFloat(p.amount) : p.amount), 0)
-        })
-      }
+      // Always calculate stats from actual payouts data to ensure accuracy
+      const payouts = Array.isArray(payoutsData) ? payoutsData : []
+      
+      const pendingPayouts = payouts.filter((p: any) => ['pending', 'review', 'requested', 'pending_review'].includes(p.status))
+      const completedPayouts = payouts.filter((p: any) => ['approved', 'completed'].includes(p.status))
+      
+      setStats({
+        total: payouts.length,
+        pending: pendingPayouts.length,
+        completed: completedPayouts.length,
+        totalAmount: payouts.reduce((sum: number, p: any) => sum + (typeof p.amount === 'string' ? parseFloat(p.amount) : p.amount), 0)
+      })
     } catch (error) {
       // Failed to load payouts
       setError('Failed to load payouts')
@@ -100,33 +105,16 @@ export default function PayoutsPage() {
   }
 
 
-  const handleProcessPayout = async () => {
-    if (!processingPayout) return
-    
-    try {
-      setUpdating(processingPayout.id)
-      setError(null)
-      
-      await api.payout.processPayout(processingPayout.id, { adminNotes: processNotes })
-      
-      setSuccess('Payout is now being processed. Payment workflow has been initiated.')
-      setProcessingPayout(null)
-      setProcessNotes('')
-      loadPayouts()
-    } catch (error) {
-      console.error('Error processing payout:', error)
-      setError(error instanceof Error ? error.message : 'Failed to process payout')
-    } finally {
-      setUpdating(null)
-    }
-  }
 
   const handleSelectAll = () => {
-    const approvablePayouts = payouts.filter(p => p.status === 'requested' || p.status === 'pending_review')
-    if (selectedPayouts.length === approvablePayouts.length) {
+    // Allow selection of payouts that can still be acted upon (not completed/approved)
+    const actionablePayouts = payouts.filter(p => 
+      !['approved', 'completed', 'cancelled', 'failed'].includes(p.status)
+    )
+    if (selectedPayouts.length === actionablePayouts.length) {
       setSelectedPayouts([])
     } else {
-      setSelectedPayouts(approvablePayouts.map(p => p.id))
+      setSelectedPayouts(actionablePayouts.map(p => p.id))
     }
   }
 
@@ -145,13 +133,40 @@ export default function PayoutsPage() {
       setUpdating('bulk')
       setError(null)
       
-      const result = await api.payout.bulkProcessPayouts({
+      // Use the new bulk process endpoint
+      const response = await api.payout.bulkProcess({
         payoutIds: selectedPayouts,
         action: bulkAction,
-        reason: bulkNotes || undefined
+        adminNotes: bulkNotes
       })
       
-      setSuccess(`Successfully ${bulkAction}d ${result.success} payout(s)${result.failed > 0 ? `, ${result.failed} failed` : ''}`)
+      
+      // Handle the response structure
+      if (response && typeof response === 'object') {
+        const { success, failed, successfulPayouts, failedPayouts } = response
+        
+        // Store report data for download
+        setLastBulkActionReport({
+          timestamp: new Date().toISOString().replace(/[:.]/g, '-'),
+          action: bulkAction,
+          totalProcessed: selectedPayouts.length,
+          successful: success || 0,
+          failed: failed || 0,
+          successfulPayouts: successfulPayouts || [],
+          failedPayouts: failedPayouts || []
+        })
+        
+        if (failed && failed > 0) {
+          const errorMessages = failedPayouts?.map((fp: any) => `${fp.payoutId}: ${fp.error}`).join(', ') || 'Some payouts failed'
+          setError(`${success || 0} payout(s) ${bulkAction}d successfully, but ${failed} failed: ${errorMessages}`)
+        } else {
+          setSuccess(`Successfully ${bulkAction}d ${success || selectedPayouts.length} payout(s)`)
+        }
+      } else {
+        // Fallback if response structure is unexpected
+        setSuccess(`Bulk ${bulkAction} operation completed`)
+      }
+      
       setShowBulkModal(false)
       setBulkNotes('')
       setSelectedPayouts([])
@@ -194,46 +209,211 @@ export default function PayoutsPage() {
     }
   }
 
-  const handleStatusUpdate = async (payoutId: string, status: 'approved' | 'rejected' | 'processing' | 'completed', notes?: string) => {
+  const handleStatusUpdate = async (payoutId: string, action: 'approve' | 'review', notes?: string, reviewMessage?: string) => {
     try {
       setUpdating(payoutId)
       setError(null)
       
-      const updateData: UpdatePayoutStatusRequest = { status }
-      if (notes) updateData.adminNotes = notes
-      
-      // Use specific payout action methods based on status
-      if (status === 'approved') {
+      // Use specific payout action methods based on action
+      if (action === 'approve') {
         await api.payout.approvePayout(payoutId, { adminNotes: notes })
-      } else if (status === 'rejected') {
-        await api.payout.rejectPayout(payoutId, { rejectionReason: notes || 'Rejected by admin', adminNotes: notes })
-      } else if (status === 'processing') {
-        await api.payout.processPayout(payoutId, { adminNotes: notes })
-      } else if (status === 'completed') {
-        await api.payout.completePayout(payoutId, { transactionId: `TXN${Date.now()}`, adminNotes: notes })
+      } else if (action === 'review') {
+        await api.payout.setPayoutToReview(payoutId, { 
+          reviewMessage: reviewMessage || notes || 'Requires additional review', 
+          adminNotes: notes 
+        })
       }
       
       // Refresh payouts
       await loadPayouts()
-      setSuccess(`Payout ${status} successfully`)
+      setSuccess(`Payout ${action === 'approve' ? 'approved' : 'set to review'} successfully`)
       setTimeout(() => setSuccess(null), 3000)
     } catch (error) {
       const apiError = error as ApiError
-      setError(apiError.error || `Failed to ${status} payout`)
+      setError(apiError.error || `Failed to ${action} payout`)
     } finally {
       setUpdating(null)
     }
   }
 
+  const handleApprovalWithWarning = (payoutId: string, notes?: string) => {
+    setPendingApproval({ payoutId, notes })
+    setShowApprovalWarning(true)
+  }
+
+  const confirmApproval = async () => {
+    if (!pendingApproval) return
+    
+    setShowApprovalWarning(false)
+    await handleStatusUpdate(pendingApproval.payoutId, 'approve', pendingApproval.notes)
+    setPendingApproval(null)
+  }
+
+  const handleCsvImport = async () => {
+    if (!csvFile) return
+    
+    try {
+      setUpdating('csv-import')
+      setError(null)
+      
+      const text = await csvFile.text()
+      const lines = text.split('\n').filter(line => line.trim())
+      const headers = lines[0].toLowerCase().split(',').map(h => h.trim())
+      
+      // Find payout ID column
+      const idColumnIndex = headers.findIndex(h => 
+        h.includes('id') || h.includes('payout') || h.includes('reference')
+      )
+      
+      if (idColumnIndex === -1) {
+        setError('CSV must contain a column with payout IDs (e.g., "id", "payout_id", "reference")')
+        return
+      }
+      
+      const payoutIds = lines.slice(1).map(line => {
+        const columns = line.split(',')
+        return columns[idColumnIndex]?.trim()
+      }).filter(id => id)
+      
+      if (payoutIds.length === 0) {
+        setError('No valid payout IDs found in CSV file')
+        return
+      }
+      
+      // Use the bulk process endpoint
+      const response = await api.payout.bulkProcess({
+        payoutIds: payoutIds,
+        action: csvImportAction,
+        adminNotes: csvImportNotes
+      })
+      
+      
+      // Handle the response structure
+      if (response && typeof response === 'object') {
+        const { success, failed, successfulPayouts, failedPayouts } = response
+        
+        // Store report data for download
+        setLastBulkActionReport({
+          timestamp: new Date().toISOString().replace(/[:.]/g, '-'),
+          action: `CSV Import - ${csvImportAction}`,
+          totalProcessed: payoutIds.length,
+          successful: success || 0,
+          failed: failed || 0,
+          successfulPayouts: successfulPayouts || [],
+          failedPayouts: failedPayouts || []
+        })
+        
+        if (failed && failed > 0) {
+          const errorMessages = failedPayouts?.map((fp: any) => `${fp.payoutId}: ${fp.error}`).join(', ') || 'Some payouts failed'
+          setError(`CSV Import: ${success || 0} payout(s) ${csvImportAction}d successfully, but ${failed} failed: ${errorMessages}`)
+        } else {
+          setSuccess(`CSV Import: Successfully ${csvImportAction}d ${success || payoutIds.length} payout(s)`)
+        }
+      } else {
+        // Fallback if response structure is unexpected
+        setSuccess(`CSV Import: Bulk ${csvImportAction} operation completed`)
+      }
+      
+      setShowCsvImport(false)
+      setCsvFile(null)
+      setCsvImportNotes('')
+      await loadPayouts()
+    } catch (error) {
+      console.error('Error with CSV import:', error)
+      setError(error instanceof Error ? error.message : 'Failed to process CSV file')
+    } finally {
+      setUpdating(null)
+    }
+  }
+
+  const downloadSampleCsv = () => {
+    const sampleData = [
+      ['payout_id', 'agent_code', 'amount', 'notes'],
+      ['payout_123456789', 'AG001', '150.00', 'Sample payout 1'],
+      ['payout_987654321', 'AG002', '275.50', 'Sample payout 2'],
+      ['payout_456789123', 'AG003', '89.25', 'Sample payout 3']
+    ]
+    
+    const csvContent = sampleData.map(row => row.join(',')).join('\n')
+    const blob = new Blob([csvContent], { type: 'text/csv' })
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.style.display = 'none'
+    a.href = url
+    a.download = 'payout_import_sample.csv'
+    document.body.appendChild(a)
+    a.click()
+    window.URL.revokeObjectURL(url)
+    document.body.removeChild(a)
+  }
+
+  const downloadBulkActionReport = () => {
+    if (!lastBulkActionReport) return
+    
+    const reportData = [
+      ['Bulk Action Report'],
+      ['Generated:', new Date().toLocaleString()],
+      ['Action:', lastBulkActionReport.action.toUpperCase()],
+      ['Total Processed:', lastBulkActionReport.totalProcessed.toString()],
+      ['Successful:', lastBulkActionReport.successful.toString()],
+      ['Failed:', lastBulkActionReport.failed.toString()],
+      [''],
+      ['SUCCESSFUL PAYOUTS'],
+      ['Payout ID', 'Agent Code', 'Amount', 'Message']
+    ]
+    
+    // Add successful payouts
+    lastBulkActionReport.successfulPayouts.forEach(payout => {
+      reportData.push([
+        payout.payoutId || '',
+        payout.agentCode || '',
+        payout.amount?.toString() || '',
+        payout.message || ''
+      ])
+    })
+    
+    // Add failed payouts section
+    if (lastBulkActionReport.failedPayouts.length > 0) {
+      reportData.push([''])
+      reportData.push(['FAILED PAYOUTS'])
+      reportData.push(['Payout ID', 'Error Message'])
+      
+      lastBulkActionReport.failedPayouts.forEach(payout => {
+        reportData.push([
+          payout.payoutId || '',
+          payout.error || ''
+        ])
+      })
+    }
+    
+    const csvContent = reportData.map(row => 
+      row.map(cell => `"${cell.toString().replace(/"/g, '""')}"`).join(',')
+    ).join('\n')
+    
+    const blob = new Blob([csvContent], { type: 'text/csv' })
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.style.display = 'none'
+    a.href = url
+    a.download = `bulk-action-report-${lastBulkActionReport.timestamp}.csv`
+    document.body.appendChild(a)
+    a.click()
+    window.URL.revokeObjectURL(url)
+    document.body.removeChild(a)
+  }
+
   const getStatusColor = (status: string) => {
     const colors = {
-      'requested': 'bg-yellow-100 text-yellow-800 border-yellow-200',
+      'pending': 'bg-yellow-100 text-yellow-800 border-yellow-200',
+      'requested': 'bg-blue-100 text-blue-800 border-blue-200',
+      'review': 'bg-orange-100 text-orange-800 border-orange-200',
       'pending_review': 'bg-orange-100 text-orange-800 border-orange-200',
-      'approved': 'bg-blue-100 text-blue-800 border-blue-200',
+      'approved': 'bg-green-100 text-green-800 border-green-200',
       'processing': 'bg-purple-100 text-purple-800 border-purple-200',
       'completed': 'bg-green-100 text-green-800 border-green-200',
-      'rejected': 'bg-red-100 text-red-800 border-red-200',
-      'cancelled': 'bg-gray-100 text-gray-800 border-gray-200'
+      'cancelled': 'bg-gray-100 text-gray-800 border-gray-200',
+      'failed': 'bg-red-100 text-red-800 border-red-200',
+      'rejected': 'bg-red-100 text-red-800 border-red-200'
     }
     return colors[status as keyof typeof colors] || 'bg-gray-100 text-gray-800 border-gray-200'
   }
@@ -241,9 +421,10 @@ export default function PayoutsPage() {
   const getMethodIcon = (method: string) => {
     const icons = {
       'bank_transfer': '🏦',
-      'airtime_topup': '📱',
-      'paypal': '💳',
-      'check': '📧',
+      'planettalk_credit': '📱',
+      'airtime_topup': '📞',
+      'mobile_money': '💳',
+      'paypal': '💰',
       'crypto': '₿'
     }
     return icons[method as keyof typeof icons] || '💰'
@@ -267,24 +448,50 @@ export default function PayoutsPage() {
 
       {/* Success/Error Alerts */}
       {success && (
-        <div className="bg-green-50 border border-green-200 text-green-700 px-6 py-4 rounded-xl mb-6 flex items-center">
-          <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3">
-            <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-            </svg>
+        <div className="bg-green-50 border border-green-200 text-green-700 px-6 py-4 rounded-xl mb-6 flex items-center justify-between">
+          <div className="flex items-center">
+            <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3">
+              <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <span className="font-medium">{success}</span>
           </div>
-          <span className="font-medium">{success}</span>
+          {lastBulkActionReport && (
+            <button
+              onClick={downloadBulkActionReport}
+              className="ml-4 px-3 py-1 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors duration-200 flex items-center"
+            >
+              <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              Download Report
+            </button>
+          )}
         </div>
       )}
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-xl mb-6 flex items-center">
-          <div className="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center mr-3">
-            <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-            </svg>
+        <div className="bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-xl mb-6 flex items-center justify-between">
+          <div className="flex items-center">
+            <div className="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center mr-3">
+              <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <span className="font-medium">{error}</span>
           </div>
-          <span className="font-medium">{error}</span>
+          {lastBulkActionReport && (
+            <button
+              onClick={downloadBulkActionReport}
+              className="ml-4 px-3 py-1 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition-colors duration-200 flex items-center"
+            >
+              <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              Download Report
+            </button>
+          )}
         </div>
       )}
 
@@ -312,7 +519,7 @@ export default function PayoutsPage() {
               </svg>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-pt-light-gray">Pending Review</p>
+              <p className="text-sm font-medium text-pt-light-gray">Pending/Review</p>
               <p className="text-2xl font-bold text-pt-dark-gray">{stats.pending}</p>
             </div>
           </div>
@@ -326,7 +533,7 @@ export default function PayoutsPage() {
               </svg>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-pt-light-gray">Completed</p>
+              <p className="text-sm font-medium text-pt-light-gray">Approved</p>
               <p className="text-2xl font-bold text-pt-dark-gray">{stats.completed}</p>
             </div>
           </div>
@@ -387,12 +594,9 @@ export default function PayoutsPage() {
               className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-pt-turquoise focus:border-pt-turquoise transition-all duration-200"
             >
               <option value="">All Statuses</option>
-              <option value="requested">Requested</option>
-              <option value="pending_review">Pending Review</option>
+              <option value="pending">Pending</option>
+              <option value="review">Under Review</option>
               <option value="approved">Approved</option>
-              <option value="processing">Processing</option>
-              <option value="completed">Completed</option>
-              <option value="rejected">Rejected</option>
             </select>
           </div>
 
@@ -405,10 +609,7 @@ export default function PayoutsPage() {
             >
               <option value="">All Methods</option>
               <option value="bank_transfer">Bank Transfer</option>
-              <option value="airtime_topup">Airtime Top-up</option>
-              <option value="paypal">PayPal</option>
-              <option value="check">Check</option>
-              <option value="crypto">Cryptocurrency</option>
+              <option value="planettalk_credit">PlanetTalk Credit</option>
             </select>
           </div>
 
@@ -467,21 +668,30 @@ export default function PayoutsPage() {
               </button>
               <button
                 onClick={() => {
-                  setBulkAction('reject')
+                  setBulkAction('review')
                   setShowBulkModal(true)
                 }}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 flex items-center"
+                className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors duration-200 flex items-center"
               >
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                Bulk Reject
+                Bulk Review
               </button>
             </>
           )}
         </div>
         
         <div className="flex items-center space-x-3">
+          <button
+            onClick={() => setShowCsvImport(true)}
+            className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors duration-200 flex items-center"
+          >
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+            </svg>
+            Import CSV
+          </button>
           <button
             onClick={handleExportCSV}
             disabled={isExporting || payouts.length === 0}
@@ -536,7 +746,7 @@ export default function PayoutsPage() {
                   <th className="px-6 py-4 text-left text-xs font-semibold text-pt-dark-gray uppercase tracking-wider">
                     <input
                       type="checkbox"
-                      checked={selectedPayouts.length > 0 && selectedPayouts.length === payouts.filter(p => p.status === 'requested' || p.status === 'pending_review').length}
+                      checked={selectedPayouts.length > 0 && selectedPayouts.length === payouts.filter(p => !['approved', 'completed', 'cancelled', 'failed'].includes(p.status)).length}
                       onChange={handleSelectAll}
                       className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
                     />
@@ -553,7 +763,7 @@ export default function PayoutsPage() {
                 {payouts.map((payout) => (
                   <tr key={payout.id} className="hover:bg-gray-50 transition-colors duration-200">
                     <td className="px-6 py-4">
-                      {(payout.status === 'requested' || payout.status === 'pending_review') && (
+                      {!['approved', 'completed', 'cancelled', 'failed'].includes(payout.status) && (
                         <input
                           type="checkbox"
                           checked={selectedPayouts.includes(payout.id)}
@@ -597,41 +807,25 @@ export default function PayoutsPage() {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center space-x-2">
-                        {(payout.status === 'requested' || payout.status === 'pending_review') && (
+                        {!['approved', 'completed', 'cancelled', 'failed'].includes(payout.status) && (
                           <>
                             <button
-                              onClick={() => handleStatusUpdate(payout.id, 'approved')}
+                              onClick={() => handleApprovalWithWarning(payout.id)}
                               disabled={updating === payout.id}
                               className="px-3 py-1 bg-green-100 text-green-700 rounded-lg text-xs font-medium hover:bg-green-200 transition-colors duration-200 disabled:opacity-50"
                             >
                               {updating === payout.id ? '...' : 'Approve'}
                             </button>
-                            <button
-                              onClick={() => handleStatusUpdate(payout.id, 'rejected', 'Rejected by admin')}
-                              disabled={updating === payout.id}
-                              className="px-3 py-1 bg-red-100 text-red-700 rounded-lg text-xs font-medium hover:bg-red-200 transition-colors duration-200 disabled:opacity-50"
-                            >
-                              {updating === payout.id ? '...' : 'Reject'}
-                            </button>
+                            {!['review', 'pending_review'].includes(payout.status) && (
+                              <button
+                                onClick={() => handleStatusUpdate(payout.id, 'review', 'Requires additional review')}
+                                disabled={updating === payout.id}
+                                className="px-3 py-1 bg-orange-100 text-orange-700 rounded-lg text-xs font-medium hover:bg-orange-200 transition-colors duration-200 disabled:opacity-50"
+                              >
+                                {updating === payout.id ? '...' : 'Review'}
+                              </button>
+                            )}
                           </>
-                        )}
-                        {payout.status === 'approved' && (
-                          <button
-                            onClick={() => setProcessingPayout(payout)}
-                            disabled={updating === payout.id}
-                            className="px-3 py-1 bg-blue-100 text-blue-700 rounded-lg text-xs font-medium hover:bg-blue-200 transition-colors duration-200 disabled:opacity-50"
-                          >
-                            {updating === payout.id ? '...' : 'Process'}
-                          </button>
-                        )}
-                        {payout.status === 'processing' && (
-                          <button
-                            onClick={() => handleStatusUpdate(payout.id, 'completed')}
-                            disabled={updating === payout.id}
-                            className="px-3 py-1 bg-purple-100 text-purple-700 rounded-lg text-xs font-medium hover:bg-purple-200 transition-colors duration-200 disabled:opacity-50"
-                          >
-                            {updating === payout.id ? '...' : 'Complete'}
-                          </button>
                         )}
                         <button 
                           onClick={() => setSelectedPayout(payout)}
@@ -726,7 +920,7 @@ export default function PayoutsPage() {
             {/* Modal Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
               <h2 className="text-xl font-semibold text-pt-dark-gray">
-                Bulk {bulkAction === 'approve' ? 'Approve' : 'Reject'} Payouts
+                Bulk {bulkAction === 'approve' ? 'Approve' : 'Review'} Payouts
               </h2>
               <button
                 onClick={() => {
@@ -744,23 +938,23 @@ export default function PayoutsPage() {
             {/* Modal Content */}
             <div className="p-6">
               {/* Selection Summary */}
-              <div className={`border rounded-lg p-4 mb-6 ${bulkAction === 'approve' ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
+              <div className={`border rounded-lg p-4 mb-6 ${bulkAction === 'approve' ? 'bg-green-50 border-green-200' : 'bg-orange-50 border-orange-200'}`}>
                 <div className="flex items-center mb-3">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center mr-3 ${bulkAction === 'approve' ? 'bg-green-500' : 'bg-red-500'}`}>
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center mr-3 ${bulkAction === 'approve' ? 'bg-green-500' : 'bg-orange-500'}`}>
                     <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       {bulkAction === 'approve' ? (
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                       ) : (
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                       )}
                     </svg>
                   </div>
                   <div>
-                    <h3 className={`font-semibold ${bulkAction === 'approve' ? 'text-green-900' : 'text-red-900'}`}>
-                      {bulkAction === 'approve' ? 'Approve' : 'Reject'} {selectedPayouts.length} Payout{selectedPayouts.length !== 1 ? 's' : ''}
+                    <h3 className={`font-semibold ${bulkAction === 'approve' ? 'text-green-900' : 'text-orange-900'}`}>
+                      {bulkAction === 'approve' ? 'Approve' : 'Set to Review'} {selectedPayouts.length} Payout{selectedPayouts.length !== 1 ? 's' : ''}
                     </h3>
-                    <p className={`text-sm ${bulkAction === 'approve' ? 'text-green-700' : 'text-red-700'}`}>
-                      Selected payout requests will be {bulkAction}d
+                    <p className={`text-sm ${bulkAction === 'approve' ? 'text-green-700' : 'text-orange-700'}`}>
+                      Selected payout requests will be {bulkAction === 'approve' ? 'approved' : 'set to review status'}
                     </p>
                   </div>
                 </div>
@@ -771,14 +965,14 @@ export default function PayoutsPage() {
                     .filter(p => selectedPayouts.includes(p.id))
                     .slice(0, 3)
                     .map(payout => (
-                      <div key={payout.id} className={`flex justify-between text-sm ${bulkAction === 'approve' ? 'text-green-800' : 'text-red-800'}`}>
+                      <div key={payout.id} className={`flex justify-between text-sm ${bulkAction === 'approve' ? 'text-green-800' : 'text-orange-800'}`}>
                         <span>{payout.agent?.agentCode || payout.id.slice(0, 8)}</span>
                         <span>{formatCurrencyWithSymbol(payout.amount)}</span>
                       </div>
                     ))
                   }
                   {selectedPayouts.length > 3 && (
-                    <div className={`text-xs ${bulkAction === 'approve' ? 'text-green-600' : 'text-red-600'}`}>
+                    <div className={`text-xs ${bulkAction === 'approve' ? 'text-green-600' : 'text-orange-600'}`}>
                       ...and {selectedPayouts.length - 3} more
                     </div>
                   )}
@@ -793,12 +987,12 @@ export default function PayoutsPage() {
                   </svg>
                   <div>
                     <h4 className="font-medium text-yellow-900 mb-1">
-                      {bulkAction === 'approve' ? 'Confirm Approval' : 'Confirm Rejection'}
+                      {bulkAction === 'approve' ? 'Confirm Approval' : 'Confirm Review Status'}
                     </h4>
                     <p className="text-sm text-yellow-800">
                       {bulkAction === 'approve' 
                         ? 'This will approve all selected payouts and they will be ready for processing. Agents will be notified via email.'
-                        : 'This will reject all selected payouts and return the funds to agent balances. Agents will be notified via email.'
+                        : 'This will set all selected payouts to review status for additional verification. Agents will be notified via email.'
                       }
                     </p>
                   </div>
@@ -808,18 +1002,18 @@ export default function PayoutsPage() {
               {/* Admin Notes */}
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {bulkAction === 'approve' ? 'Approval Notes (Optional)' : 'Rejection Reason'}
+                  {bulkAction === 'approve' ? 'Approval Notes (Optional)' : 'Review Message'}
                 </label>
                 <textarea
                   value={bulkNotes}
                   onChange={(e) => setBulkNotes(e.target.value)}
                   placeholder={bulkAction === 'approve' 
                     ? "Add any notes about the approval (e.g., batch approved, verified earnings, etc.)"
-                    : "Explain why these payouts are being rejected (this will be sent to agents)"
+                    : "Explain why these payouts need additional review (this will be sent to agents)"
                   }
                   rows={3}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
-                  required={bulkAction === 'reject'}
+                  required={bulkAction === 'review'}
                 />
               </div>
 
@@ -836,11 +1030,11 @@ export default function PayoutsPage() {
                 </button>
                 <button
                   onClick={handleBulkAction}
-                  disabled={updating === 'bulk' || (bulkAction === 'reject' && !bulkNotes.trim())}
+                  disabled={updating === 'bulk' || (bulkAction === 'review' && !bulkNotes.trim())}
                   className={`px-6 py-2 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center ${
                     bulkAction === 'approve' 
                       ? 'bg-green-600 text-white hover:bg-green-700' 
-                      : 'bg-red-600 text-white hover:bg-red-700'
+                      : 'bg-orange-600 text-white hover:bg-orange-700'
                   }`}
                 >
                   {updating === 'bulk' ? (
@@ -849,7 +1043,7 @@ export default function PayoutsPage() {
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                       </svg>
-                      {bulkAction === 'approve' ? 'Approving...' : 'Rejecting...'}
+                      {bulkAction === 'approve' ? 'Approving...' : 'Setting to Review...'}
                     </>
                   ) : (
                     <>
@@ -857,10 +1051,10 @@ export default function PayoutsPage() {
                         {bulkAction === 'approve' ? (
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                         ) : (
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         )}
                       </svg>
-                      {bulkAction === 'approve' ? 'Approve All' : 'Reject All'}
+                      {bulkAction === 'approve' ? 'Approve All' : 'Set to Review'}
                     </>
                   )}
                 </button>
@@ -870,131 +1064,6 @@ export default function PayoutsPage() {
         </div>
       )}
 
-      {/* Process Payout Modal */}
-      {processingPayout && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl shadow-xl max-w-lg w-full">
-            {/* Modal Header */}
-            <div className="flex items-center justify-between p-6 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-pt-dark-gray">Process Payout</h2>
-              <button
-                onClick={() => {
-                  setProcessingPayout(null)
-                  setProcessNotes('')
-                }}
-                className="text-gray-400 hover:text-gray-600 transition-colors duration-200"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-
-            {/* Modal Content */}
-            <div className="p-6">
-              {/* Payout Info */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                <div className="flex items-center mb-3">
-                  <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center mr-3">
-                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-blue-900">Payout Details</h3>
-                    <p className="text-sm text-blue-700">ID: {processingPayout.id.slice(0, 8)}</p>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="font-medium text-blue-900">Amount:</span>
-                    <p className="text-blue-700">{formatCurrencyWithSymbol(processingPayout.amount)}</p>
-                  </div>
-                  <div>
-                    <span className="font-medium text-blue-900">Method:</span>
-                    <p className="text-blue-700 capitalize">{processingPayout.method.replace('_', ' ')}</p>
-                  </div>
-                  <div>
-                    <span className="font-medium text-blue-900">Agent:</span>
-                    <p className="text-blue-700">{processingPayout.agent?.agentCode || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <span className="font-medium text-blue-900">Status:</span>
-                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">
-                      APPROVED
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Process Information */}
-              <div className="mb-6">
-                <div className="flex items-start space-x-3 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                  <svg className="w-5 h-5 text-yellow-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <div>
-                    <h4 className="font-medium text-yellow-900 mb-1">Processing Payment</h4>
-                    <p className="text-sm text-yellow-800">
-                      This will mark the payout as &quot;processing&quot; and initiate the payment workflow. 
-                      The agent will be notified that their payment is being processed.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Admin Notes */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Processing Notes (Optional)
-                </label>
-                <textarea
-                  value={processNotes}
-                  onChange={(e) => setProcessNotes(e.target.value)}
-                  placeholder="Add any notes about the payment processing (e.g., batch ID, payment method details, etc.)"
-                  rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
-                />
-              </div>
-
-              {/* Modal Actions */}
-              <div className="flex justify-end space-x-3">
-                <button
-                  onClick={() => {
-                    setProcessingPayout(null)
-                    setProcessNotes('')
-                  }}
-                  className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors duration-200"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleProcessPayout}
-                  disabled={updating === processingPayout.id}
-                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-                >
-                  {updating === processingPayout.id ? (
-                    <>
-                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Processing...
-                    </>
-                  ) : (
-                    <>
-                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      Start Processing
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Payout Details Modal */}
       {selectedPayout && (
@@ -1065,10 +1134,6 @@ export default function PayoutsPage() {
                       <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
                       <p className="text-sm text-gray-900">{selectedPayout.agent.user?.email}</p>
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Tier</label>
-                      <p className="text-sm text-gray-900 capitalize">{selectedPayout.agent.tier}</p>
-                    </div>
                   </div>
                 </div>
               )}
@@ -1078,32 +1143,46 @@ export default function PayoutsPage() {
                 <div className="border-t border-gray-200 pt-6">
                   <h3 className="text-lg font-medium text-pt-dark-gray mb-4">Payment Details</h3>
                   <div className="bg-gray-50 rounded-lg p-4">
-                    {selectedPayout.method === 'airtime_topup' && selectedPayout.paymentDetails.airtimeTopup && (
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
-                        <p className="text-sm text-gray-900">{selectedPayout.paymentDetails.airtimeTopup.phoneNumber}</p>
+                    {selectedPayout.method === 'planettalk_credit' && selectedPayout.paymentDetails.planettalkCredit && (
+                      <div className="space-y-2">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">PlanetTalk Mobile</label>
+                          <p className="text-sm text-gray-900">{selectedPayout.paymentDetails.planettalkCredit.planettalkMobile}</p>
+                        </div>
+                        {selectedPayout.paymentDetails.planettalkCredit.accountName && (
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Account Name</label>
+                            <p className="text-sm text-gray-900">{selectedPayout.paymentDetails.planettalkCredit.accountName}</p>
+                          </div>
+                        )}
                       </div>
                     )}
-                    {selectedPayout.method === 'bank_transfer' && selectedPayout.paymentDetails.bankTransfer && (
+                    {selectedPayout.method === 'bank_transfer' && selectedPayout.paymentDetails.bankAccount && (
                       <div className="space-y-2">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">Account Number</label>
-                          <p className="text-sm text-gray-900">{selectedPayout.paymentDetails.bankTransfer.accountNumber}</p>
+                          <p className="text-sm text-gray-900">{selectedPayout.paymentDetails.bankAccount.accountNumber}</p>
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">Bank Name</label>
-                          <p className="text-sm text-gray-900">{selectedPayout.paymentDetails.bankTransfer.bankName}</p>
+                          <p className="text-sm text-gray-900">{selectedPayout.paymentDetails.bankAccount.bankName}</p>
                         </div>
-                        {selectedPayout.paymentDetails.bankTransfer.routingNumber && (
+                        {selectedPayout.paymentDetails.bankAccount.routingNumber && (
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Routing Number</label>
-                            <p className="text-sm text-gray-900">{selectedPayout.paymentDetails.bankTransfer.routingNumber}</p>
+                            <p className="text-sm text-gray-900">{selectedPayout.paymentDetails.bankAccount.routingNumber}</p>
+                          </div>
+                        )}
+                        {selectedPayout.paymentDetails.bankAccount.accountName && (
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Account Name</label>
+                            <p className="text-sm text-gray-900">{selectedPayout.paymentDetails.bankAccount.accountName}</p>
                           </div>
                         )}
                       </div>
                     )}
                     {/* Add other payment method details as needed */}
-                    {!['airtime_topup', 'bank_transfer'].includes(selectedPayout.method) && (
+                    {!['planettalk_credit', 'bank_transfer'].includes(selectedPayout.method) && (
                       <pre className="text-xs text-gray-600 whitespace-pre-wrap">{JSON.stringify(selectedPayout.paymentDetails, null, 2)}</pre>
                     )}
                   </div>
@@ -1124,23 +1203,11 @@ export default function PayoutsPage() {
                       <span className="text-sm text-gray-900">{new Date(selectedPayout.approvedAt).toLocaleString()}</span>
                     </div>
                   )}
-                  {selectedPayout.processedAt && (
-                    <div className="flex justify-between">
-                      <span className="text-sm font-medium text-gray-700">Processed At:</span>
-                      <span className="text-sm text-gray-900">{new Date(selectedPayout.processedAt).toLocaleString()}</span>
-                    </div>
-                  )}
-                  {selectedPayout.completedAt && (
-                    <div className="flex justify-between">
-                      <span className="text-sm font-medium text-gray-700">Completed At:</span>
-                      <span className="text-sm text-gray-900">{new Date(selectedPayout.completedAt).toLocaleString()}</span>
-                    </div>
-                  )}
                 </div>
               </div>
 
               {/* Description & Notes */}
-              {(selectedPayout.description || selectedPayout.adminNotes || selectedPayout.rejectionReason) && (
+              {(selectedPayout.description || selectedPayout.adminNotes || selectedPayout.reviewMessage) && (
                 <div className="border-t border-gray-200 pt-6">
                   <h3 className="text-lg font-medium text-pt-dark-gray mb-4">Additional Information</h3>
                   {selectedPayout.description && (
@@ -1155,32 +1222,332 @@ export default function PayoutsPage() {
                       <p className="text-sm text-gray-900 bg-blue-50 px-3 py-2 rounded-lg">{selectedPayout.adminNotes}</p>
                     </div>
                   )}
-                  {selectedPayout.rejectionReason && (
+                  {selectedPayout.reviewMessage && (
                     <div className="mb-3">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Rejection Reason</label>
-                      <p className="text-sm text-red-900 bg-red-50 px-3 py-2 rounded-lg">{selectedPayout.rejectionReason}</p>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Review Message</label>
+                      <p className="text-sm text-orange-900 bg-orange-50 px-3 py-2 rounded-lg">{selectedPayout.reviewMessage}</p>
                     </div>
                   )}
-                </div>
-              )}
-
-              {/* Transaction ID */}
-              {selectedPayout.transactionId && (
-                <div className="border-t border-gray-200 pt-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Transaction ID</label>
-                  <p className="text-sm text-gray-900 bg-gray-50 px-3 py-2 rounded-lg font-mono">{selectedPayout.transactionId}</p>
                 </div>
               )}
             </div>
 
             {/* Modal Footer */}
-            <div className="flex justify-end p-6 border-t border-gray-200">
+            <div className="flex justify-between p-6 border-t border-gray-200">
+              <div className="flex items-center space-x-3">
+                {selectedPayout && !['approved', 'completed', 'cancelled', 'failed'].includes(selectedPayout.status) && (
+                  <>
+                    <button
+                      onClick={() => handleApprovalWithWarning(selectedPayout.id)}
+                      disabled={updating === selectedPayout.id}
+                      className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 disabled:opacity-50 flex items-center"
+                    >
+                      {updating === selectedPayout.id ? (
+                        <>
+                          <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          Processing...
+                        </>
+                      ) : (
+                        <>
+                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                          </svg>
+                          Approve
+                        </>
+                      )}
+                    </button>
+                    {!['review', 'pending_review'].includes(selectedPayout.status) && (
+                      <button
+                        onClick={() => handleStatusUpdate(selectedPayout.id, 'review', 'Requires additional review')}
+                        disabled={updating === selectedPayout.id}
+                        className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors duration-200 disabled:opacity-50 flex items-center"
+                      >
+                        {updating === selectedPayout.id ? (
+                          <>
+                            <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Processing...
+                          </>
+                        ) : (
+                          <>
+                            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Set to Review
+                          </>
+                        )}
+                      </button>
+                    )}
+                  </>
+                )}
+              </div>
               <button
                 onClick={() => setSelectedPayout(null)}
                 className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors duration-200"
               >
                 Close
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Approval Warning Modal */}
+      {showApprovalWarning && pendingApproval && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <div className="flex items-center">
+                <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center mr-3">
+                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <h2 className="text-xl font-semibold text-pt-dark-gray">Confirm Approval</h2>
+              </div>
+              <button
+                onClick={() => {
+                  setShowApprovalWarning(false)
+                  setPendingApproval(null)
+                }}
+                className="text-gray-400 hover:text-gray-600 transition-colors duration-200"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6">
+              <div className="mb-6">
+                <div className="flex items-start space-x-3 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <svg className="w-5 h-5 text-yellow-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                  </svg>
+                  <div>
+                    <h4 className="font-medium text-yellow-900 mb-1">Are you sure you want to approve this payout?</h4>
+                    <p className="text-sm text-yellow-800">
+                      This action cannot be undone. The payout will be processed and the agent will be notified via email.
+                    </p>
+                    <p className="text-sm text-yellow-800 mt-2">
+                      <strong>Payout ID:</strong> {pendingApproval.payoutId}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Modal Actions */}
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={() => {
+                    setShowApprovalWarning(false)
+                    setPendingApproval(null)
+                  }}
+                  className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors duration-200"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmApproval}
+                  className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 flex items-center"
+                >
+                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  Yes, Approve Payout
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* CSV Import Modal */}
+      {showCsvImport && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <h2 className="text-xl font-semibold text-pt-dark-gray">Import CSV for Bulk Actions</h2>
+              <button
+                onClick={() => {
+                  setShowCsvImport(false)
+                  setCsvFile(null)
+                  setCsvImportNotes('')
+                }}
+                className="text-gray-400 hover:text-gray-600 transition-colors duration-200"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6 space-y-6">
+              {/* CSV Format Guide */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-start space-x-3">
+                  <svg className="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <div className="flex-1">
+                    <h4 className="font-medium text-blue-900 mb-2">CSV Format Requirements</h4>
+                    <div className="text-sm text-blue-800 space-y-2">
+                      <p><strong>Required:</strong> One column containing payout IDs</p>
+                      <p><strong>Accepted column names:</strong> "id", "payout_id", "reference", or any column containing these words</p>
+                      <p><strong>Format:</strong> Standard CSV with comma separators and headers in the first row</p>
+                      <div className="bg-white rounded p-2 mt-2 font-mono text-xs">
+                        <div className="text-gray-600">Example:</div>
+                        <div>payout_id,agent_code,amount</div>
+                        <div>payout_123456789,AG001,150.00</div>
+                        <div>payout_987654321,AG002,275.50</div>
+                      </div>
+                    </div>
+                    <div className="mt-3">
+                      <button
+                        onClick={downloadSampleCsv}
+                        className="inline-flex items-center px-3 py-1 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700 transition-colors duration-200"
+                      >
+                        <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Download Sample CSV
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* File Upload */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Upload CSV File</label>
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+                  <input
+                    type="file"
+                    accept=".csv"
+                    onChange={(e) => setCsvFile(e.target.files?.[0] || null)}
+                    className="hidden"
+                    id="csv-upload"
+                  />
+                  <label htmlFor="csv-upload" className="cursor-pointer">
+                    <svg className="w-8 h-8 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    </svg>
+                    <p className="text-sm text-gray-600">
+                      {csvFile ? csvFile.name : 'Click to upload CSV file'}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Only CSV files are accepted
+                    </p>
+                  </label>
+                </div>
+              </div>
+
+              {/* Action Selection */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Action to Perform</label>
+                <div className="flex space-x-4">
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      value="approve"
+                      checked={csvImportAction === 'approve'}
+                      onChange={(e) => setCsvImportAction(e.target.value as 'approve' | 'review')}
+                      className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 focus:ring-green-500 focus:ring-2"
+                    />
+                    <span className="ml-2 text-sm text-gray-900">Approve</span>
+                  </label>
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      value="review"
+                      checked={csvImportAction === 'review'}
+                      onChange={(e) => setCsvImportAction(e.target.value as 'approve' | 'review')}
+                      className="w-4 h-4 text-orange-600 bg-gray-100 border-gray-300 focus:ring-orange-500 focus:ring-2"
+                    />
+                    <span className="ml-2 text-sm text-gray-900">Set to Review</span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Notes */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {csvImportAction === 'approve' ? 'Approval Notes (Optional)' : 'Review Message'}
+                </label>
+                <textarea
+                  value={csvImportNotes}
+                  onChange={(e) => setCsvImportNotes(e.target.value)}
+                  placeholder={csvImportAction === 'approve' 
+                    ? "Add any notes about the bulk approval"
+                    : "Explain why these payouts need review"
+                  }
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                  required={csvImportAction === 'review'}
+                />
+              </div>
+
+              {/* Warning */}
+              <div className="flex items-start space-x-3 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <svg className="w-5 h-5 text-yellow-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div>
+                  <h4 className="font-medium text-yellow-900 mb-1">Bulk Action Warning</h4>
+                  <p className="text-sm text-yellow-800">
+                    This will {csvImportAction} all payouts listed in the CSV file. Make sure you have verified the file contents before proceeding.
+                  </p>
+                </div>
+              </div>
+
+              {/* Modal Actions */}
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={() => {
+                    setShowCsvImport(false)
+                    setCsvFile(null)
+                    setCsvImportNotes('')
+                  }}
+                  className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors duration-200"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleCsvImport}
+                  disabled={!csvFile || updating === 'csv-import' || (csvImportAction === 'review' && !csvImportNotes.trim())}
+                  className={`px-6 py-2 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center ${
+                    csvImportAction === 'approve' 
+                      ? 'bg-green-600 text-white hover:bg-green-700' 
+                      : 'bg-orange-600 text-white hover:bg-orange-700'
+                  }`}
+                >
+                  {updating === 'csv-import' ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+                      </svg>
+                      Import & {csvImportAction === 'approve' ? 'Approve' : 'Review'}
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </div>

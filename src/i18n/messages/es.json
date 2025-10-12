@@ -1,7 +1,6 @@
 {
   "navigation": {
     "agentPortal": "Portal del Agente",
-    "features": "Características",
     "about": "Acerca de",
     "planettalkWebsite": "PlanetTalk.com",
     "dashboard": "Panel",
@@ -26,11 +25,40 @@
   },
   "hero": {
     "badge": "Portal de Agentes En Vivo",
-    "title": "PlanetTalk",
-    "subtitle": "Red de Agentes",
-    "description": "Únete a nuestra red global de telecomunicaciones. Gana comisiones compartiendo tu código de agente único y ayudando a clientes con recargas en todo el mundo.",
+    "title": "Convertirse en Agente",
+    "middle": "con",
+    "subtitle": "PlanetTalk",
+    "subtitle2": "¡Gana dinero con PlanetTalk!",
+    "description": "Comienza a ganar comisiones trayendo nuevos clientes a PlanetTalk.",
+    "info": "Miles de personas en el Reino Unido, Francia y Canadá están usando la aplicación PlanetTalk para conectar y apoyar a sus seres queridos a través de llamadas internacionales baratas, recargas fáciles de crédito de datos y tiempo aire, e-vouchers, tarjetas de regalo y pagos de facturas de servicios públicos a tarifas inmejorables.",
+    "helpThemStay": "¡Puedes ayudarlos a mantenerse conectados con sus seres queridos y ganar dinero en el proceso!",
     "ctaPrimary": "Iniciar Sesión de Agente",
     "ctaSecondary": "Convertirse en Agente",
+    "signUp": "Registrarse Ahora",
+    "cta": "¿Listo para Comenzar?",
+    "ctaDescription": "¡Únete a nosotros hoy y convierte tus conexiones en dinero!",
+    "whyJoin": {
+      "title": "¿Por Qué Unirse?",
+      "reasons": [
+        {
+          "title": "Gana Comisiones Continuas",
+          "description": "Recibe comisiones de cada cliente durante 24 meses desde su primera recarga exitosa."
+        },
+        {
+          "title": "Código de Agente Único",
+          "description": "Comparte tu código único con tu red, lo usan una vez y ganas comisión cada vez que recargan."
+        },
+        {
+          "title": "Genera un Impacto Positivo",
+          "description": "¡Ayuda a la diáspora a conectar y apoyar a sus familias en casa sin quebrar el banco!"
+        }
+      ]
+    },
+    "commissionBadge": {
+      "months": "24",
+      "period": "meses",
+      "label": "comisión"
+    },
     "process": {
       "step1": {
         "title": "Aplicar en Línea",
@@ -458,7 +486,15 @@
     "welcomeBack": "¡Bienvenido de vuelta, {name}! 👋",
     "agentId": "ID de Agente",
     "totalEarnings": "Ganancias Totales",
+    "earnings": "Ganancias",
+    "referrals": "Referencias",
+    "balance": "Saldo",
+    "availableForPayout": "Disponible para Pago",
+    "totalReferrals": "Referencias Totales",
     "activeReferrals": "Referencias Activas",
+    "agentTier": "Nivel de Agente",
+    "pendingBalance": "Saldo Pendiente",
+    "agentStatus": "Estado del Agente",
     "availableBalance": "Saldo Disponible",
     "agentCode": "Código de Agente",
     "welcomeTitle": "🎉 ¡Bienvenido al Portal de Agentes PlanetTalk!",
@@ -466,6 +502,7 @@
     "nextSteps": "Próximos Pasos:",
     "shareAgentCode": "Comparte Tu Código de Agente",
     "shareAgentCodeDescription": "Usa el código {code} para empezar a ganar",
+    "shareToEarn": "Comparte con amigos y familiares para empezar a ganar comisiones",
     "trackEarnings": "Rastrea Tus Ganancias",
     "trackEarningsDescription": "Monitorea la actividad de clientes y comisiones",
     "accessTraining": "Accede a Entrenamiento",
@@ -493,13 +530,32 @@
     "minimum": "mínimo",
     "readyForPayout": "¡Listo para pago!",
     "balanceMeetsRequirement": "Tu saldo cumple con el requisito mínimo de pago",
+    "payoutInformation": "Información de Pago",
+    "processingTime": "Tiempo de procesamiento: 3-5 días hábiles",
+    "availableMethods": "Métodos disponibles: Transferencia Bancaria y Crédito PlanetTalk",
+    "emailConfirmation": "Recibirás confirmación por correo una vez procesado",
+    "payoutRequirements": "Requisitos de Pago",
+    "minimumBalance": "Saldo mínimo: {amount}",
+    "howToReachMinimum": "Cómo Alcanzar el Mínimo",
+    "shareAgentCode": "Comparte tu código de agente con amigos y familiares",
+    "postOnSocialMedia": "Publica en redes sociales usando los botones de compartir arriba",
+    "earnCommission": "Gana {rate}% de comisión en toda actividad de referidos",
     "quickStats": "Estadísticas Rápidas",
     "recentEarnings": "Ganancias Recientes",
     "recentPayouts": "Pagos Recientes",
     "commissionEarned": "Comisión ganada",
     "bankTransfer": "Transferencia Bancaria",
+    "airtimeTopup": "Recarga de Saldo",
+    "planettalkCredit": "Crédito PlanetTalk",
+    "review": "En Revisión",
     "confirmed": "Confirmado",
     "pending": "Pendiente",
+    "requested": "Solicitado",
+    "approved": "Aprobado",
+    "processed": "Procesado",
+    "completed": "Completado",
+    "rejected": "Rechazado",
+    "cancelled": "Cancelado",
     "noEarningsYet": "Sin ganancias aún",
     "startSharing": "Empieza a compartir tu código de agente para ganar comisiones",
     "noPayoutsYet": "Sin pagos aún",
@@ -521,7 +577,12 @@
     "thisMonth": "este mes",
     "progressTo": "Progreso a",
     "sharing": "Compartiendo...",
-    "failedToShareLink": "Error al compartir enlace"
+    "failedToShareLink": "Error al compartir enlace",
+    "justNow": "Ahora mismo",
+    "minutesAgo": "minutos",
+    "hoursAgo": "horas",
+    "yesterday": "Ayer",
+    "daysAgo": "días"
   },
   "media": {
     "title": "Medios y Recursos",

@@ -313,6 +313,20 @@ export class AdminService extends BaseService {
     );
   }
 
+  /**
+   * Export earnings (admin only)
+   */
+  async exportEarnings(params?: EarningsQueryParams & { format?: 'csv' | 'xlsx' }): Promise<Blob> {
+    const response = await this.execute(() => 
+      this.client.get('admin/earnings/export', this.cleanParams(params || {}), {
+        'Accept': params?.format === 'xlsx' ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' : 'text/csv'
+      })
+    );
+    return new Blob([response], { 
+      type: params?.format === 'xlsx' ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' : 'text/csv' 
+    });
+  }
+
   // ===== Resource Management =====
 
   /**

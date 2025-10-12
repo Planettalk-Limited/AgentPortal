@@ -3,11 +3,10 @@
 import { useState, useEffect } from 'react'
 import { useTranslations, useLocale } from 'next-intl'
 import { useAuth } from '@/contexts/AuthContext'
-import { api, Agent, AgentDashboard, Earning, Payout } from '@/lib/api'
-import { CreatePayoutRequest } from '@/lib/api/types'
+import { api, Agent, AgentDashboard, Earning, Payout, CreatePayoutRequest } from '@/lib/api'
 import { formatCurrencyWithSymbol, parseCurrency } from '@/lib/utils/currency'
 import { MINIMUM_PAYOUT_AMOUNT } from '@/lib/constants/payout'
-import ShareButton from '@/components/ShareButton'
+import SocialShareButton from '@/components/SocialShareButton'
 import SimplifiedPayoutModal from '@/components/SimplifiedPayoutModal'
 
 export default function DashboardPage() {
@@ -23,6 +22,69 @@ export default function DashboardPage() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [showPayoutModal, setShowPayoutModal] = useState(false)
   const [payoutLoading, setPayoutLoading] = useState(false)
+
+  // Function to format dates in a human-readable way
+  const formatHumanDate = (dateString: string) => {
+    const date = new Date(dateString)
+    const now = new Date()
+    const diffInMs = now.getTime() - date.getTime()
+    const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24))
+    const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60))
+    const diffInMinutes = Math.floor(diffInMs / (1000 * 60))
+
+    // If it's today
+    if (diffInDays === 0) {
+      if (diffInHours === 0) {
+        if (diffInMinutes === 0) {
+          return t('justNow') || 'Just now'
+        }
+        return `${diffInMinutes} ${t('minutesAgo') || 'minutes ago'}`
+      }
+      return `${diffInHours} ${t('hoursAgo') || 'hours ago'}`
+    }
+    
+    // If it's yesterday
+    if (diffInDays === 1) {
+      return t('yesterday') || 'Yesterday'
+    }
+    
+    // If it's within the last week
+    if (diffInDays < 7) {
+      return `${diffInDays} ${t('daysAgo') || 'days ago'}`
+    }
+    
+    // For older dates, show formatted date
+    return date.toLocaleDateString(locale, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    })
+  }
+
+  // Function to get status display info
+  const getPayoutStatusInfo = (status: string) => {
+    switch (status) {
+      case 'approved':
+        return {
+          label: t('approved') || 'Approved',
+          bgColor: 'bg-green-100',
+          textColor: 'text-green-800'
+        }
+      case 'review':
+        return {
+          label: t('review') || 'Under Review',
+          bgColor: 'bg-orange-100',
+          textColor: 'text-orange-800'
+        }
+      case 'pending':
+      default:
+        return {
+          label: t('pending') || 'Pending',
+          bgColor: 'bg-yellow-100',
+          textColor: 'text-yellow-800'
+        }
+    }
+  }
 
   useEffect(() => {
     loadDashboardData()
@@ -269,80 +331,70 @@ export default function DashboardPage() {
               <span className="text-sm font-medium">{t('allTime')}</span>
             </div>
           </div>
-          
-          {/* This Month */}
+
+          {/* This Month Earnings - MONTHLY */}
           <div className="bg-white rounded-2xl p-6 shadow-xl border border-gray-100 hover:shadow-2xl transition-shadow duration-300">
             <div className="flex items-center justify-between mb-4">
               <div className="p-3 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-            </div>
-              <div className="text-right">
-                <div className="text-2xl font-bold text-gray-900">{formatCurrencyWithSymbol(dashboard?.summary.monthlyEarnings || 0)}</div>
-                <div className="text-sm text-gray-500">{getCurrentMonth()}</div>
+                </svg>
               </div>
-                </div>
+              <div className="text-right">
+                <div className="text-2xl font-bold text-gray-900">{formatCurrencyWithSymbol(agent.earningsThisMonth || 0)}</div>
+                <div className="text-sm text-gray-500">{t('earnings')} - {getCurrentMonth()}</div>
+              </div>
+            </div>
             <div className="flex items-center text-blue-600">
               <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <span className="text-sm font-medium">{t('currentMonth')}</span>
+              <span className="text-sm font-medium">{getCurrentMonth()}</span>
             </div>
           </div>
           
           {/* Total Referrals */}
           <div className="bg-white rounded-2xl p-6 shadow-xl border border-gray-100 hover:shadow-2xl transition-shadow duration-300">
             <div className="flex items-center justify-between mb-4">
+              <div className="p-3 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              </div>
+              <div className="text-right">
+                <div className="text-2xl font-bold text-gray-900">{agent.totalReferrals || 0}</div>
+                <div className="text-sm text-gray-500">{t('totalReferrals')}</div>
+              </div>
+            </div>
+            <div className="flex items-center text-orange-600">
+              <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+              </svg>
+              <span className="text-sm font-medium">{t('allTime')}</span>
+            </div>
+          </div>
+
+          {/* Referrals This Month */}
+          <div className="bg-white rounded-2xl p-6 shadow-xl border border-gray-100 hover:shadow-2xl transition-shadow duration-300">
+            <div className="flex items-center justify-between mb-4">
               <div className="p-3 bg-gradient-to-br from-purple-400 to-purple-600 rounded-xl">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
                 </svg>
-                </div>
+              </div>
               <div className="text-right">
-                <div className="text-2xl font-bold text-gray-900">{agent.totalReferrals || 0}</div>
-                <div className="text-sm text-gray-500">{t('totalReferrals')}</div>
-            </div>
+                <div className="text-2xl font-bold text-gray-900">{agent.referralsThisMonth || 0}</div>
+                <div className="text-sm text-gray-500">{t('referrals')} - {getCurrentMonth()}</div>
+              </div>
             </div>
             <div className="flex items-center text-purple-600">
-              <span className="text-sm font-medium">{parseFloat(String(agent.commissionRate || '0'))}% rate</span>
-          </div>
-        </div>
-
-          {/* Available Balance */}
-          <div className="bg-white rounded-2xl p-6 shadow-xl border border-gray-100 hover:shadow-2xl transition-shadow duration-300">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-xl">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
+              <span className="text-sm font-medium">{getCurrentMonth()}</span>
             </div>
-              <div className="text-right">
-                <div className="text-2xl font-bold text-gray-900">{formatCurrencyWithSymbol(agent.availableBalance)}</div>
-                <div className="text-sm text-gray-500">Available</div>
-              </div>
-            </div>
-            {parseCurrency(agent.availableBalance) < MINIMUM_PAYOUT_AMOUNT ? (
-              <div className="space-y-2">
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
-                    className="bg-gradient-to-r from-yellow-400 to-yellow-500 h-2 rounded-full transition-all duration-500" 
-                    style={{ width: `${Math.min((parseCurrency(agent.availableBalance) / MINIMUM_PAYOUT_AMOUNT) * 100, 100)}%` }}
-                  ></div>
-                </div>
-                <div className="text-xs text-gray-500">
-                  ${MINIMUM_PAYOUT_AMOUNT - parseCurrency(agent.availableBalance)} {t('toPayout')}
-                </div>
-                </div>
-              ) : (
-              <div className="flex items-center text-emerald-600">
-                <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                </svg>
-                <span className="text-sm font-medium">{t('readyForPayoutShort')}</span>
-              </div>
-              )}
-            </div>
+          </div>
+
         </div>
         
         {/* Main Content Grid */}
@@ -356,93 +408,12 @@ export default function DashboardPage() {
       </div>
 
               <div className="p-8">
-                {/* Agent Code Showcase */}
-                <div className="text-center mb-8">
-                  <div className="inline-flex items-center bg-gradient-to-r from-pt-turquoise-50 to-pt-turquoise-100 rounded-2xl p-6 mb-6">
-        <div className="text-center">
-                      <div className="text-sm font-semibold text-pt-turquoise-700 mb-2">{t('yourAgentCode')}</div>
-                      <div className="font-mono text-4xl font-bold text-pt-turquoise mb-3 tracking-wider">
-                        {agent.agentCode}
-                      </div>
-                      <button
-                        onClick={() => {
-                          navigator.clipboard?.writeText(agent.agentCode)
-                          setSuccessMessage(t('agentCodeCopied'))
-                        }}
-                        className="inline-flex items-center space-x-2 text-pt-turquoise hover:text-pt-turquoise-600 font-medium transition-colors"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                        </svg>
-                        <span>{t('copyCode')}</span>
-                      </button>
-          </div>
-        </div>
-      </div>
-
-                {/* Enhanced Share Options */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-                  <button
-                    onClick={() => {
-                      const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(`Hi, my name is ${user?.firstName} ${user?.lastName}. Download the PlanetTalk app for great rates on international calls and top-ups! Use my agent code: ${agent.agentCode} when you sign up. https://app.planettalk.com/Jxk8/shareapp`)}`
-                      window.open(whatsappUrl, '_blank')
-                    }}
-                    className="flex flex-col items-center p-6 bg-green-50 hover:bg-green-100 rounded-xl transition-colors group"
-                  >
-                    <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                      <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
-                      </svg>
-                    </div>
-                    <div className="text-green-700 font-semibold">{t('whatsapp')}</div>
-                    <div className="text-green-600 text-sm">{t('quickShare')}</div>
-                  </button>
-                  
-                  <button
-                    onClick={() => {
-                      const emailSubject = 'Join PlanetTalk - International Top-ups'
-                      const emailBody = `Hi, my name is ${user?.firstName} ${user?.lastName}.\\n\\nI'd like to invite you to download the PlanetTalk app for great rates on international calls and mobile top-ups.\\n\\nPlease use my agent code: ${agent.agentCode} when you sign up - this helps support my business.\\n\\nDownload the app here: https://app.planettalk.com/Jxk8/shareapp\\n\\nThanks!\\n${user?.firstName}`
-                      window.open(`mailto:?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`, '_blank')
-                    }}
-                    className="flex flex-col items-center p-6 bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors group"
-                  >
-                    <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                      </svg>
-                    </div>
-                    <div className="text-blue-700 font-semibold">{t('email')}</div>
-                    <div className="text-blue-600 text-sm">{t('professional')}</div>
-                  </button>
-                  
-                  <button
-                    onClick={() => {
-                      const tweetText = `Hi, my name is ${user?.firstName} ${user?.lastName}. Download PlanetTalk for great international calls & top-ups! Use my agent code: ${agent.agentCode} when you sign up 📱💰 #PlanetTalk`
-                      window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(`https://app.planettalk.com/Jxk8/shareapp`)}`, '_blank')
-                    }}
-                    className="flex flex-col items-center p-6 bg-sky-50 hover:bg-sky-100 rounded-xl transition-colors group"
-                  >
-                    <div className="w-12 h-12 bg-sky-500 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                      <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
-                      </svg>
-                    </div>
-                    <div className="text-sky-700 font-semibold">{t('twitter')}</div>
-                    <div className="text-sky-600 text-sm">{t('socialMedia')}</div>
-                  </button>
-                </div>
-                
-                {/* Advanced Share Button */}
-                <div className="border-t pt-6">
-                      <ShareButton 
-                        code={agent.agentCode}
-                        agentName={`${user?.firstName} ${user?.lastName}`}
-                    variant="primary"
-                    size="lg"
-                    showUrl={true}
-                    className="w-full"
-                      />
-                    </div>
+                {/* Social Media Sharing */}
+                <SocialShareButton 
+                  code={agent.agentCode}
+                  agentName={`${user?.firstName} ${user?.lastName}`}
+                  className="w-full"
+                />
               </div>
                 </div>
                 </div>
@@ -464,7 +435,7 @@ export default function DashboardPage() {
                 </div>
                 
                 {parseCurrency(agent.availableBalance) < MINIMUM_PAYOUT_AMOUNT ? (
-                  <div className="space-y-4">
+                  <div className="space-y-6">
                     <div className="bg-yellow-50 rounded-lg p-4">
                       <div className="flex items-center mb-2">
                         <svg className="w-5 h-5 text-yellow-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -489,6 +460,55 @@ export default function DashboardPage() {
                         ></div>
                       </div>
                     </div>
+
+                    {/* Payout Requirements Information */}
+                    <div className="bg-blue-50 rounded-lg p-4">
+                      <h4 className="font-semibold text-blue-800 mb-3 flex items-center">
+                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        {t('payoutRequirements')}
+                      </h4>
+                      <div className="space-y-2 text-sm text-blue-700">
+                        <div className="flex items-start">
+                          <span className="w-2 h-2 bg-blue-400 rounded-full mt-1.5 mr-2 flex-shrink-0"></span>
+                          <span>{t('minimumBalance', { amount: `$${MINIMUM_PAYOUT_AMOUNT}` })}</span>
+                        </div>
+                        <div className="flex items-start">
+                          <span className="w-2 h-2 bg-blue-400 rounded-full mt-1.5 mr-2 flex-shrink-0"></span>
+                          <span>{t('processingTime')}</span>
+                        </div>
+                        <div className="flex items-start">
+                          <span className="w-2 h-2 bg-blue-400 rounded-full mt-1.5 mr-2 flex-shrink-0"></span>
+                          <span>{t('availableMethods')}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* How to Earn More */}
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <h4 className="font-semibold text-gray-800 mb-3 flex items-center">
+                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                        {t('howToReachMinimum')}
+                      </h4>
+                      <div className="space-y-2 text-sm text-gray-700">
+                        <div className="flex items-start">
+                          <span className="w-2 h-2 bg-pt-turquoise rounded-full mt-1.5 mr-2 flex-shrink-0"></span>
+                          <span>{t('shareAgentCode')}</span>
+                        </div>
+                        <div className="flex items-start">
+                          <span className="w-2 h-2 bg-pt-turquoise rounded-full mt-1.5 mr-2 flex-shrink-0"></span>
+                          <span>{t('postOnSocialMedia')}</span>
+                        </div>
+                        <div className="flex items-start">
+                          <span className="w-2 h-2 bg-pt-turquoise rounded-full mt-1.5 mr-2 flex-shrink-0"></span>
+                          <span>{t('earnCommission', { rate: parseFloat(String(agent.commissionRate || '0')) })}</span>
+                        </div>
+                      </div>
+                    </div>
+
                     
                     <button
                       disabled
@@ -498,7 +518,7 @@ export default function DashboardPage() {
                     </button>
                   </div>
                 ) : (
-                  <div className="space-y-4">
+                  <div className="space-y-6">
                     <div className="bg-green-50 rounded-lg p-4">
                       <div className="flex items-center mb-2">
                         <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -510,6 +530,31 @@ export default function DashboardPage() {
                         {t('balanceMeetsRequirement')}
                       </p>
                     </div>
+
+                    {/* Payout Information */}
+                    <div className="bg-blue-50 rounded-lg p-4">
+                      <h4 className="font-semibold text-blue-800 mb-3 flex items-center">
+                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        {t('payoutInformation')}
+                      </h4>
+                      <div className="space-y-2 text-sm text-blue-700">
+                        <div className="flex items-start">
+                          <span className="w-2 h-2 bg-blue-400 rounded-full mt-1.5 mr-2 flex-shrink-0"></span>
+                          <span>{t('processingTime')}</span>
+                        </div>
+                        <div className="flex items-start">
+                          <span className="w-2 h-2 bg-blue-400 rounded-full mt-1.5 mr-2 flex-shrink-0"></span>
+                          <span>{t('availableMethods')}</span>
+                        </div>
+                        <div className="flex items-start">
+                          <span className="w-2 h-2 bg-blue-400 rounded-full mt-1.5 mr-2 flex-shrink-0"></span>
+                          <span>{t('emailConfirmation')}</span>
+                        </div>
+                      </div>
+                    </div>
+
                     
                     <button
                       onClick={() => setShowPayoutModal(true)}
@@ -521,25 +566,6 @@ export default function DashboardPage() {
                   )}
                 </div>
               </div>
-            
-            {/* Quick Stats */}
-            <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('quickStats')}</h3>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-600">{t('commissionRate')}</span>
-                  <span className="font-semibold text-pt-turquoise">{parseFloat(String(agent.commissionRate || '0'))}%</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Active Referrals</span>
-                  <span className="font-semibold">{agent.activeReferrals || 0}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Commission Rate</span>
-                  <span className="font-semibold">{parseFloat(String(agent.commissionRate || '0'))}%</span>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
         
@@ -572,7 +598,7 @@ export default function DashboardPage() {
                             {earning.description || t('commissionEarned')}
                           </p>
                           <p className="text-sm text-gray-500">
-                            {new Date(earning.createdAt || Date.now()).toLocaleDateString()}
+                            {formatHumanDate(earning.createdAt || new Date().toISOString())}
                           </p>
                         </div>
                       </div>
@@ -619,33 +645,38 @@ export default function DashboardPage() {
             <div className="p-6">
               {payouts.length > 0 ? (
                 <div className="space-y-4">
-                  {payouts.slice(0, 5).map((payout, index) => (
-                    <div key={index} className="flex justify-between items-center p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
-                      <div className="flex items-center">
-                        <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                          <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                          </svg>
-                </div>
-                <div>
-                          <p className="font-medium text-gray-900">
-                            {payout.method || t('bankTransfer')}
+                  {payouts.slice(0, 5).map((payout, index) => {
+                    const statusInfo = getPayoutStatusInfo(payout.status || 'pending')
+                    return (
+                      <div key={index} className="flex justify-between items-center p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
+                        <div className="flex items-center">
+                          <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                            <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                            </svg>
+                          </div>
+                          <div>
+                            <p className="font-medium text-gray-900">
+                              {payout.method === 'bank_transfer' ? t('bankTransfer') : 
+                               payout.method === 'planettalk_credit' ? t('planettalkCredit') || 'PlanetTalk Credit' :
+                               payout.method || t('bankTransfer')}
+                            </p>
+                            <p className="text-sm text-gray-500">
+                              {formatHumanDate(payout.createdAt || new Date().toISOString())}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-lg font-bold text-blue-600">
+                            {formatCurrencyWithSymbol(payout.amount)}
                           </p>
-                          <p className="text-sm text-gray-500">
-                            {new Date(payout.createdAt || Date.now()).toLocaleDateString()}
-                          </p>
+                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${statusInfo.bgColor} ${statusInfo.textColor}`}>
+                            {statusInfo.label}
+                          </span>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <p className="text-lg font-bold text-blue-600">
-                          {formatCurrencyWithSymbol(payout.amount)}
-                        </p>
-                        <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                          {t('pending')}
-                        </span>
-                </div>
-              </div>
-                  ))}
+                    )
+                  })}
                 </div>
               ) : (
                 <div className="text-center py-12">

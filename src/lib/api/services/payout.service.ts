@@ -11,21 +11,18 @@ export interface Payout {
   id: string;
   agentId: string;
   amount: number;
-  fees: number;
+  fees?: number;
   netAmount: number;
   currency: string;
-  status: 'requested' | 'pending_review' | 'approved' | 'processing' | 'completed' | 'rejected' | 'cancelled' | 'failed';
-  method: 'bank_transfer' | 'paypal' | 'stripe' | 'wire_transfer' | 'check' | 'airtime_topup';
+  status: 'pending' | 'approved' | 'review';
+  method: 'bank_transfer' | 'planettalk_credit';
+  description?: string;
   paymentDetails: Record<string, any>;
   requestedAt: string;
   approvedAt?: string;
-  processedAt?: string;
-  completedAt?: string;
-  rejectedAt?: string;
-  cancelledAt?: string;
-  transactionId?: string;
-  rejectionReason?: string;
+  reviewMessage?: string;
   adminNotes?: string;
+  metadata?: Record<string, any>;
   agent: {
     id: string;
     agentCode: string;
@@ -41,9 +38,10 @@ export interface Payout {
 
 export interface CreatePayoutRequest {
   amount: number;
-  method: 'bank_transfer' | 'paypal' | 'stripe' | 'wire_transfer' | 'check' | 'airtime_topup';
+  method: 'bank_transfer' | 'planettalk_credit';
+  description?: string;
   paymentDetails: Record<string, any>;
-  notes?: string;
+  metadata?: Record<string, any>;
 }
 
 export interface PayoutQueryParams {
@@ -171,13 +169,13 @@ export class PayoutService extends BaseService {
   }
 
   /**
-   * Reject payout (admin only)
+   * Set payout to review status (admin only)
    */
-  async rejectPayout(id: string, data: {
-    rejectionReason: string;
+  async setPayoutToReview(id: string, data: {
+    reviewMessage: string;
     adminNotes?: string;
   }): Promise<Payout> {
-    return this.actionWithResult<Payout>(`admin/payouts/${id}/reject`, data);
+    return this.actionWithResult<Payout>(`admin/payouts/${id}/review`, data);
   }
 
   /**
@@ -217,6 +215,41 @@ export class PayoutService extends BaseService {
     errors?: any[];
   }> {
     return this.actionWithResult('admin/payouts/bulk-process', data);
+  }
+
+  /**
+   * Bulk process payouts with new API format (admin only)
+   */
+  async bulkProcess(data: {
+    payoutIds: string[];
+    action: 'approve' | 'review';
+    adminNotes?: string;
+    individualMessages?: Array<{
+      payoutId: string;
+      reviewMessage: string;
+    }>;
+  }): Promise<{
+    success: number;
+    failed: number;
+    errors?: string[];
+    successfulPayouts?: Array<{
+      payoutId: string;
+      agentCode: string;
+      amount: number;
+      message: string;
+    }>;
+    failedPayouts?: Array<{
+      payoutId: string;
+      error: string;
+    }>;
+  }> {
+    // Use direct client call to handle the response structure properly
+    const response = await this.execute(() => 
+      this.client.post('admin/payouts/bulk-process', data)
+    );
+    
+    // The API returns the bulk response directly, not wrapped in ApiResponse
+    return response as any;
   }
 
   /**
@@ -307,3 +340,4 @@ export class PayoutService extends BaseService {
 
 // Export singleton instance
 export const payoutService = new PayoutService();
+// Updated with new bulkProcess method

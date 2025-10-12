@@ -1,7 +1,6 @@
 {
   "navigation": {
     "agentPortal": "Agent Portal",
-    "features": "Features",
     "about": "About",
     "planettalkWebsite": "PlanetTalk.com",
     "dashboard": "Dashboard",
@@ -26,11 +25,40 @@
   },
   "hero": {
     "badge": "Agent Portal Live",
-    "title": "PlanetTalk",
-    "subtitle": "Agent Network",
-    "description": "Join our global telecommunications network. Earn commissions by sharing your unique agent code and helping customers with top-ups worldwide.",
+    "title": "Become an Agent",
+    "middle": "with",
+    "subtitle": "PlanetTalk",
+    "subtitle2": "Make some cash with PlanetTalk!",
+    "description": "Start earning commissions by bringing in new customers to PlanetTalk.",
+    "info": "Thousands of people in the UK, France and Canada are using the PlanetTalk app to connect and support their loved ones via cheap international calls, easy airtime and data credit recharges and top-ups, e-vouchers, gift cards, and utility bill payments at unbeatable rates.",
+    "helpThemStay": "You can help them stay connected with loved ones and make some money in the process!",
     "ctaPrimary": "Agent Sign In",
     "ctaSecondary": "Become an Agent",
+    "signUp": "Sign Up Now",
+    "cta": "Ready to Start?",
+    "ctaDescription": "Join us today and turn your connections into cash!",
+    "whyJoin": {
+      "title": "Why Join?",
+      "reasons": [
+        {
+          "title": "Earn Ongoing Commissions",
+          "description": "Receive commissions on each customer for 24 months from their first successful top-up."
+        },
+        {
+          "title": "Unique Agent Code",
+          "description": "Share your unique code with your network, they use it once and you earn commission every time they top up."
+        },
+        {
+          "title": "Make a Positive Impact",
+          "description": "Help the diaspora connect and support their families back home without breaking the bank!"
+        }
+      ]
+    },
+    "commissionBadge": {
+      "months": "24",
+      "period": "months",
+      "label": "commission"
+    },
     "process": {
       "step1": {
         "title": "Apply Online",
@@ -561,7 +589,15 @@
     "welcomeBack": "Welcome back, {name}! 👋",
     "agentId": "Agent ID",
     "totalEarnings": "Total Earnings",
+    "earnings": "Earnings",
+    "referrals": "Referrals", 
+    "balance": "Balance",
+    "availableForPayout": "Available for Payout",
+    "totalReferrals": "Total Referrals",
     "activeReferrals": "Active Referrals",
+    "agentTier": "Agent Tier",
+    "pendingBalance": "Pending Balance", 
+    "agentStatus": "Agent Status",
     "availableBalance": "Available Balance",
     "agentCode": "Agent Code",
     "welcomeTitle": "🎉 Welcome to PlanetTalk Agent Portal!",
@@ -569,6 +605,7 @@
     "nextSteps": "Next Steps:",
     "shareAgentCode": "Share Your Agent Code",
     "shareAgentCodeDescription": "Use code {code} to start earning",
+    "shareToEarn": "Share with friends and family to start earning commissions",
     "trackEarnings": "Track Your Earnings",
     "trackEarningsDescription": "Monitor customer activity and commissions",
     "accessTraining": "Access Training",
@@ -596,13 +633,32 @@
     "minimum": "minimum",
     "readyForPayout": "Ready for payout!",
     "balanceMeetsRequirement": "Your balance meets the minimum payout requirement",
+    "payoutInformation": "Payout Information",
+    "processingTime": "Processing time: 3-5 business days",
+    "availableMethods": "Available methods: Bank Transfer & PlanetTalk Credit",
+    "emailConfirmation": "You'll receive email confirmation once processed",
+    "payoutRequirements": "Payout Requirements",
+    "minimumBalance": "Minimum balance: {amount}",
+    "howToReachMinimum": "How to Reach Minimum",
+    "shareAgentCode": "Share your agent code with friends & family",
+    "postOnSocialMedia": "Post on social media using the share buttons above",
+    "earnCommission": "Earn {rate}% commission on all referral activity",
     "quickStats": "Quick Stats",
     "recentEarnings": "Recent Earnings",
     "recentPayouts": "Recent Payouts",
     "commissionEarned": "Commission earned",
     "bankTransfer": "Bank Transfer",
+    "airtimeTopup": "Airtime Top-up",
+    "planettalkCredit": "PlanetTalk Credit",
+    "review": "Under Review",
     "confirmed": "Confirmed",
     "pending": "Pending",
+    "requested": "Requested",
+    "approved": "Approved",
+    "processed": "Processed",
+    "completed": "Completed",
+    "rejected": "Rejected",
+    "cancelled": "Cancelled",
     "noEarningsYet": "No earnings yet",
     "startSharing": "Start sharing your agent code to earn commissions",
     "noPayoutsYet": "No payouts yet",
@@ -624,7 +680,12 @@
     "thisMonth": "this month",
     "progressTo": "Progress to",
     "sharing": "Sharing...",
-    "failedToShareLink": "Failed to share link"
+    "failedToShareLink": "Failed to share link",
+    "justNow": "Just now",
+    "minutesAgo": "minutes ago",
+    "hoursAgo": "hours ago",
+    "yesterday": "Yesterday",
+    "daysAgo": "days ago"
   },
   "media": {
     "title": "Media & Resources",

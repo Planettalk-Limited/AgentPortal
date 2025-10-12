@@ -156,6 +156,8 @@ export interface Agent {
   pendingBalance: number;
   totalReferrals: number;
   activeReferrals: number;
+  earningsThisMonth?: number;
+  referralsThisMonth?: number;
   commissionRate: number;
   user: User;
   createdAt: string;

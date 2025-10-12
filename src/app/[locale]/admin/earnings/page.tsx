@@ -1,44 +1,76 @@
 'use client'
 
-export const dynamic = 'force-dynamic'
-
 import { useState, useEffect } from 'react'
-import { useTranslations } from 'next-intl'
-import { api, Earning, ApiError } from '@/lib/api'
-import { withAuth } from '@/contexts/AuthContext'
+import { api, Earning } from '@/lib/api'
 import { formatCurrencyWithSymbol } from '@/lib/utils/currency'
 
-function EarningsManagementPage() {
+interface BulkUploadData {
+  agentCode: string
+  amount: number
+  type: 'referral_commission' | 'bonus' | 'penalty' | 'adjustment' | 'promotion_bonus'
+  description: string
+  referenceId?: string
+  commissionRate?: number
+  earnedAt?: string
+  currency?: string
+}
+
+interface BulkUploadResult {
+  totalProcessed: number
+  successful: number
+  failed: number
+  skipped: number
+  totalAmount: number
+  updatedAgents: string[]
+  details: Array<{
+    agentCode: string
+    status: 'success' | 'failed' | 'skipped'
+    earningId?: string
+    amount: number
+    message?: string
+    error?: string
+  }>
+  errorSummary: {
+    invalidAgentCodes: string[]
+    duplicateReferences: string[]
+    validationErrors: string[]
+    otherErrors: string[]
+  }
+  batchInfo: {
+    batchId: string
+    processedAt: string
+    processingTimeMs: number
+    uploadedBy: string
+  }
+}
+
+export default function EarningsPage() {
   const [earnings, setEarnings] = useState<Earning[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
-  const [actionLoading, setActionLoading] = useState<string | null>(null)
-  const [selectedEarnings, setSelectedEarnings] = useState<Set<string>>(new Set())
-  const [showRejectModal, setShowRejectModal] = useState(false)
-  const [showBulkRejectModal, setShowBulkRejectModal] = useState(false)
-  const [rejectingEarning, setRejectingEarning] = useState<string | null>(null)
-  const [rejectReason, setRejectReason] = useState('')
-  const [rejectNotes, setRejectNotes] = useState('')
+  const [showBulkUpload, setShowBulkUpload] = useState(false)
+  const [csvFile, setCsvFile] = useState<File | null>(null)
+  const [batchDescription, setBatchDescription] = useState('')
+  const [autoConfirm, setAutoConfirm] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
+  const [isExporting, setIsExporting] = useState(false)
+  const [lastUploadResult, setLastUploadResult] = useState<BulkUploadResult | null>(null)
   const [filtersExpanded, setFiltersExpanded] = useState(false)
   const [filters, setFilters] = useState({
-    status: 'all',
-    type: 'all',
-    agentId: '',
-    tier: 'all',
-    startDate: '',
-    endDate: '',
-    search: '',
     page: 1,
-    limit: 20
+    limit: 20,
+    status: '',
+    type: '',
+    agentCode: '',
+    startDate: '',
+    endDate: ''
   })
   const [stats, setStats] = useState({
     total: 0,
     pending: 0,
     confirmed: 0,
-    cancelled: 0,
-    totalAmount: 0,
-    pendingAmount: 0
+    totalAmount: 0
   })
   const [pagination, setPagination] = useState({
     page: 1,
@@ -46,37 +78,40 @@ function EarningsManagementPage() {
     total: 0,
     totalPages: 1
   })
-  
-  const t = useTranslations('admin.earnings')
 
   useEffect(() => {
     loadEarnings()
   }, [filters])
 
+  useEffect(() => {
+    // Clear success/error messages after 5 seconds
+    if (success) {
+      const timer = setTimeout(() => setSuccess(null), 5000)
+      return () => clearTimeout(timer)
+    }
+    if (error) {
+      const timer = setTimeout(() => setError(null), 8000)
+      return () => clearTimeout(timer)
+    }
+  }, [success, error])
+
   const loadEarnings = async () => {
     try {
       setLoading(true)
-      setError(null)
+      const response = await api.admin.getAllEarnings(filters)
       
-      // Prepare API parameters
-      const params = {
-        page: filters.page,
-        limit: filters.limit,
-        status: filters.status === 'all' ? undefined : filters.status,
-        type: filters.type === 'all' ? undefined : filters.type,
-        agentId: filters.agentId || undefined,
-        tier: filters.tier === 'all' ? undefined : filters.tier,
-        startDate: filters.startDate || undefined,
-        endDate: filters.endDate || undefined,
-        search: filters.search || undefined
+      // Handle paginated response structure
+      let earningsData: Earning[] = []
+      let paginationData: any = {}
+      let statsData: any = {}
+      
+      if (Array.isArray(response)) {
+        earningsData = response
+      } else {
+        earningsData = (response as any).earnings || (response as any).data || []
+        paginationData = (response as any).pagination || {}
+        statsData = (response as any).stats || {}
       }
-      
-      const data = await api.admin.getAllEarnings(params)
-      
-      // Handle paginated response
-      const earningsData = (data as any).earnings || (data as any).data || []
-      const paginationData = (data as any).pagination || {}
-      const metricsData = (data as any).metrics || {}
       
       setEarnings(Array.isArray(earningsData) ? earningsData : [])
       
@@ -88,181 +123,253 @@ function EarningsManagementPage() {
         totalPages: paginationData.totalPages || 1
       })
 
-      // Use API metrics or calculate from data
-      if (metricsData.overview) {
+      // Update stats
         setStats({
-          total: metricsData.overview.totalEarnings || 0,
-          pending: metricsData.statusBreakdown?.pending?.count || metricsData.statusSummary?.pending?.count || 0,
-          confirmed: metricsData.statusBreakdown?.confirmed?.count || metricsData.statusSummary?.confirmed?.count || 0,
-          cancelled: metricsData.statusBreakdown?.cancelled?.count || metricsData.statusSummary?.cancelled?.count || 0,
-          totalAmount: metricsData.overview.totalAmount || 0,
-          pendingAmount: metricsData.statusBreakdown?.pending?.amount || metricsData.statusSummary?.pending?.amount || 0
-        })
-      } else {
-        // Fallback to local calculation
-        const totalEarnings = earningsData.length
-        const pending = earningsData.filter((e: Earning) => e.status === 'pending').length
-        const confirmed = earningsData.filter((e: Earning) => e.status === 'confirmed').length
-        const cancelled = earningsData.filter((e: Earning) => e.status === 'cancelled').length
-        const totalAmount = earningsData.reduce((sum: number, e: Earning) => sum + parseFloat(e.amount?.toString() || '0'), 0)
-        const pendingAmount = earningsData.filter((e: Earning) => e.status === 'pending').reduce((sum: number, e: Earning) => sum + parseFloat(e.amount?.toString() || '0'), 0)
-        
-        setStats({
-          total: totalEarnings,
-          pending,
-          confirmed,
-          cancelled,
-          totalAmount,
-          pendingAmount
-        })
-      }
+        total: statsData.total || earningsData.length,
+        pending: statsData.pending || 0,
+        confirmed: statsData.confirmed || 0,
+        totalAmount: statsData.totalAmount || 0
+      })
     } catch (error) {
-      const apiError = error as ApiError
-      setError(apiError.error || t('messages.loadError'))
+      setError('Failed to load earnings')
       setEarnings([])
       setPagination({ page: 1, limit: 20, total: 0, totalPages: 1 })
-      setStats({ total: 0, pending: 0, confirmed: 0, cancelled: 0, totalAmount: 0, pendingAmount: 0 })
+      setStats({ total: 0, pending: 0, confirmed: 0, totalAmount: 0 })
     } finally {
       setLoading(false)
     }
   }
 
-  const handleApprove = async (earningId: string, notes?: string) => {
+  const handleBulkUpload = async () => {
+    if (!csvFile) return
+    
     try {
-      setActionLoading(earningId)
+      setIsUploading(true)
       setError(null)
       
-      await api.admin.approveEarning(earningId, { notes })
+      const text = await csvFile.text()
+      const lines = text.split('\n').filter(line => line.trim())
+      const headers = lines[0].toLowerCase().split(',').map(h => h.trim())
       
-      // Reload earnings to reflect status changes
-      setSuccess(t('messages.approveSuccess'))
-      setTimeout(() => setSuccess(null), 3000)
-      loadEarnings()
-    } catch (error) {
-      const apiError = error as ApiError
-      setError(apiError.error || t('messages.approveError'))
-    } finally {
-      setActionLoading(null)
-    }
-  }
-
-  const handleReject = async (earningId: string, reason: string, notes?: string) => {
-    try {
-      setActionLoading(earningId)
-      setError(null)
+      // Expected headers mapping
+      const headerMapping = {
+        'agent_code': 'agentCode',
+        'agentcode': 'agentCode',
+        'agent': 'agentCode',
+        'amount': 'amount',
+        'type': 'type',
+        'description': 'description',
+        'reference_id': 'referenceId',
+        'referenceid': 'referenceId',
+        'reference': 'referenceId',
+        'commission_rate': 'commissionRate',
+        'commissionrate': 'commissionRate',
+        'earned_at': 'earnedAt',
+        'earnedat': 'earnedAt',
+        'date': 'earnedAt',
+        'currency': 'currency'
+      }
       
-      await api.admin.rejectEarning(earningId, { reason, notes })
+      // Find required columns
+      const agentCodeIndex = headers.findIndex(h => ['agent_code', 'agentcode', 'agent'].includes(h))
+      const amountIndex = headers.findIndex(h => h === 'amount')
+      const typeIndex = headers.findIndex(h => h === 'type')
+      const descriptionIndex = headers.findIndex(h => h === 'description')
       
-      // Reload earnings to reflect status changes
-      setSuccess(t('messages.rejectSuccess'))
-      setTimeout(() => setSuccess(null), 3000)
-      loadEarnings()
-      
-      // Reset modal state
-      setShowRejectModal(false)
-      setRejectingEarning(null)
-      setRejectReason('')
-      setRejectNotes('')
-    } catch (error) {
-      const apiError = error as ApiError
-      setError(apiError.error || t('messages.rejectError'))
-    } finally {
-      setActionLoading(null)
-    }
-  }
-
-  const handleBulkApprove = async () => {
-    if (selectedEarnings.size === 0) return
-
-    try {
-      setActionLoading('bulk-approve')
-      setError(null)
-      
-      // Only include pending earnings in bulk operations
-      const pendingEarningIds = earnings
-        .filter(e => selectedEarnings.has(e.id) && e.status === 'pending')
-        .map(e => e.id)
-      
-      if (pendingEarningIds.length === 0) {
-        setError('No pending earnings selected for approval')
-        setActionLoading(null)
+      if (agentCodeIndex === -1 || amountIndex === -1 || typeIndex === -1 || descriptionIndex === -1) {
+        setError('CSV must contain columns: agent_code, amount, type, description')
         return
       }
       
-      const result = await api.admin.bulkApproveEarnings({
-        earningIds: pendingEarningIds,
-        notes: 'Bulk approval from admin dashboard'
-      })
+      // Parse CSV data
+      const earningsData: BulkUploadData[] = []
       
-      // Reload earnings to reflect status changes
-      setSelectedEarnings(new Set())
-      setSuccess(result.summary)
-      setTimeout(() => setSuccess(null), 5000)
-      loadEarnings()
-    } catch (error) {
-      const apiError = error as ApiError
-      setError(apiError.error || 'Failed to bulk approve earnings')
-    } finally {
-      setActionLoading(null)
-    }
-  }
-
-  const handleBulkReject = async () => {
-    if (selectedEarnings.size === 0 || !rejectReason.trim()) return
-
-    try {
-      setActionLoading('bulk-reject')
-      setError(null)
+      for (let i = 1; i < lines.length; i++) {
+        const columns = lines[i].split(',').map(col => col.trim())
+        if (columns.length < 4) continue
+        
+        const earning: BulkUploadData = {
+          agentCode: columns[agentCodeIndex],
+          amount: parseFloat(columns[amountIndex]) || 0,
+          type: columns[typeIndex] as any,
+          description: columns[descriptionIndex] || '',
+          currency: 'USD'
+        }
+        
+        // Add optional fields if present
+        const referenceIndex = headers.findIndex(h => ['reference_id', 'referenceid', 'reference'].includes(h))
+        if (referenceIndex !== -1 && columns[referenceIndex]) {
+          earning.referenceId = columns[referenceIndex]
+        }
+        
+        const commissionIndex = headers.findIndex(h => ['commission_rate', 'commissionrate'].includes(h))
+        if (commissionIndex !== -1 && columns[commissionIndex]) {
+          earning.commissionRate = parseFloat(columns[commissionIndex]) || undefined
+        }
+        
+        const dateIndex = headers.findIndex(h => ['earned_at', 'earnedat', 'date'].includes(h))
+        if (dateIndex !== -1 && columns[dateIndex]) {
+          earning.earnedAt = columns[dateIndex]
+        }
+        
+        earningsData.push(earning)
+      }
       
-      // Only include pending earnings in bulk operations
-      const pendingEarningIds = earnings
-        .filter(e => selectedEarnings.has(e.id) && e.status === 'pending')
-        .map(e => e.id)
-      
-      if (pendingEarningIds.length === 0) {
-        setError('No pending earnings selected for rejection')
-        setActionLoading(null)
+      if (earningsData.length === 0) {
+        setError('No valid earnings data found in CSV file')
         return
       }
       
-      const result = await api.admin.bulkRejectEarnings({
-        earningIds: pendingEarningIds,
-        reason: rejectReason,
-        notes: rejectNotes || undefined
+      // Upload via API
+      const response = await api.admin.bulkUploadEarnings({
+        earnings: earningsData,
+        batchDescription: batchDescription || `CSV Upload - ${new Date().toLocaleString()}`,
+        autoConfirm: autoConfirm,
+        metadata: {
+          uploadSource: 'Admin Panel CSV',
+          filename: csvFile.name
+        }
       })
       
-      // Reload earnings to reflect status changes
-      setSelectedEarnings(new Set())
-      setShowBulkRejectModal(false)
-      setRejectReason('')
-      setRejectNotes('')
-      setSuccess(result.summary)
-      setTimeout(() => setSuccess(null), 5000)
-      loadEarnings()
+      setLastUploadResult(response)
+      
+      if (response.failed > 0) {
+        setError(`Upload completed: ${response.successful} successful, ${response.failed} failed, ${response.skipped} skipped`)
+      } else {
+        setSuccess(`Successfully uploaded ${response.successful} earnings (${formatCurrencyWithSymbol(response.totalAmount)})`)
+      }
+      
+      setShowBulkUpload(false)
+      setCsvFile(null)
+      setBatchDescription('')
+      await loadEarnings()
     } catch (error) {
-      const apiError = error as ApiError
-      setError(apiError.error || 'Failed to bulk reject earnings')
+      console.error('Error with bulk upload:', error)
+      setError(error instanceof Error ? error.message : 'Failed to upload earnings')
     } finally {
-      setActionLoading(null)
+      setIsUploading(false)
     }
   }
 
-  const toggleEarningSelection = (earningId: string) => {
-    const newSelection = new Set(selectedEarnings)
-    if (newSelection.has(earningId)) {
-      newSelection.delete(earningId)
-    } else {
-      newSelection.add(earningId)
+  const handleExportCSV = async () => {
+    try {
+      setIsExporting(true)
+      setError(null)
+      
+      const blob = await api.admin.exportEarnings({ ...filters, format: 'csv' })
+      
+      // Create download link
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.style.display = 'none'
+      a.href = url
+      a.download = `earnings-export-${new Date().toISOString().split('T')[0]}.csv`
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+      
+      setSuccess('Earnings exported successfully')
+    } catch (error) {
+      console.error('Error exporting earnings:', error)
+      setError(error instanceof Error ? error.message : 'Failed to export earnings')
+    } finally {
+      setIsExporting(false)
     }
-    setSelectedEarnings(newSelection)
   }
 
-  const selectAll = () => {
-    if (selectedEarnings.size === earnings.length) {
-      setSelectedEarnings(new Set())
-    } else {
-      setSelectedEarnings(new Set(earnings.map(e => e.id)))
+  const downloadSampleCsv = () => {
+    const sampleData = [
+      ['agent_code', 'amount', 'type', 'description', 'reference_id', 'commission_rate', 'earned_at'],
+      ['AG123456', '25.50', 'referral_commission', 'Commission for customer referral', 'TXN-12345', '10.5', '2025-01-15T10:30:00Z'],
+      ['AG789012', '50.00', 'bonus', 'Monthly performance bonus', 'BONUS-JAN-2025', '', '2025-01-15T10:30:00Z'],
+      ['AG345678', '15.75', 'referral_commission', 'Commission for mobile top-up referral', 'TXN-67890', '12.0', '2025-01-15T10:30:00Z'],
+      ['AG111213', '-5.00', 'penalty', 'Late submission penalty', 'PEN-2025-001', '', '2025-01-15T10:30:00Z']
+    ]
+    
+    const csvContent = sampleData.map(row => row.join(',')).join('\n')
+    const blob = new Blob([csvContent], { type: 'text/csv' })
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.style.display = 'none'
+    a.href = url
+    a.download = 'earnings_import_sample.csv'
+    document.body.appendChild(a)
+    a.click()
+    window.URL.revokeObjectURL(url)
+    document.body.removeChild(a)
+  }
+
+  const downloadUploadReport = () => {
+    if (!lastUploadResult) return
+    
+    const reportData = [
+      ['Bulk Earnings Upload Report'],
+      ['Generated:', new Date().toLocaleString()],
+      ['Batch ID:', lastUploadResult.batchInfo.batchId],
+      ['Total Processed:', lastUploadResult.totalProcessed.toString()],
+      ['Successful:', lastUploadResult.successful.toString()],
+      ['Failed:', lastUploadResult.failed.toString()],
+      ['Skipped:', lastUploadResult.skipped.toString()],
+      ['Total Amount:', lastUploadResult.totalAmount.toString()],
+      ['Processing Time (ms):', lastUploadResult.batchInfo.processingTimeMs.toString()],
+      [''],
+      ['DETAILED RESULTS'],
+      ['Agent Code', 'Status', 'Amount', 'Earning ID', 'Message/Error']
+    ]
+    
+    lastUploadResult.details.forEach(detail => {
+      reportData.push([
+        detail.agentCode,
+        detail.status,
+        detail.amount.toString(),
+        detail.earningId || '',
+        detail.message || detail.error || ''
+      ])
+    })
+    
+    if (lastUploadResult.errorSummary.invalidAgentCodes.length > 0) {
+      reportData.push([''])
+      reportData.push(['INVALID AGENT CODES'])
+      lastUploadResult.errorSummary.invalidAgentCodes.forEach(code => {
+        reportData.push([code])
+      })
     }
+    
+    const csvContent = reportData.map(row => 
+      row.map(cell => `"${cell.toString().replace(/"/g, '""')}"`).join(',')
+    ).join('\n')
+    
+    const blob = new Blob([csvContent], { type: 'text/csv' })
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.style.display = 'none'
+    a.href = url
+    a.download = `earnings-upload-report-${lastUploadResult.batchInfo.batchId}.csv`
+    document.body.appendChild(a)
+    a.click()
+    window.URL.revokeObjectURL(url)
+    document.body.removeChild(a)
+  }
+
+  const getTypeColor = (type: string) => {
+    const colors = {
+      'referral_commission': 'bg-blue-100 text-blue-800 border-blue-200',
+      'bonus': 'bg-green-100 text-green-800 border-green-200',
+      'penalty': 'bg-red-100 text-red-800 border-red-200',
+      'adjustment': 'bg-yellow-100 text-yellow-800 border-yellow-200',
+      'promotion_bonus': 'bg-purple-100 text-purple-800 border-purple-200'
+    }
+    return colors[type as keyof typeof colors] || 'bg-gray-100 text-gray-800 border-gray-200'
+  }
+
+  const getStatusColor = (status: string) => {
+    const colors = {
+      'pending': 'bg-yellow-100 text-yellow-800 border-yellow-200',
+      'confirmed': 'bg-green-100 text-green-800 border-green-200',
+      'cancelled': 'bg-red-100 text-red-800 border-red-200'
+    }
+    return colors[status as keyof typeof colors] || 'bg-gray-100 text-gray-800 border-gray-200'
   }
 
   const handlePageChange = (newPage: number) => {
@@ -273,56 +380,70 @@ function EarningsManagementPage() {
     setFilters(prev => ({ ...prev, limit: newLimit, page: 1 }))
   }
 
-  const handleStatusFilter = (status: string) => {
-    setFilters(prev => ({ ...prev, status, page: 1 }))
-  }
-
-  const handleTypeFilter = (type: string) => {
-    setFilters(prev => ({ ...prev, type, page: 1 }))
-  }
-
-  const handleSearchFilter = (search: string) => {
-    setFilters(prev => ({ ...prev, search, page: 1 }))
-  }
-
-  const handleAgentFilter = (agentId: string) => {
-    setFilters(prev => ({ ...prev, agentId, page: 1 }))
-  }
-
-  const handleTierFilter = (tier: string) => {
-    setFilters(prev => ({ ...prev, tier, page: 1 }))
-  }
-
-  const handleDateRangeFilter = (startDate: string, endDate: string) => {
-    setFilters(prev => ({ ...prev, startDate, endDate, page: 1 }))
-  }
-
-  if (loading) {
-    return (
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pt-turquoise mx-auto"></div>
-          <p className="mt-4 text-pt-light-gray">{t('loading')}</p>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className="max-w-7xl mx-auto">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-pt-dark-gray">Earnings Management</h1>
-        <p className="text-pt-light-gray mt-2">Monitor and manage all agent earnings across all statuses</p>
+        <h1 className="text-3xl font-bold text-pt-dark-gray mb-2">Earnings Management</h1>
+        <p className="text-pt-light-gray">Manage agent earnings, commissions, and bulk uploads</p>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 mb-8">
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+      {/* Success/Error Alerts */}
+      {success && (
+        <div className="bg-green-50 border border-green-200 text-green-700 px-6 py-4 rounded-xl mb-6 flex items-center justify-between">
           <div className="flex items-center">
-            <div className="p-3 bg-pt-turquoise/10 rounded-lg">
-              <svg className="w-6 h-6 text-pt-turquoise" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+            <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3">
+              <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <span className="font-medium">{success}</span>
+            </div>
+          {lastUploadResult && (
+            <button
+              onClick={downloadUploadReport}
+              className="ml-4 px-3 py-1 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors duration-200 flex items-center"
+            >
+              <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              Download Report
+            </button>
+          )}
+          </div>
+      )}
+
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-xl mb-6 flex items-center justify-between">
+          <div className="flex items-center">
+            <div className="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center mr-3">
+              <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <span className="font-medium">{error}</span>
+            </div>
+          {lastUploadResult && (
+            <button
+              onClick={downloadUploadReport}
+              className="ml-4 px-3 py-1 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition-colors duration-200 flex items-center"
+            >
+              <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              Download Report
+            </button>
+          )}
+          </div>
+      )}
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center">
+            <div className="p-3 bg-blue-100 rounded-xl">
+              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
             </div>
             <div className="ml-4">
@@ -332,9 +453,9 @@ function EarningsManagementPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <div className="flex items-center">
-            <div className="p-3 bg-yellow-100 rounded-lg">
+            <div className="p-3 bg-yellow-100 rounded-xl">
               <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -346,11 +467,11 @@ function EarningsManagementPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <div className="flex items-center">
-            <div className="p-3 bg-green-100 rounded-lg">
+            <div className="p-3 bg-green-100 rounded-xl">
               <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
               </svg>
             </div>
             <div className="ml-4">
@@ -360,74 +481,23 @@ function EarningsManagementPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <div className="flex items-center">
-            <div className="p-3 bg-red-100 rounded-lg">
-              <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+            <div className="p-3 bg-pt-turquoise/10 rounded-xl">
+              <svg className="w-6 h-6 text-pt-turquoise" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-pt-light-gray">Cancelled</p>
-              <p className="text-2xl font-bold text-pt-dark-gray">{stats.cancelled}</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-          <div className="flex items-center">
-            <div className="p-3 bg-blue-100 rounded-lg">
-              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-pt-light-gray">Total Value</p>
+              <p className="text-sm font-medium text-pt-light-gray">Total Amount</p>
               <p className="text-2xl font-bold text-pt-dark-gray">{formatCurrencyWithSymbol(stats.totalAmount)}</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-          <div className="flex items-center">
-            <div className="p-3 bg-orange-100 rounded-lg">
-              <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-pt-light-gray">Pending Value</p>
-              <p className="text-2xl font-bold text-pt-dark-gray">{formatCurrencyWithSymbol(stats.pendingAmount)}</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Alerts */}
-      {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
-          <div className="flex items-center">
-            <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-            </svg>
-            {error}
-          </div>
-        </div>
-      )}
-
-      {success && (
-        <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-6">
-          <div className="flex items-center">
-            <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-            </svg>
-            {success}
-          </div>
-        </div>
-      )}
-
       {/* Filters */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 mb-6">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 mb-8">
         <div className="px-6 py-4 border-b border-gray-200">
           <button
             onClick={() => setFiltersExpanded(!filtersExpanded)}
@@ -438,8 +508,7 @@ function EarningsManagementPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.707A1 1 0 013 7V4z" />
               </svg>
               <h3 className="text-lg font-medium text-gray-900">Filters & Search</h3>
-              {(filters.status !== 'all' || filters.type !== 'all' || filters.tier !== 'all' || 
-                filters.agentId || filters.startDate || filters.endDate || filters.search) && (
+              {(filters.status || filters.type || filters.agentCode || filters.startDate || filters.endDate) && (
                 <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-pt-turquoise text-white">
                   Active
                 </span>
@@ -458,366 +527,210 @@ function EarningsManagementPage() {
         
         {filtersExpanded && (
           <div className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-4">
-            <div className="xl:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Search</label>
-              <input
-                type="text"
-                placeholder="Search by agent, customer, or description..."
-                value={filters.search}
-                onChange={(e) => handleSearchFilter(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pt-turquoise focus:border-pt-turquoise"
-              />
-            </div>
-            
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                <label className="block text-sm font-medium text-pt-dark-gray mb-2">Status</label>
               <select
                 value={filters.status}
-                onChange={(e) => handleStatusFilter(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pt-turquoise focus:border-pt-turquoise"
+                  onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value, page: 1 }))}
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-pt-turquoise focus:border-pt-turquoise transition-all duration-200"
               >
-                <option value="all">All Status</option>
+                  <option value="">All Statuses</option>
                 <option value="pending">Pending</option>
                 <option value="confirmed">Confirmed</option>
-                <option value="cancelled">Cancelled</option>
+                  <option value="rejected">Rejected</option>
               </select>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                <label className="block text-sm font-medium text-pt-dark-gray mb-2">Type</label>
               <select
                 value={filters.type}
-                onChange={(e) => handleTypeFilter(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pt-turquoise focus:border-pt-turquoise"
+                  onChange={(e) => setFilters(prev => ({ ...prev, type: e.target.value, page: 1 }))}
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-pt-turquoise focus:border-pt-turquoise transition-all duration-200"
               >
-                <option value="all">All Types</option>
+                  <option value="">All Types</option>
                 <option value="referral_commission">Referral Commission</option>
                 <option value="bonus">Bonus</option>
                 <option value="penalty">Penalty</option>
                 <option value="adjustment">Adjustment</option>
+                  <option value="promotion_bonus">Promotion Bonus</option>
               </select>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Agent ID</label>
+                <label className="block text-sm font-medium text-pt-dark-gray mb-2">Agent Code</label>
               <input
                 type="text"
-                placeholder="Enter agent ID..."
-                value={filters.agentId}
-                onChange={(e) => handleAgentFilter(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pt-turquoise focus:border-pt-turquoise"
+                  value={filters.agentCode}
+                  onChange={(e) => setFilters(prev => ({ ...prev, agentCode: e.target.value, page: 1 }))}
+                  placeholder="Search by agent code..."
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-pt-turquoise focus:border-pt-turquoise transition-all duration-200"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Tier</label>
-              <select
-                value={filters.tier}
-                onChange={(e) => handleTierFilter(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pt-turquoise focus:border-pt-turquoise"
-              >
-                <option value="all">All Tiers</option>
-                <option value="bronze">Bronze</option>
-                <option value="silver">Silver</option>
-                <option value="gold">Gold</option>
-                <option value="platinum">Platinum</option>
-                <option value="diamond">Diamond</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                <label className="block text-sm font-medium text-pt-dark-gray mb-2">Date From</label>
               <input
                 type="date"
                 value={filters.startDate}
-                onChange={(e) => handleDateRangeFilter(e.target.value, filters.endDate)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pt-turquoise focus:border-pt-turquoise"
+                  onChange={(e) => setFilters(prev => ({ ...prev, startDate: e.target.value, page: 1 }))}
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-pt-turquoise focus:border-pt-turquoise transition-all duration-200"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                <label className="block text-sm font-medium text-pt-dark-gray mb-2">Date To</label>
               <input
                 type="date"
                 value={filters.endDate}
-                onChange={(e) => handleDateRangeFilter(filters.startDate, e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pt-turquoise focus:border-pt-turquoise"
+                  onChange={(e) => setFilters(prev => ({ ...prev, endDate: e.target.value, page: 1 }))}
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-pt-turquoise focus:border-pt-turquoise transition-all duration-200"
               />
             </div>
           </div>
 
-          {/* Quick Status Filter Buttons */}
-          <div className="flex flex-wrap gap-2">
+            <div className="flex justify-end mt-4">
             <button
-              onClick={() => handleStatusFilter('all')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                filters.status === 'all'
-                  ? 'bg-pt-turquoise text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              All ({stats.total})
-            </button>
-            <button
-              onClick={() => handleStatusFilter('pending')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                filters.status === 'pending'
-                  ? 'bg-yellow-500 text-white'
-                  : 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
-              }`}
-            >
-              Pending ({stats.pending})
-            </button>
-            <button
-              onClick={() => handleStatusFilter('confirmed')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                filters.status === 'confirmed'
-                  ? 'bg-green-500 text-white'
-                  : 'bg-green-100 text-green-700 hover:bg-green-200'
-              }`}
-            >
-              Confirmed ({stats.confirmed})
-            </button>
-            <button
-              onClick={() => handleStatusFilter('cancelled')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                filters.status === 'cancelled'
-                  ? 'bg-red-500 text-white'
-                  : 'bg-red-100 text-red-700 hover:bg-red-200'
-              }`}
-            >
-              Cancelled ({stats.cancelled})
-            </button>
-          </div>
-
-          {/* Filter Actions */}
-          <div className="flex justify-between items-center mt-4 pt-4 border-t border-gray-200">
-            <div className="flex items-center space-x-2">
-              <span className="text-sm text-gray-500">Quick filters:</span>
-              <button
-                onClick={() => {
-                  setFilters(prev => ({ ...prev, startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], endDate: '', page: 1 }))
-                }}
-                className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200"
+                onClick={() => setFilters({ page: 1, limit: 20, status: '', type: '', agentCode: '', startDate: '', endDate: '' })}
+                className="px-4 py-2 text-pt-turquoise hover:text-pt-turquoise-600 font-medium transition-colors duration-200"
               >
-                Last 30 days
-              </button>
-              <button
-                onClick={() => {
-                  const today = new Date()
-                  const firstDay = new Date(today.getFullYear(), today.getMonth(), 1)
-                  setFilters(prev => ({ ...prev, startDate: firstDay.toISOString().split('T')[0], endDate: '', page: 1 }))
-                }}
-                className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200"
-              >
-                This month
-              </button>
-              <button
-                onClick={() => {
-                  setFilters(prev => ({ ...prev, tier: 'platinum', page: 1 }))
-                }}
-                className="px-3 py-1 text-xs bg-purple-100 text-purple-700 rounded-md hover:bg-purple-200"
-              >
-                Platinum agents
-              </button>
+                Clear Filters
+            </button>
             </div>
-            
-            <button
-              onClick={() => {
-                setFilters({
-                  status: 'all',
-                  type: 'all',
-                  agentId: '',
-                  tier: 'all',
-                  startDate: '',
-                  endDate: '',
-                  search: '',
-                  page: 1,
-                  limit: 20
-                })
-              }}
-              className="px-4 py-2 text-sm text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-            >
-              Clear All Filters
-            </button>
-          </div>
           </div>
         )}
-      </div>
+          </div>
 
-      {/* Bulk Actions - Only available for pending earnings */}
-      {selectedEarnings.size > 0 && earnings.some(e => selectedEarnings.has(e.id) && e.status === 'pending') && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-          <div className="flex items-center justify-between">
-            <span className="text-blue-800">
-              {selectedEarnings.size} earning{selectedEarnings.size !== 1 ? 's' : ''} selected
-            </span>
-            <div className="space-x-3">
+      {/* Action Toolbar */}
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h2 className="text-xl font-semibold text-pt-dark-gray">Earnings Records</h2>
+        </div>
+        
+        <div className="flex items-center space-x-3">
               <button
-                onClick={handleBulkApprove}
-                disabled={actionLoading === 'bulk-approve'}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
-              >
-                {actionLoading === 'bulk-approve' ? t('actions.approving') : t('actions.bulkApprove')}
+            onClick={() => setShowBulkUpload(true)}
+            className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors duration-200 flex items-center"
+          >
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+            </svg>
+            Bulk Upload
               </button>
               <button
-                onClick={() => setShowBulkRejectModal(true)}
-                disabled={!!actionLoading}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
-              >
-                Bulk Reject
+            onClick={handleExportCSV}
+            disabled={isExporting || earnings.length === 0}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+          >
+            {isExporting ? (
+              <>
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Exporting...
+              </>
+            ) : (
+              <>
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Export CSV
+              </>
+            )}
+              </button>
+        </div>
+            </div>
+            
+      {/* Earnings Table */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        {loading ? (
+          <div className="p-12 text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pt-turquoise mx-auto mb-4"></div>
+            <p className="text-pt-light-gray">Loading earnings...</p>
+          </div>
+        ) : earnings.length === 0 ? (
+          <div className="p-12 text-center">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+          </div>
+            <h3 className="text-lg font-medium text-pt-dark-gray mb-2">No earnings found</h3>
+            <p className="text-pt-light-gray mb-4">No earnings records match your current filters.</p>
+              <button
+              onClick={() => setShowBulkUpload(true)}
+              className="px-4 py-2 bg-pt-turquoise text-white rounded-lg hover:bg-pt-turquoise-600 transition-colors duration-200"
+            >
+              Upload Earnings
               </button>
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* Earnings Table */}
-      {earnings.length > 0 ? (
-        <div className="bg-white shadow rounded-lg overflow-hidden">
-          <table className="min-w-full divide-y divide-gray-200">
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  <input
-                    type="checkbox"
-                    checked={selectedEarnings.size === earnings.length && earnings.length > 0}
-                    onChange={selectAll}
-                    className="rounded border-gray-300 text-pt-turquoise focus:ring-pt-turquoise"
-                  />
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('table.date')}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('table.agent')}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('table.customer')}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Type
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('table.amount')}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('table.actions')}
-                </th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-pt-dark-gray uppercase tracking-wider">Agent</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-pt-dark-gray uppercase tracking-wider">Amount</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-pt-dark-gray uppercase tracking-wider">Type</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-pt-dark-gray uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-pt-dark-gray uppercase tracking-wider">Description</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-pt-dark-gray uppercase tracking-wider">Earned Date</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="divide-y divide-gray-200">
               {earnings.map((earning) => (
-                <tr key={earning.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <input
-                      type="checkbox"
-                      checked={selectedEarnings.has(earning.id)}
-                      onChange={() => toggleEarningSelection(earning.id)}
-                      className="rounded border-gray-300 text-pt-turquoise focus:ring-pt-turquoise"
-                    />
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {new Date(earning.earnedAt).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">
-                      {earning.agent?.agentCode || earning.metadata?.agentCode || 'N/A'}
-                    </div>
-                    <div className="text-sm text-gray-500">
-                      {earning.agent?.fullName || (earning.agent?.firstName && earning.agent?.lastName ? `${earning.agent.firstName} ${earning.agent.lastName}` : 'N/A')}
-                    </div>
-                    <div className="text-xs text-gray-400">
-                      {earning.agent?.email || 'N/A'}
-                    </div>
-                    {earning.agent?.tier && (
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full mt-1 ${
-                        earning.agent.tier === 'platinum' ? 'bg-purple-100 text-purple-800' :
-                        earning.agent.tier === 'gold' ? 'bg-yellow-100 text-yellow-800' :
-                        earning.agent.tier === 'silver' ? 'bg-gray-100 text-gray-800' :
-                        earning.agent.tier === 'diamond' ? 'bg-indigo-100 text-indigo-800' :
-                        'bg-orange-100 text-orange-800'
-                      }`}>
-                        {earning.agent.tier}
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
-                      {earning.referralUsage?.referredUserName || earning.metadata?.customerInfo?.name || 'N/A'}
-                    </div>
-                    <div className="text-sm text-gray-500">
-                      {earning.referralUsage?.referredUserPhone || earning.metadata?.customerInfo?.phone || 'N/A'}
-                    </div>
-                    {earning.metadata?.serviceType && (
-                      <div className="text-xs text-gray-400 mt-1">
-                        {earning.metadata.serviceType}
+                  <tr key={earning.id} className="hover:bg-gray-50 transition-colors duration-200">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center">
+                        <div className="w-8 h-8 bg-pt-turquoise rounded-full flex items-center justify-center mr-3">
+                          <span className="text-white text-sm font-medium">
+                            {(earning.agent?.agentCode || 'AG').slice(0, 2).toUpperCase()}
+                          </span>
+                        </div>
+                        <div>
+                          <div className="text-sm font-medium text-pt-dark-gray">{earning.agent?.agentCode || 'Unknown'}</div>
+                          <div className="text-sm text-pt-light-gray">{earning.agent?.firstName} {earning.agent?.lastName}</div>
+                        </div>
                       </div>
-                    )}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className={`text-sm font-medium ${earning.amount >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {earning.amount >= 0 ? '+' : ''}{formatCurrencyWithSymbol(earning.amount)}
+                    </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      earning.type === 'referral_commission' ? 'bg-blue-100 text-blue-800' :
-                      earning.type === 'bonus' ? 'bg-green-100 text-green-800' :
-                      earning.type === 'penalty' ? 'bg-red-100 text-red-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}>
-                      {earning.type?.replace('_', ' ') || 'N/A'}
+                    <td className="px-6 py-4">
+                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${getTypeColor(earning.type)}`}>
+                        {earning.type.replace('_', ' ').toUpperCase()}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {formatCurrencyWithSymbol(earning.amount)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      earning.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                      earning.status === 'confirmed' ? 'bg-green-100 text-green-800' :
-                      earning.status === 'cancelled' ? 'bg-red-100 text-red-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}>
-                      {earning.status || 'N/A'}
+                    <td className="px-6 py-4">
+                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(earning.status)}`}>
+                        {earning.status.toUpperCase()}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                    {earning.status === 'pending' ? (
-                      <>
-                        <button
-                          onClick={() => handleApprove(earning.id, 'Approved via admin dashboard')}
-                          disabled={actionLoading === earning.id}
-                          className="text-green-600 hover:text-green-900 disabled:opacity-50"
-                        >
-                          {actionLoading === earning.id ? t('actions.approving') : t('actions.approve')}
-                        </button>
-                        <button
-                          onClick={() => {
-                            setRejectingEarning(earning.id)
-                            setShowRejectModal(true)
-                          }}
-                          disabled={!!actionLoading}
-                          className="text-red-600 hover:text-red-900 disabled:opacity-50"
-                        >
-                          {t('actions.reject')}
-                        </button>
-                      </>
-                    ) : (
-                      <span className="text-gray-400 text-xs">
-                        {earning.status === 'confirmed' ? 'Approved' : 
-                         earning.status === 'cancelled' ? 'Rejected' : 'No actions'}
-                      </span>
-                    )}
-                  </td>
+                    <td className="px-6 py-4">
+                      <div className="text-sm text-pt-dark-gray max-w-xs truncate" title={earning.description}>
+                        {earning.description}
+                      </div>
+                      {earning.referralCode && (
+                        <div className="text-sm text-pt-light-gray">Ref: {earning.referralCode}</div>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-pt-dark-gray">
+                      {new Date(earning.earnedAt).toLocaleDateString()}
+                    </td>
                 </tr>
               ))}
             </tbody>
           </table>
+          </div>
+        )}
           
           {/* Pagination */}
           {!loading && earnings.length > 0 && (
-            <div className="border-t border-gray-200 bg-gray-50 px-6 py-4">
+          <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
               <div className="flex items-center justify-between">
                 <div className="flex items-center text-sm text-pt-light-gray">
                   <span>
@@ -885,139 +798,169 @@ function EarningsManagementPage() {
             </div>
           )}
         </div>
-      ) : (
-        <div className="text-center py-12">
-          <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-          </svg>
-          <h3 className="mt-2 text-sm font-medium text-gray-900">{t('noEarnings')}</h3>
-          <p className="mt-1 text-sm text-gray-500">{t('noEarningsDescription')}</p>
-        </div>
-      )}
 
-      {/* Reject Modal */}
-      {showRejectModal && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <div className="mt-3">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Reject Earning</h3>
-              
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Reason for rejection *
-                </label>
-                <select
-                  value={rejectReason}
-                  onChange={(e) => setRejectReason(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-pt-turquoise focus:border-pt-turquoise"
-                  required
-                >
-                  <option value="">Select a reason</option>
-                  <option value="Invalid referral">Invalid referral</option>
-                  <option value="Duplicate referral">Duplicate referral</option>
-                  <option value="No customer activity">No customer activity</option>
-                  <option value="Fraudulent activity">Fraudulent activity</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
-              
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Additional notes
-                </label>
-                <textarea
-                  value={rejectNotes}
-                  onChange={(e) => setRejectNotes(e.target.value)}
-                  rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-pt-turquoise focus:border-pt-turquoise"
-                  placeholder="Optional additional details..."
-                />
-              </div>
-              
-              <div className="flex justify-end space-x-3">
+      {/* Bulk Upload Modal */}
+      {showBulkUpload && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <h2 className="text-xl font-semibold text-pt-dark-gray">Bulk Upload Earnings</h2>
                 <button
                   onClick={() => {
-                    setShowRejectModal(false)
-                    setRejectingEarning(null)
-                    setRejectReason('')
-                    setRejectNotes('')
-                  }}
-                  className="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50"
-                >
-                  Cancel
+                  setShowBulkUpload(false)
+                  setCsvFile(null)
+                  setBatchDescription('')
+                  setAutoConfirm(false)
+                }}
+                className="text-gray-400 hover:text-gray-600 transition-colors duration-200"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
                 </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6 space-y-6">
+              {/* CSV Format Guide */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-start space-x-3">
+                  <svg className="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <div className="flex-1">
+                    <h4 className="font-medium text-blue-900 mb-2">CSV Format Requirements</h4>
+                    <div className="text-sm text-blue-800 space-y-2">
+                      <p><strong>Required columns:</strong> agent_code, amount, type, description</p>
+                      <p><strong>Optional columns:</strong> reference_id, commission_rate, earned_at</p>
+                      <p><strong>Types:</strong> referral_commission, bonus, penalty, adjustment, promotion_bonus</p>
+                      <div className="bg-white rounded p-2 mt-2 font-mono text-xs">
+                        <div className="text-gray-600">Example:</div>
+                        <div>agent_code,amount,type,description</div>
+                        <div>AG123456,25.50,referral_commission,Customer referral</div>
+                        <div>AG789012,50.00,bonus,Performance bonus</div>
+                      </div>
+                    </div>
+                    <div className="mt-3">
                 <button
-                  onClick={() => rejectingEarning && handleReject(rejectingEarning, rejectReason, rejectNotes)}
-                  disabled={!rejectReason.trim() || actionLoading === rejectingEarning}
-                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50"
+                        onClick={downloadSampleCsv}
+                        className="inline-flex items-center px-3 py-1 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700 transition-colors duration-200"
                 >
-                  {actionLoading === rejectingEarning ? 'Rejecting...' : 'Reject Earning'}
+                        <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Download Sample CSV
                 </button>
               </div>
             </div>
           </div>
         </div>
-      )}
 
-      {/* Bulk Reject Modal */}
-      {showBulkRejectModal && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <div className="mt-3">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">
-                Bulk Reject {selectedEarnings.size} Earnings
-              </h3>
-              
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Reason for rejection *
+              {/* File Upload */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Upload CSV File</label>
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+                  <input
+                    type="file"
+                    accept=".csv"
+                    onChange={(e) => setCsvFile(e.target.files?.[0] || null)}
+                    className="hidden"
+                    id="csv-upload"
+                  />
+                  <label htmlFor="csv-upload" className="cursor-pointer">
+                    <svg className="w-8 h-8 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    </svg>
+                    <p className="text-sm text-gray-600">
+                      {csvFile ? csvFile.name : 'Click to upload CSV file'}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Only CSV files are accepted
+                    </p>
                 </label>
-                <select
-                  value={rejectReason}
-                  onChange={(e) => setRejectReason(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-pt-turquoise focus:border-pt-turquoise"
-                  required
-                >
-                  <option value="">Select a reason</option>
-                  <option value="Invalid referrals">Invalid referrals</option>
-                  <option value="Duplicate referrals">Duplicate referrals</option>
-                  <option value="No customer activity">No customer activity</option>
-                  <option value="Fraudulent activity">Fraudulent activity</option>
-                  <option value="Policy violation">Policy violation</option>
-                  <option value="Other">Other</option>
-                </select>
+                </div>
               </div>
               
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Additional notes
-                </label>
-                <textarea
-                  value={rejectNotes}
-                  onChange={(e) => setRejectNotes(e.target.value)}
-                  rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-pt-turquoise focus:border-pt-turquoise"
-                  placeholder="Optional additional details..."
+              {/* Batch Description */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Batch Description (Optional)</label>
+                <input
+                  type="text"
+                  value={batchDescription}
+                  onChange={(e) => setBatchDescription(e.target.value)}
+                  placeholder="e.g., January 2025 commission upload"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
               
+              {/* Auto Confirm */}
+              <div className="flex items-start space-x-3">
+                <input
+                  type="checkbox"
+                  id="auto-confirm"
+                  checked={autoConfirm}
+                  onChange={(e) => setAutoConfirm(e.target.checked)}
+                  className="mt-1 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                />
+                <div>
+                  <label htmlFor="auto-confirm" className="block text-sm font-medium text-gray-900">
+                    Auto-confirm earnings
+                  </label>
+                  <p className="text-sm text-gray-600">
+                    When checked, earnings will be immediately confirmed and agent balances updated. 
+                    Otherwise, earnings will be created as pending and require manual approval.
+                  </p>
+                </div>
+              </div>
+
+              {/* Warning */}
+              <div className="flex items-start space-x-3 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <svg className="w-5 h-5 text-yellow-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div>
+                  <h4 className="font-medium text-yellow-900 mb-1">Upload Warning</h4>
+                  <p className="text-sm text-yellow-800">
+                    This will process all earnings in the CSV file. Make sure you have verified the file contents and agent codes before uploading.
+                  </p>
+                </div>
+              </div>
+
+              {/* Modal Actions */}
               <div className="flex justify-end space-x-3">
                 <button
                   onClick={() => {
-                    setShowBulkRejectModal(false)
-                    setRejectReason('')
-                    setRejectNotes('')
+                    setShowBulkUpload(false)
+                    setCsvFile(null)
+                    setBatchDescription('')
+                    setAutoConfirm(false)
                   }}
-                  className="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50"
+                  className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors duration-200"
                 >
                   Cancel
                 </button>
                 <button
-                  onClick={handleBulkReject}
-                  disabled={!rejectReason.trim() || actionLoading === 'bulk-reject'}
-                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50"
+                  onClick={handleBulkUpload}
+                  disabled={!csvFile || isUploading}
+                  className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
                 >
-                  {actionLoading === 'bulk-reject' ? 'Rejecting...' : `Reject ${selectedEarnings.size} Earnings`}
+                  {isUploading ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Uploading...
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+                      </svg>
+                      Upload Earnings
+                    </>
+                  )}
                 </button>
               </div>
             </div>
@@ -1027,5 +970,3 @@ function EarningsManagementPage() {
     </div>
   )
 }
-
-export default withAuth(EarningsManagementPage, ['admin', 'pt_admin'])
