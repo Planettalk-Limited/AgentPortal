@@ -5,6 +5,7 @@
 
 import { BaseService } from '../base.service';
 import { PaginatedResponse } from '../client';
+import { CreatePayoutRequest } from '../types';
 
 // Payout Types
 export interface Payout {
@@ -36,13 +37,6 @@ export interface Payout {
   updatedAt: string;
 }
 
-export interface CreatePayoutRequest {
-  amount: number;
-  method: 'bank_transfer' | 'planettalk_credit';
-  description?: string;
-  paymentDetails: Record<string, any>;
-  metadata?: Record<string, any>;
-}
 
 export interface PayoutQueryParams {
   page?: number;

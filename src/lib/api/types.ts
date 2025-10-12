@@ -488,7 +488,7 @@ export interface Payout {
 
 export interface CreatePayoutRequest {
   amount: number;
-  method: 'bank_transfer' | 'airtime_topup';
+  method: 'bank_transfer' | 'planettalk_credit' | 'airtime_topup';
   description?: string;
   paymentDetails: {
     bankAccount?: {
@@ -496,6 +496,10 @@ export interface CreatePayoutRequest {
       routingNumber: string;
       accountName: string;
       bankName: string;
+    };
+    planettalkCredit?: {
+      planettalkMobile: string;
+      accountName?: string;
     };
     airtimeTopup?: {
       phoneNumber: string;
