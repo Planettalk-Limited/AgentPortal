@@ -44,6 +44,29 @@ interface BulkUploadResult {
   }
 }
 
+// Helper function to derive earning type from description or metadata
+const deriveEarningType = (earning: Earning): string => {
+  // If type is explicitly provided, use it
+  if (earning.type) return earning.type
+
+  // Try to derive from metadata
+  if (earning.metadata?.earningType) return earning.metadata.earningType
+
+  // Try to derive from description
+  const desc = earning.description?.toLowerCase() || ''
+  if (desc.includes('referral') || desc.includes('commission')) return 'referral_commission'
+  if (desc.includes('bonus') || desc.includes('promotion')) return 'bonus'
+  if (desc.includes('penalty') || desc.includes('deduction')) return 'penalty'
+  if (desc.includes('adjustment') || desc.includes('correction')) return 'adjustment'
+
+  // Check amount - negative amounts might be penalties
+  const amount = typeof earning.amount === 'string' ? parseFloat(earning.amount) : earning.amount
+  if (amount < 0) return 'penalty'
+
+  // Default to referral_commission for positive amounts
+  return 'referral_commission'
+}
+
 export default function EarningsPage() {
   const [earnings, setEarnings] = useState<Earning[]>([])
   const [loading, setLoading] = useState(true)
@@ -696,20 +719,30 @@ export default function EarningsPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className={`text-sm font-medium ${earning.amount >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                        {earning.amount >= 0 ? '+' : ''}{formatCurrencyWithSymbol(earning.amount)}
-                    </div>
+                      {(() => {
+                        const amount = typeof earning.amount === 'string' ? parseFloat(earning.amount) : earning.amount
+                        return (
+                          <div className={`text-sm font-medium ${amount >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                            {amount >= 0 ? '+' : ''}{formatCurrencyWithSymbol(amount)}
+                          </div>
+                        )
+                      })()}
                   </td>
-                    <td className="px-6 py-4">
-                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${getTypeColor(earning.type)}`}>
-                        {earning.type.replace('_', ' ').toUpperCase()}
-                    </span>
+                  <td className="px-6 py-4">
+                    {(() => {
+                      const earningType = deriveEarningType(earning)
+                      return (
+                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${getTypeColor(earningType)}`}>
+                          {earningType.replace('_', ' ').toUpperCase()}
+                        </span>
+                      )
+                    })()}
                   </td>
-                    <td className="px-6 py-4">
-                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(earning.status)}`}>
-                        {earning.status.toUpperCase()}
-                    </span>
-                  </td>
+                  <td className="px-6 py-4">
+                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(earning.status || '')}`}>
+                      {earning.status ? earning.status.toUpperCase() : 'UNKNOWN'}
+                  </span>
+                </td>
                     <td className="px-6 py-4">
                       <div className="text-sm text-pt-dark-gray max-w-xs truncate" title={earning.description}>
                         {earning.description}

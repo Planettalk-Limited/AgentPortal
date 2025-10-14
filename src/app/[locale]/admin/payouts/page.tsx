@@ -776,12 +776,16 @@ export default function PayoutsPage() {
                       <div className="flex items-center">
                         <div className="w-8 h-8 bg-pt-turquoise rounded-full flex items-center justify-center mr-3">
                           <span className="text-white text-sm font-medium">
-                            {payout.id.slice(0, 2).toUpperCase()}
+                            {payout.agent?.agentCode ? payout.agent.agentCode.slice(0, 2).toUpperCase() : payout.id.slice(0, 2).toUpperCase()}
                           </span>
                         </div>
                         <div>
-                          <div className="text-sm font-medium text-pt-dark-gray">Agent #{payout.id.slice(0, 8)}</div>
-                          <div className="text-sm text-pt-light-gray">ID: {payout.id}</div>
+                          {payout.agent?.agentCode && (
+                            <div className="inline-flex items-center px-2 py-1 bg-pt-turquoise/10 border border-pt-turquoise rounded-md mb-1">
+                              <span className="text-sm font-bold text-pt-turquoise">{payout.agent.agentCode}</span>
+                            </div>
+                          )}
+                          <div className="text-xs text-pt-light-gray">ID: {payout.id.slice(0, 12)}...</div>
                         </div>
                       </div>
                     </td>
@@ -965,9 +969,15 @@ export default function PayoutsPage() {
                     .filter(p => selectedPayouts.includes(p.id))
                     .slice(0, 3)
                     .map(payout => (
-                      <div key={payout.id} className={`flex justify-between text-sm ${bulkAction === 'approve' ? 'text-green-800' : 'text-orange-800'}`}>
-                        <span>{payout.agent?.agentCode || payout.id.slice(0, 8)}</span>
-                        <span>{formatCurrencyWithSymbol(payout.amount)}</span>
+                      <div key={payout.id} className={`flex justify-between items-center text-sm ${bulkAction === 'approve' ? 'text-green-800' : 'text-orange-800'}`}>
+                        <div className="flex items-center">
+                          {payout.agent?.agentCode ? (
+                            <span className="font-bold px-2 py-0.5 bg-white rounded border border-current mr-2">{payout.agent.agentCode}</span>
+                          ) : (
+                            <span className="text-xs opacity-75">{payout.id.slice(0, 8)}</span>
+                          )}
+                        </div>
+                        <span className="font-semibold">{formatCurrencyWithSymbol(payout.amount)}</span>
                       </div>
                     ))
                   }
@@ -1123,8 +1133,10 @@ export default function PayoutsPage() {
                   <h3 className="text-lg font-medium text-pt-dark-gray mb-4">Agent Information</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Agent Code</label>
-                      <p className="text-sm text-gray-900">{selectedPayout.agent.agentCode}</p>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Agent Code</label>
+                      <div className="inline-flex items-center px-4 py-2 bg-pt-turquoise/10 border-2 border-pt-turquoise rounded-lg">
+                        <span className="text-lg font-bold text-pt-turquoise tracking-wide">{selectedPayout.agent.agentCode}</span>
+                      </div>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Agent Name</label>

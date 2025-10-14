@@ -62,7 +62,21 @@ export class AgentService extends BaseService {
    * Get agent by ID (admin only) - Updated to use admin endpoint
    */
   async getAgent(id: string): Promise<Agent> {
-    return this.getOne<Agent>(`admin/agents/${id}`);
+    const response = await this.execute(() => 
+      this.client.get<any>(`admin/agents/${id}`)
+    );
+    
+    // Handle wrapped response
+    if (response?.data) {
+      return response.data;
+    }
+    
+    // Handle direct agent response
+    if (response?.agentCode) {
+      return response;
+    }
+    
+    throw new Error('Invalid response from get agent API');
   }
 
   /**
@@ -93,7 +107,21 @@ export class AgentService extends BaseService {
    * Create agent (admin only) - Updated to use admin endpoint
    */
   async createAgent(data: any): Promise<Agent> {
-    return this.create<Agent>('admin/agents', data);
+    const response = await this.execute(() => 
+      this.client.post<ApiResponse<Agent>>('admin/agents', data)
+    );
+    
+    // Return the data directly from response
+    if (response?.data) {
+      return response.data;
+    }
+    
+    // If response itself looks like an agent (has agentCode), return it
+    if ((response as any)?.agentCode) {
+      return response as unknown as Agent;
+    }
+    
+    throw new Error('Invalid response from create agent API');
   }
 
   /**

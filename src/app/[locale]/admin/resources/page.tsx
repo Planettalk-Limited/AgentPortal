@@ -41,16 +41,26 @@ export default function ResourcesPage() {
     sortOrder: 'DESC'
   })
 
-  const [uploadData, setUploadData] = useState({
+  const [uploadData, setUploadData] = useState<{
+    title: string;
+    description: string;
+    type: 'document' | 'image' | 'video' | 'audio' | 'archive' | 'other';
+    category: 'training' | 'marketing' | 'compliance' | 'announcement' | 'policy' | 'guide' | 'template' | 'bank_forms' | 'terms_conditions' | 'media' | 'other';
+    visibility: 'public' | 'private' | 'restricted';
+    isFeatured: boolean;
+    tags: string;
+    expiresAt: string;
+    file: File | null;
+  }>({
     title: '',
     description: '',
-    type: 'document' as const,
-    category: 'training' as const,
-    visibility: 'public' as const,
+    type: 'document',
+    category: 'training',
+    visibility: 'public',
     isFeatured: false,
     tags: '',
     expiresAt: '',
-    file: null as File | null
+    file: null
   })
 
   const [pagination, setPagination] = useState({
@@ -194,6 +204,12 @@ export default function ResourcesPage() {
     const validCategories = ['training', 'marketing', 'compliance', 'announcement', 'policy', 'guide', 'template', 'bank_forms', 'terms_conditions', 'media', 'other']
     if (!validCategories.includes(uploadData.category)) {
       errors.push('Please select a valid category')
+    }
+
+    // Media type restriction - Images, Videos, and Audio must be Announcements only
+    const mediaTypes = ['image', 'video', 'audio']
+    if (mediaTypes.includes(uploadData.type) && uploadData.category !== 'announcement') {
+      errors.push('Media files (images, videos, audio) can only be uploaded as Announcements')
     }
 
     // Visibility validation
@@ -951,6 +967,23 @@ export default function ResourcesPage() {
                 </div>
               </div>
 
+              {/* Media Restriction Info */}
+              {['image', 'video', 'audio'].includes(uploadData.type) && (
+                <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                  <div className="flex items-start">
+                    <svg className="w-5 h-5 text-orange-600 mt-0.5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div>
+                      <h4 className="font-semibold text-orange-900 mb-1">Media Upload Restriction</h4>
+                      <p className="text-sm text-orange-800">
+                        Images, videos, and audio files can only be uploaded as <strong>Announcements</strong>. The category has been automatically set for you.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
@@ -977,23 +1010,35 @@ export default function ResourcesPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Category
+                    {['image', 'video', 'audio'].includes(uploadData.type) && (
+                      <span className="ml-2 text-xs text-orange-600 font-normal">(Media must be Announcements)</span>
+                    )}
+                  </label>
                   <select
                     value={uploadData.category}
                     onChange={(e) => setUploadData(prev => ({ ...prev, category: e.target.value as any }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pt-turquoise focus:border-pt-turquoise"
+                    disabled={['image', 'video', 'audio'].includes(uploadData.type)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pt-turquoise focus:border-pt-turquoise disabled:bg-gray-100 disabled:cursor-not-allowed"
                   >
-                    <option value="training">Training</option>
-                    <option value="marketing">Marketing</option>
-                    <option value="compliance">Compliance</option>
-                    <option value="announcement">Announcement</option>
-                    <option value="policy">Policy</option>
-                    <option value="guide">Guide</option>
-                    <option value="template">Template</option>
-                    <option value="bank_forms">Bank Forms</option>
-                    <option value="terms_conditions">Terms & Conditions</option>
-                    <option value="media">Media</option>
-                    <option value="other">Other</option>
+                    {['image', 'video', 'audio'].includes(uploadData.type) ? (
+                      <option value="announcement">Announcement</option>
+                    ) : (
+                      <>
+                        <option value="training">Training</option>
+                        <option value="marketing">Marketing</option>
+                        <option value="compliance">Compliance</option>
+                        <option value="announcement">Announcement</option>
+                        <option value="policy">Policy</option>
+                        <option value="guide">Guide</option>
+                        <option value="template">Template</option>
+                        <option value="bank_forms">Bank Forms</option>
+                        <option value="terms_conditions">Terms & Conditions</option>
+                        <option value="media">Media</option>
+                        <option value="other">Other</option>
+                      </>
+                    )}
                   </select>
                 </div>
 
@@ -1001,13 +1046,21 @@ export default function ResourcesPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">Type</label>
                   <select
                     value={uploadData.type}
-                    onChange={(e) => setUploadData(prev => ({ ...prev, type: e.target.value as any }))}
+                    onChange={(e) => {
+                      const newType = e.target.value as any
+                      setUploadData(prev => ({ 
+                        ...prev, 
+                        type: newType,
+                        // Auto-set category to 'announcement' for media types
+                        category: ['image', 'video', 'audio'].includes(newType) ? 'announcement' : prev.category
+                      }))
+                    }}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pt-turquoise focus:border-pt-turquoise"
                   >
                     <option value="document">Document</option>
-                    <option value="image">Image</option>
-                    <option value="video">Video</option>
-                    <option value="audio">Audio</option>
+                    <option value="image">📸 Image (Announcements only)</option>
+                    <option value="video">🎥 Video (Announcements only)</option>
+                    <option value="audio">🎵 Audio (Announcements only)</option>
                     <option value="archive">Archive</option>
                     <option value="other">Other</option>
                   </select>

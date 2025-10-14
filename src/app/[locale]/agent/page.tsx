@@ -175,16 +175,6 @@ function AgentPage() {
     }
   }
 
-  const getTierColor = (tier: string) => {
-    switch (tier) {
-      case 'bronze': return 'bg-amber-100 text-amber-800'
-      case 'silver': return 'bg-gray-100 text-gray-800'
-      case 'gold': return 'bg-yellow-100 text-yellow-800'
-      case 'platinum': return 'bg-purple-100 text-purple-800'
-      default: return 'bg-gray-100 text-gray-800'
-    }
-  }
-
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active': return 'bg-green-100 text-green-800'
@@ -271,9 +261,6 @@ function AgentPage() {
               <div className="text-right">
                 <p className="text-sm text-gray-500">Agent Code</p>
                 <p className="text-xl font-bold text-pt-turquoise">{agent.agentCode}</p>
-              </div>
-              <div className={`px-3 py-1 rounded-full text-sm font-medium ${getTierColor(agent.tier)}`}>
-                {t(`tier.${agent.tier}`)}
               </div>
               {parseFloat(String(agent.availableBalance || '0')) < MINIMUM_PAYOUT_AMOUNT && (
                 <div className="text-right">
@@ -470,7 +457,7 @@ function AgentPage() {
             {activeTab === 'overview' && (
               <div className="space-y-8">
                 {/* Agent Status Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6 border border-green-200">
                     <div className="flex items-center justify-between mb-4">
                       <div className="p-3 bg-green-500 rounded-lg">
@@ -484,21 +471,6 @@ function AgentPage() {
                     </div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-1">{t('overview.accountStatus')}</h3>
                     <p className="text-gray-600 text-sm">{t('overview.accountStatusDescription')}</p>
-                  </div>
-
-                  <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6 border border-purple-200">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="p-3 bg-purple-500 rounded-lg">
-                        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                        </svg>
-                      </div>
-                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${getTierColor(agent.tier)}`}>
-                        {t(`tier.${agent.tier}`)}
-                      </span>
-                    </div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-1">{t('overview.agentTier')}</h3>
-                    <p className="text-gray-600 text-sm">{t('overview.agentTierDescription')}</p>
                   </div>
 
                   <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 border border-blue-200">

@@ -379,18 +379,23 @@ export interface UseReferralCodeResponse {
 // Earnings Types
 export interface Earning {
   id: string;
-  type: 'referral_commission' | 'bonus' | 'penalty' | 'adjustment';
-  amount: number;
+  type?: 'referral_commission' | 'bonus' | 'penalty' | 'adjustment' | 'promotion_bonus';
+  amount: number | string;
+  currency?: string;
   description: string;
   status: 'pending' | 'confirmed' | 'cancelled';
   earnedAt: string;
+  confirmedAt?: string;
+  commissionRate?: number | string;
+  referenceId?: string;
   referralCode?: string;
   referredUser?: string;
   metadata?: Record<string, any>;
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
   // Agent information
   agent?: {
+    id?: string;
     agentCode?: string;
     fullName?: string;
     firstName?: string;
@@ -400,8 +405,10 @@ export interface Earning {
   };
   // Referral usage information
   referralUsage?: {
+    id?: string;
     referredUserName?: string;
     referredUserPhone?: string;
+    usedAt?: string;
   };
 }
 
@@ -631,7 +638,7 @@ export interface UploadResourceRequest {
   title: string;
   description: string;
   type: 'document' | 'image' | 'video' | 'audio' | 'archive' | 'other';
-  category: 'training' | 'marketing' | 'compliance' | 'policy' | 'guide' | 'template' | 'other';
+  category: 'training' | 'marketing' | 'compliance' | 'announcement' | 'policy' | 'guide' | 'template' | 'bank_forms' | 'terms_conditions' | 'media' | 'other';
   visibility: 'public' | 'private' | 'restricted';
   isFeatured?: boolean;
   publishedAt?: string;

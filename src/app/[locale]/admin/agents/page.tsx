@@ -4,6 +4,38 @@ import { useState, useEffect } from 'react'
 import { useTranslations, useLocale } from 'next-intl'
 import { api, Agent, PaginatedResponse } from '@/lib/api'
 import { formatCurrencyWithSymbol } from '@/lib/utils/currency'
+import CountryPicker from '@/components/CountryPicker'
+import PhoneNumberInput from '@/components/PhoneNumberInput'
+
+// Mapping from country codes to phone codes
+const countryToPhoneCodeMap: Record<string, string> = {
+  'US': '+1', 'CA': '+1', 'GB': '+44', 'AU': '+61', 'DE': '+49', 'FR': '+33', 'IT': '+39', 'ES': '+34',
+  'NL': '+31', 'BE': '+32', 'CH': '+41', 'AT': '+43', 'SE': '+46', 'NO': '+47', 'DK': '+45', 'FI': '+358',
+  'IE': '+353', 'PT': '+351', 'GR': '+30', 'PL': '+48', 'CZ': '+420', 'HU': '+36', 'RO': '+40',
+  'BG': '+359', 'HR': '+385', 'SI': '+386', 'SK': '+421', 'LT': '+370', 'LV': '+371', 'EE': '+372',
+  'RU': '+7', 'CN': '+86', 'JP': '+81', 'KR': '+82', 'IN': '+91', 'PK': '+92', 'BD': '+880', 'LK': '+94',
+  'TH': '+66', 'VN': '+84', 'MY': '+60', 'SG': '+65', 'ID': '+62', 'PH': '+63', 'TW': '+886', 'HK': '+852',
+  'MO': '+853', 'BR': '+55', 'AR': '+54', 'CL': '+56', 'CO': '+57', 'PE': '+51', 'VE': '+58', 'UY': '+598',
+  'PY': '+595', 'BO': '+591', 'EC': '+593', 'GY': '+592', 'SR': '+597', 'MX': '+52', 'GT': '+502',
+  'BZ': '+501', 'SV': '+503', 'HN': '+504', 'NI': '+505', 'CR': '+506', 'PA': '+507', 'CU': '+53',
+  'JM': '+1876', 'HT': '+509', 'DO': '+1849', 'PR': '+1939', 'TT': '+1868', 'BB': '+1246', 'GD': '+1473',
+  'LC': '+1758', 'VC': '+1784', 'AG': '+1268', 'DM': '+1767', 'KN': '+1869', 'EG': '+20', 'LY': '+218',
+  'SD': '+249', 'TN': '+216', 'DZ': '+213', 'MA': '+212', 'ZA': '+27', 'ZW': '+263', 'ZM': '+260',
+  'MW': '+265', 'MZ': '+258', 'MG': '+261', 'MU': '+230', 'RE': '+262', 'YT': '+262', 'KM': '+269',
+  'SC': '+248', 'KE': '+254', 'UG': '+256', 'TZ': '+255', 'RW': '+250', 'BI': '+257', 'DJ': '+253',
+  'SO': '+252', 'ET': '+251', 'ER': '+291', 'SS': '+211', 'NG': '+234', 'GH': '+233', 'CI': '+225',
+  'BF': '+226', 'ML': '+223', 'NE': '+227', 'TD': '+235', 'SN': '+221', 'GM': '+220', 'GW': '+245',
+  'GN': '+224', 'SL': '+232', 'LR': '+231', 'BJ': '+229', 'TG': '+228', 'GA': '+241', 'GQ': '+240',
+  'CM': '+237', 'CF': '+236', 'CG': '+242', 'CD': '+243', 'AO': '+244', 'NA': '+264', 'BW': '+267',
+  'LS': '+266', 'SZ': '+268', 'TR': '+90', 'GE': '+995', 'AM': '+374', 'AZ': '+994', 'BY': '+375',
+  'UA': '+380', 'MD': '+373', 'IL': '+972', 'PS': '+970', 'JO': '+962', 'LB': '+961', 'SY': '+963',
+  'IQ': '+964', 'KW': '+965', 'SA': '+966', 'YE': '+967', 'OM': '+968', 'AE': '+971', 'QA': '+974',
+  'BH': '+973', 'IR': '+98', 'AF': '+93', 'UZ': '+998', 'TM': '+993', 'TJ': '+992', 'KG': '+996',
+  'KZ': '+7', 'MN': '+976', 'NP': '+977', 'BT': '+975', 'MM': '+95', 'LA': '+856', 'KH': '+855',
+  'FJ': '+679', 'NC': '+687', 'PF': '+689', 'TO': '+676', 'WS': '+685', 'KI': '+686', 'TV': '+688',
+  'NR': '+674', 'PW': '+680', 'FM': '+691', 'MH': '+692', 'PG': '+675', 'SB': '+677', 'VU': '+678',
+  'NU': '+683', 'CK': '+682', 'TK': '+690', 'AS': '+1684', 'GU': '+1671', 'MP': '+1670'
+}
 
 export default function AgentsPage() {
   const [agents, setAgents] = useState<Agent[]>([])
@@ -11,11 +43,26 @@ export default function AgentsPage() {
   const [error, setError] = useState<string | null>(null)
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null)
   const [showAgentModal, setShowAgentModal] = useState(false)
+  const [showCreateModal, setShowCreateModal] = useState(false)
+  const [createLoading, setCreateLoading] = useState(false)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const [showCredentialsModal, setShowCredentialsModal] = useState(false)
+  const [createdAgentData, setCreatedAgentData] = useState<any>(null)
+  const [createdAgentFormData, setCreatedAgentFormData] = useState<any>(null)
   const [filtersExpanded, setFiltersExpanded] = useState(false)
+  const [phoneCountryCode, setPhoneCountryCode] = useState('+44') // Default to UK
+  const [newAgent, setNewAgent] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    address: '',
+    country: '',
+    notes: ''
+  })
   const [filters, setFilters] = useState({
     search: '',
     status: '',
-    tier: '',
     page: 1,
     limit: 20
   })
@@ -32,13 +79,6 @@ export default function AgentsPage() {
       pending_application: 0,
       suspended: 0,
       inactive: 0
-    },
-    tierBreakdown: {
-      bronze: 0,
-      silver: 0,
-      gold: 0,
-      platinum: 0,
-      diamond: 0
     }
   })
   const [pagination, setPagination] = useState({
@@ -92,13 +132,6 @@ export default function AgentsPage() {
           pending_application: 0,
           suspended: 0,
           inactive: 0
-        },
-        tierBreakdown: metricsData.tierBreakdown || {
-          bronze: 0,
-          silver: 0,
-          gold: 0,
-          platinum: 0,
-          diamond: 0
         }
       })
 
@@ -120,13 +153,6 @@ export default function AgentsPage() {
           pending_application: 0,
           suspended: 0,
           inactive: 0
-        },
-        tierBreakdown: {
-          bronze: 0,
-          silver: 0,
-          gold: 0,
-          platinum: 0,
-          diamond: 0
         }
       })
     } finally {
@@ -171,6 +197,76 @@ export default function AgentsPage() {
     setShowAgentModal(true)
   }
 
+  const handleCreateAgent = async () => {
+    try {
+      setCreateLoading(true)
+      setError(null)
+
+      // Validate required fields
+      if (!newAgent.firstName || !newAgent.lastName || !newAgent.email) {
+        setError('Please fill in all required fields (First Name, Last Name, Email)')
+        setCreateLoading(false)
+        return
+      }
+
+      // Prepare the request body
+      const requestBody: any = {
+        firstName: newAgent.firstName,
+        lastName: newAgent.lastName,
+        email: newAgent.email
+      }
+
+      // Add optional fields if they have values
+      if (newAgent.phone) requestBody.phone = newAgent.phone
+      if (newAgent.address) requestBody.address = newAgent.address
+      if (newAgent.country) requestBody.country = newAgent.country
+      if (newAgent.notes) requestBody.notes = newAgent.notes
+
+      // Create the agent
+      const response = await api.agent.createAgent(requestBody)
+
+      // Check if response exists and has required fields
+      if (!response || !response.agentCode) {
+        throw new Error('No agent code received from server')
+      }
+
+      // Use the create response directly - it has all the agent data we need
+      setCreatedAgentData(response)
+      
+      // Save form data for display (in case user object is not fully populated)
+      setCreatedAgentFormData({
+        firstName: newAgent.firstName,
+        lastName: newAgent.lastName,
+        email: newAgent.email
+      })
+
+      // Reset form and close create modal
+      setNewAgent({
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: '',
+        address: '',
+        country: '',
+        notes: ''
+      })
+      setPhoneCountryCode('+44')
+      setShowCreateModal(false)
+
+      // Show credentials modal with agent details after a brief delay
+      setTimeout(() => {
+        setShowCredentialsModal(true)
+      }, 100)
+
+      // Reload agents list
+      loadData()
+    } catch (error: any) {
+      setError(error.error || error.message || 'Failed to create agent')
+    } finally {
+      setCreateLoading(false)
+    }
+  }
+
   const getCurrentMonth = () => {
     return new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
   }
@@ -183,16 +279,6 @@ export default function AgentsPage() {
       case 'code_generated': return 'bg-purple-100 text-purple-800'
       case 'credentials_sent': return 'bg-indigo-100 text-indigo-800'
       case 'suspended': return 'bg-red-100 text-red-800'
-      default: return 'bg-gray-100 text-gray-800'
-    }
-  }
-
-  const getTierColor = (tier: string) => {
-    switch (tier) {
-      case 'platinum': return 'bg-purple-100 text-purple-800'
-      case 'gold': return 'bg-yellow-100 text-yellow-800'
-      case 'silver': return 'bg-gray-100 text-gray-800'
-      case 'bronze': return 'bg-orange-100 text-orange-800'
       default: return 'bg-gray-100 text-gray-800'
     }
   }
@@ -210,10 +296,35 @@ export default function AgentsPage() {
 
   return (
     <div className="max-w-7xl mx-auto">
+      {/* Success Message */}
+      {successMessage && (
+        <div className="fixed top-4 right-4 bg-green-500 text-white px-6 py-4 rounded-xl shadow-2xl z-50 max-w-md">
+          <div className="flex items-center">
+            <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center mr-3">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <span className="font-medium">{successMessage}</span>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-pt-dark-gray mb-2">Agent Management</h1>
-        <p className="text-pt-light-gray">Manage agents and monitor performance</p>
+      <div className="mb-8 flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold text-pt-dark-gray mb-2">Agent Management</h1>
+          <p className="text-pt-light-gray">Manage agents and monitor performance</p>
+        </div>
+        <button
+          onClick={() => setShowCreateModal(true)}
+          className="px-6 py-3 bg-pt-turquoise text-white rounded-lg hover:bg-pt-turquoise-600 transition-colors font-semibold shadow-lg flex items-center"
+        >
+          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+          </svg>
+          Create New Agent
+        </button>
       </div>
 
       {/* Stats Cards */}
@@ -287,20 +398,6 @@ export default function AgentsPage() {
             </div>
           </div>
         </div>
-
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-          <div className="flex items-center">
-            <div className="p-3 bg-purple-100 rounded-lg">
-              <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-              </svg>
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-pt-light-gray">Platinum+ Tier</p>
-              <p className="text-2xl font-bold text-pt-dark-gray">{(stats.tierBreakdown.platinum || 0) + (stats.tierBreakdown.diamond || 0)}</p>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Filters and Agents Table */}
@@ -315,7 +412,7 @@ export default function AgentsPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.707A1 1 0 013 7V4z" />
               </svg>
               <h3 className="text-lg font-medium text-gray-900">Filters & Search</h3>
-              {(filters.status || filters.tier || filters.search) && (
+              {(filters.status || filters.search) && (
                 <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-pt-turquoise text-white">
                   Active
                 </span>
@@ -358,17 +455,6 @@ export default function AgentsPage() {
               <option value="credentials_sent">Credentials Sent</option>
               <option value="suspended">Suspended</option>
             </select>
-            <select
-              value={filters.tier}
-              onChange={(e) => setFilters(prev => ({ ...prev, tier: e.target.value }))}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pt-turquoise focus:border-pt-turquoise"
-            >
-              <option value="">All Tiers</option>
-              <option value="bronze">Bronze</option>
-              <option value="silver">Silver</option>
-              <option value="gold">Gold</option>
-              <option value="platinum">Platinum</option>
-            </select>
           </div>
           </div>
         )}
@@ -388,7 +474,6 @@ export default function AgentsPage() {
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Agent</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tier</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Earnings</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Referrals</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
@@ -420,11 +505,6 @@ export default function AgentsPage() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(agent.status)}`}>
                           {agent.status.replace('_', ' ').toUpperCase()}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getTierColor(agent.tier)}`}>
-                          {agent.tier.toUpperCase()}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -697,12 +777,6 @@ export default function AgentsPage() {
                       <span className="font-medium">{selectedAgent.user.country || 'Not provided'}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Tier:</span>
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getTierColor(selectedAgent.tier)}`}>
-                        {selectedAgent.tier.toUpperCase()}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
                       <span className="text-gray-600">Status:</span>
                       <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(selectedAgent.status)}`}>
                         {selectedAgent.status.replace('_', ' ').toUpperCase()}
@@ -778,6 +852,433 @@ export default function AgentsPage() {
                   </button>
                 )}
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Create Agent Modal */}
+      {showCreateModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full my-8">
+            {/* Modal Header */}
+            <div className="relative bg-gradient-to-r from-pt-turquoise to-pt-turquoise-600 px-8 py-6 rounded-t-2xl">
+              <button
+                onClick={() => setShowCreateModal(false)}
+                className="absolute top-4 right-4 text-white/80 hover:text-white transition-colors duration-200"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+              <h2 className="text-2xl font-bold text-white">Create New Agent</h2>
+              <p className="text-pt-turquoise-100 text-sm mt-1">Add a new agent to the platform</p>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-8 space-y-6 max-h-[calc(100vh-250px)] overflow-y-auto">
+              {/* Required Fields */}
+              <div className="space-y-5">
+                <div className="flex items-center">
+                  <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center mr-3">
+                    <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900">Required Information</h3>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      First Name <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={newAgent.firstName}
+                      onChange={(e) => setNewAgent(prev => ({ ...prev, firstName: e.target.value }))}
+                      className="w-full px-4 sm:px-6 py-3 sm:py-4 h-[48px] sm:h-[60px] border-2 border-gray-200 rounded-xl sm:rounded-2xl bg-gray-50 focus:bg-white focus:ring-0 focus:border-pt-turquoise hover:border-pt-turquoise transition-all text-base sm:text-lg"
+                      placeholder="John"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Last Name <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={newAgent.lastName}
+                      onChange={(e) => setNewAgent(prev => ({ ...prev, lastName: e.target.value }))}
+                      className="w-full px-4 sm:px-6 py-3 sm:py-4 h-[48px] sm:h-[60px] border-2 border-gray-200 rounded-xl sm:rounded-2xl bg-gray-50 focus:bg-white focus:ring-0 focus:border-pt-turquoise hover:border-pt-turquoise transition-all text-base sm:text-lg"
+                      placeholder="Doe"
+                      required
+                    />
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Email Address <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="email"
+                      value={newAgent.email}
+                      onChange={(e) => setNewAgent(prev => ({ ...prev, email: e.target.value }))}
+                      className="w-full px-4 sm:px-6 py-3 sm:py-4 h-[48px] sm:h-[60px] border-2 border-gray-200 rounded-xl sm:rounded-2xl bg-gray-50 focus:bg-white focus:ring-0 focus:border-pt-turquoise hover:border-pt-turquoise transition-all text-base sm:text-lg"
+                      placeholder="john.doe@example.com"
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Divider */}
+              <div className="border-t border-gray-200"></div>
+
+              {/* Optional Fields */}
+              <div className="space-y-5">
+                <div className="flex items-center">
+                  <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900">Additional Information</h3>
+                  <span className="ml-2 text-xs text-gray-500 font-normal">(Optional)</span>
+                </div>
+
+                <div className="space-y-5">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Country</label>
+                    <CountryPicker
+                      value={newAgent.country}
+                      onChange={(countryCode) => {
+                        setNewAgent(prev => ({ ...prev, country: countryCode }))
+                        
+                        // Automatically update phone country code when country changes
+                        const phoneCode = countryToPhoneCodeMap[countryCode]
+                        if (phoneCode) {
+                          setPhoneCountryCode(phoneCode)
+                          // Reset phone number to avoid confusion with old country code
+                          setNewAgent(prev => ({ ...prev, phone: '' }))
+                        }
+                      }}
+                      className="w-full"
+                    />
+                  </div>
+
+                  <div>
+                    <PhoneNumberInput
+                      value={newAgent.phone}
+                      onChange={(value) => setNewAgent(prev => ({ ...prev, phone: value }))}
+                      countryCode={phoneCountryCode}
+                      onCountryCodeChange={setPhoneCountryCode}
+                      className="w-full"
+                      label="Phone Number"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Address</label>
+                    <input
+                      type="text"
+                      value={newAgent.address}
+                      onChange={(e) => setNewAgent(prev => ({ ...prev, address: e.target.value }))}
+                      className="w-full px-4 sm:px-6 py-3 sm:py-4 h-[48px] sm:h-[60px] border-2 border-gray-200 rounded-xl sm:rounded-2xl bg-gray-50 focus:bg-white focus:ring-0 focus:border-pt-turquoise hover:border-pt-turquoise transition-all text-base sm:text-lg"
+                      placeholder="123 Main St, City, Country"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Notes
+                      <span className="ml-2 text-xs text-gray-500 font-normal">({newAgent.notes.length}/1000)</span>
+                    </label>
+                    <textarea
+                      value={newAgent.notes}
+                      onChange={(e) => setNewAgent(prev => ({ ...prev, notes: e.target.value }))}
+                      rows={4}
+                      maxLength={1000}
+                      className="w-full px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-200 rounded-xl sm:rounded-2xl bg-gray-50 focus:bg-white focus:ring-0 focus:border-pt-turquoise hover:border-pt-turquoise transition-all resize-none text-base sm:text-lg"
+                      placeholder="Add any additional notes about this agent..."
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex justify-end gap-3 p-6 border-t border-gray-200 bg-gray-50 rounded-b-2xl">
+              <button
+                onClick={() => setShowCreateModal(false)}
+                className="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-white hover:border-gray-400 transition-all duration-200"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleCreateAgent}
+                disabled={createLoading}
+                className="px-8 py-3 bg-pt-turquoise text-white rounded-xl font-semibold hover:bg-pt-turquoise-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center shadow-lg shadow-pt-turquoise/30"
+              >
+                {createLoading ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Creating Agent...
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Create Agent
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Agent Credentials Modal */}
+      {showCredentialsModal && createdAgentData && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full my-8">
+            {/* Modal Header */}
+            <div className="relative bg-gradient-to-r from-green-500 to-green-600 px-8 py-6 rounded-t-2xl">
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mr-4">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold text-white">Agent Created Successfully!</h2>
+                  <p className="text-green-100 text-sm mt-1">Save these credentials - they won't be shown again</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-8 space-y-6">
+              {/* Important Warning or Info */}
+              {createdAgentData.user?.metadata?.tempPassword ? (
+                <div className="bg-amber-50 border-2 border-amber-400 rounded-xl p-4">
+                  <div className="flex items-start">
+                    <svg className="w-6 h-6 text-amber-600 mt-0.5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-1.732-1.333-2.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <div>
+                      <h4 className="font-bold text-amber-900 mb-1">⚠️ Important - Save This Information</h4>
+                      <p className="text-sm text-amber-800">
+                        These login credentials will not be displayed again. Please save them securely and share with the agent.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-blue-50 border-2 border-blue-400 rounded-xl p-4">
+                  <div className="flex items-start">
+                    <svg className="w-6 h-6 text-blue-600 mt-0.5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div>
+                      <h4 className="font-bold text-blue-900 mb-1">ℹ️ Agent Created</h4>
+                      <p className="text-sm text-blue-800">
+                        The agent has been created successfully. Login credentials will be sent to the agent's email address.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Agent Details */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+                  <svg className="w-5 h-5 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                  Agent Information
+                </h3>
+
+                <div className="grid grid-cols-1 gap-4">
+                  {/* Agent Code */}
+                  <div className="bg-gradient-to-br from-pt-turquoise/10 to-pt-turquoise/5 border-2 border-pt-turquoise rounded-xl p-4">
+                    <label className="block text-xs font-semibold text-gray-600 mb-2">AGENT CODE</label>
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono text-2xl font-bold text-pt-turquoise tracking-wider">{createdAgentData.agentCode}</span>
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(createdAgentData.agentCode)
+                          setSuccessMessage('Agent code copied!')
+                          setTimeout(() => setSuccessMessage(null), 2000)
+                        }}
+                        className="p-2 hover:bg-pt-turquoise/20 rounded-lg transition-colors"
+                        title="Copy agent code"
+                      >
+                        <svg className="w-5 h-5 text-pt-turquoise" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Agent Details Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <label className="block text-xs font-semibold text-gray-600 mb-1">NAME</label>
+                      <p className="text-sm font-medium text-gray-900">
+                        {createdAgentData.user?.firstName || createdAgentFormData?.firstName} {createdAgentData.user?.lastName || createdAgentFormData?.lastName}
+                      </p>
+                    </div>
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <label className="block text-xs font-semibold text-gray-600 mb-1">EMAIL</label>
+                      <p className="text-sm font-medium text-gray-900 break-all">
+                        {createdAgentData.user?.email || createdAgentFormData?.email}
+                      </p>
+                    </div>
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <label className="block text-xs font-semibold text-gray-600 mb-1">STATUS</label>
+                      <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                        {createdAgentData.status?.replace('_', ' ').toUpperCase()}
+                      </span>
+                    </div>
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <label className="block text-xs font-semibold text-gray-600 mb-1">COMMISSION RATE</label>
+                      <p className="text-sm font-medium text-gray-900">{createdAgentData.commissionRate}%</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Login Credentials */}
+              {createdAgentData.user?.metadata?.tempPassword && (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+                    <svg className="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                    </svg>
+                    Login Credentials
+                  </h3>
+
+                  <div className="grid grid-cols-1 gap-4">
+                    {/* Username */}
+                    <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="block text-xs font-semibold text-blue-900">USERNAME</label>
+                        <button
+                          onClick={() => {
+                            navigator.clipboard.writeText(createdAgentData.user?.username || createdAgentData.user?.email)
+                            setSuccessMessage('Username copied!')
+                            setTimeout(() => setSuccessMessage(null), 2000)
+                          }}
+                          className="p-1.5 hover:bg-blue-200 rounded transition-colors"
+                          title="Copy username"
+                        >
+                          <svg className="w-4 h-4 text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                          </svg>
+                        </button>
+                      </div>
+                      <p className="font-mono text-lg font-bold text-blue-900">{createdAgentData.user?.username || createdAgentData.user?.email}</p>
+                    </div>
+
+                    {/* Temporary Password */}
+                    <div className="bg-purple-50 border border-purple-200 rounded-xl p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="block text-xs font-semibold text-purple-900">TEMPORARY PASSWORD</label>
+                        <button
+                          onClick={() => {
+                            navigator.clipboard.writeText(createdAgentData.user?.metadata?.tempPassword)
+                            setSuccessMessage('Password copied!')
+                            setTimeout(() => setSuccessMessage(null), 2000)
+                          }}
+                          className="p-1.5 hover:bg-purple-200 rounded transition-colors"
+                          title="Copy password"
+                        >
+                          <svg className="w-4 h-4 text-purple-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                          </svg>
+                        </button>
+                      </div>
+                      <p className="font-mono text-lg font-bold text-purple-900">{createdAgentData.user?.metadata?.tempPassword}</p>
+                      <p className="text-xs text-purple-700 mt-2">Agent should change this password on first login</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Quick Share */}
+              <div className="bg-gray-50 rounded-xl p-4">
+                <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
+                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                  Copy All Information
+                </h4>
+                <button
+                  onClick={() => {
+                    const agentName = `${createdAgentData.user?.firstName || createdAgentFormData?.firstName} ${createdAgentData.user?.lastName || createdAgentFormData?.lastName}`
+                    const agentEmail = createdAgentData.user?.email || createdAgentFormData?.email
+                    
+                    let credentials = `Agent Account Created
+━━━━━━━━━━━━━━━━━━━━━━
+
+Agent Code: ${createdAgentData.agentCode}
+Status: ${createdAgentData.status?.replace('_', ' ').toUpperCase()}
+Commission Rate: ${createdAgentData.commissionRate}%
+
+CONTACT INFORMATION
+━━━━━━━━━━━━━━━━━━━━━━
+Name: ${agentName}
+Email: ${agentEmail}`
+
+                    if (createdAgentData.user?.metadata?.tempPassword) {
+                      credentials += `
+
+LOGIN CREDENTIALS
+━━━━━━━━━━━━━━━━━━━━━━
+Username: ${createdAgentData.user?.username || createdAgentData.user?.email}
+Password: ${createdAgentData.user?.metadata?.tempPassword}
+
+⚠️ Please change your password after first login.
+Login at: ${window.location.origin}/en/auth/login`
+                    }
+                    
+                    navigator.clipboard.writeText(credentials)
+                    setSuccessMessage('All information copied to clipboard!')
+                    setTimeout(() => setSuccessMessage(null), 3000)
+                  }}
+                  className="w-full px-4 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-800 transition-colors font-medium flex items-center justify-center"
+                >
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                  Copy All Details
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex justify-end gap-3 p-6 border-t border-gray-200 bg-gray-50 rounded-b-2xl">
+              <button
+                onClick={() => {
+                  setShowCredentialsModal(false)
+                  setCreatedAgentData(null)
+                  setCreatedAgentFormData(null)
+                  setSuccessMessage('Agent created successfully!')
+                  setTimeout(() => setSuccessMessage(null), 3000)
+                }}
+                className="px-8 py-3 bg-green-600 text-white rounded-xl font-semibold hover:bg-green-700 transition-all duration-200 flex items-center shadow-lg"
+              >
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                </svg>
+                Done
+              </button>
             </div>
           </div>
         </div>
