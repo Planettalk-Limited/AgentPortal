@@ -594,6 +594,7 @@
       "featured": "En Vedette"
     },
     "categories": {
+      "all": "Toutes les Ressources",
       "featured": "En Vedette",
       "training": "Matériels de Formation",
       "bankForms": "Formulaires Bancaires",
@@ -815,5 +816,32 @@
     "failedToUpdateProfile": "Échec de la mise à jour du profil",
     "failedToChangePassword": "Échec du changement de mot de passe",
     "passwordsDoNotMatch": "Les nouveaux mots de passe ne correspondent pas"
+  },
+
+  "termsPage": {
+    "pageTitle": "Conditions Générales du Programme Agent",
+    "metaDescription": "Veuillez lire attentivement nos conditions générales avant de participer au Programme Agent PlanetTalk.",
+    "breadcrumb": {
+      "home": "Accueil",
+      "current": "Conditions Générales"
+    },
+    "header": {
+      "title": "Conditions Générales du Programme Agent",
+      "subtitle": "Veuillez lire attentivement nos conditions générales avant de participer au Programme Agent PlanetTalk."
+    },
+    "document": {
+      "title": "Document des Conditions Générales",
+      "format": "Format PDF"
+    },
+    "download": "Télécharger le PDF",
+    "fallback": {
+      "noSupport": "Votre navigateur ne prend pas en charge l'affichage des PDF en ligne.",
+      "pleaseDownload": "Veuillez télécharger le PDF pour le consulter."
+    },
+    "help": {
+      "title": "Des questions sur nos conditions ?",
+      "description": "Si vous avez des questions sur ces conditions générales, n'hésitez pas à nous contacter.",
+      "email": "agent@planettalk.com"
+    }
   }
 }

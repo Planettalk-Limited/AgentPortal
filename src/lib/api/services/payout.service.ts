@@ -159,7 +159,7 @@ export class PayoutService extends BaseService {
    * Approve payout (admin only)
    */
   async approvePayout(id: string, data?: { adminNotes?: string }): Promise<Payout> {
-    return this.actionWithResult<Payout>(`admin/payouts/${id}/approve`, data);
+    return this.update<Payout>(`admin/payouts/${id}/approve`, data || {});
   }
 
   /**
@@ -169,14 +169,14 @@ export class PayoutService extends BaseService {
     reviewMessage: string;
     adminNotes?: string;
   }): Promise<Payout> {
-    return this.actionWithResult<Payout>(`admin/payouts/${id}/review`, data);
+    return this.update<Payout>(`admin/payouts/${id}/review`, data);
   }
 
   /**
    * Process payout (admin only)
    */
   async processPayout(id: string, data?: { adminNotes?: string }): Promise<Payout> {
-    return this.actionWithResult<Payout>(`admin/payouts/${id}/process`, data);
+    return this.update<Payout>(`admin/payouts/${id}/process`, data || {});
   }
 
   /**
@@ -187,7 +187,7 @@ export class PayoutService extends BaseService {
     fees?: number;
     adminNotes?: string;
   }): Promise<Payout> {
-    return this.actionWithResult<Payout>(`admin/payouts/${id}/complete`, data);
+    return this.update<Payout>(`admin/payouts/${id}/complete`, data);
   }
 
   /**
@@ -197,7 +197,7 @@ export class PayoutService extends BaseService {
     failureReason: string;
     adminNotes?: string;
   }): Promise<Payout> {
-    return this.actionWithResult<Payout>(`admin/payouts/${id}/fail`, data);
+    return this.update<Payout>(`admin/payouts/${id}/fail`, data);
   }
 
   /**
@@ -208,7 +208,7 @@ export class PayoutService extends BaseService {
     failed: number;
     errors?: any[];
   }> {
-    return this.actionWithResult('admin/payouts/bulk-process', data);
+    return this.update('admin/payouts/bulk-process', data);
   }
 
   /**

@@ -1172,23 +1172,41 @@ export default function PayoutsPage() {
                     {selectedPayout.method === 'bank_transfer' && selectedPayout.paymentDetails.bankAccount && (
                       <div className="space-y-2">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Account Number</label>
-                          <p className="text-sm text-gray-900">{selectedPayout.paymentDetails.bankAccount.accountNumber}</p>
-                        </div>
-                        <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">Bank Name</label>
                           <p className="text-sm text-gray-900">{selectedPayout.paymentDetails.bankAccount.bankName}</p>
                         </div>
-                        {selectedPayout.paymentDetails.bankAccount.routingNumber && (
+                        {selectedPayout.paymentDetails.bankAccount.branchNameOrCode && (
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Routing Number</label>
-                            <p className="text-sm text-gray-900">{selectedPayout.paymentDetails.bankAccount.routingNumber}</p>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Branch Name/Code</label>
+                            <p className="text-sm text-gray-900">{selectedPayout.paymentDetails.bankAccount.branchNameOrCode}</p>
                           </div>
                         )}
                         {selectedPayout.paymentDetails.bankAccount.accountName && (
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Account Name</label>
                             <p className="text-sm text-gray-900">{selectedPayout.paymentDetails.bankAccount.accountName}</p>
+                          </div>
+                        )}
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Account Number/IBAN</label>
+                          <p className="text-sm text-gray-900">{selectedPayout.paymentDetails.bankAccount.accountNumberOrIban}</p>
+                        </div>
+                        {selectedPayout.paymentDetails.bankAccount.swiftBicCode && (
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">SWIFT/BIC Code</label>
+                            <p className="text-sm text-gray-900">{selectedPayout.paymentDetails.bankAccount.swiftBicCode}</p>
+                          </div>
+                        )}
+                        {selectedPayout.paymentDetails.bankAccount.currency && (
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Currency</label>
+                            <p className="text-sm text-gray-900">{selectedPayout.paymentDetails.bankAccount.currency}</p>
+                          </div>
+                        )}
+                        {selectedPayout.paymentDetails.bankAccount.bankCountry && (
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Bank Country</label>
+                            <p className="text-sm text-gray-900">{selectedPayout.paymentDetails.bankAccount.bankCountry}</p>
                           </div>
                         )}
                       </div>

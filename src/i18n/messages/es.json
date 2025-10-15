@@ -596,6 +596,7 @@
       "featured": "Destacados"
     },
     "categories": {
+      "all": "Todos los Recursos",
       "featured": "Destacados",
       "training": "Materiales de Entrenamiento",
       "bankForms": "Formularios Bancarios",
@@ -770,5 +771,32 @@
     "saveNotificationPreferences": "Guardar Preferencias de Notificación",
     "changePassword": "Cambiar Contraseña",
     "changingPassword": "Cambiando Contraseña..."
+  },
+
+  "termsPage": {
+    "pageTitle": "Términos y Condiciones del Programa de Agentes",
+    "metaDescription": "Por favor lea nuestros términos y condiciones cuidadosamente antes de participar en el Programa de Agentes de PlanetTalk.",
+    "breadcrumb": {
+      "home": "Inicio",
+      "current": "Términos y Condiciones"
+    },
+    "header": {
+      "title": "Términos y Condiciones del Programa de Agentes",
+      "subtitle": "Por favor lea nuestros términos y condiciones cuidadosamente antes de participar en el Programa de Agentes de PlanetTalk."
+    },
+    "document": {
+      "title": "Documento de Términos y Condiciones",
+      "format": "Formato PDF"
+    },
+    "download": "Descargar PDF",
+    "fallback": {
+      "noSupport": "Su navegador no admite la visualización de PDF en línea.",
+      "pleaseDownload": "Por favor descargue el PDF para verlo."
+    },
+    "help": {
+      "title": "¿Preguntas sobre nuestros términos?",
+      "description": "Si tiene alguna pregunta sobre estos términos y condiciones, no dude en contactarnos.",
+      "email": "agent@planettalk.com"
+    }
   }
 }

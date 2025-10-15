@@ -187,7 +187,7 @@ const Hero = () => {
                     <h4 className="text-sm font-semibold text-gray-700 mb-2">Terms and Conditions</h4>
                     <p className="text-sm text-gray-600">
                       Please read this before filling out the form. By submitting this form, you agree to our 
-                      <a href="/agent_program_terms_&_conditions.pdf" target="_blank" className="text-pt-turquoise underline hover:no-underline"> Agent Program Terms and Conditions</a>. 
+                      <a href="/terms-and-conditions.pdf" target="_blank" className="text-pt-turquoise underline hover:no-underline"> Agent Program Terms and Conditions</a>. 
                       You consent to receive communications about the PlanetTalk Agent Program and understand that your data will be processed in accordance with our Privacy Policy.
                     </p>
                   </div>

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
 import { CreatePayoutRequest } from '@/lib/api'
 import { MINIMUM_PAYOUT_AMOUNT } from '@/lib/constants/payout'
+import CountryPicker from './CountryPicker'
 
 interface SimplifiedPayoutModalProps {
   isOpen: boolean
@@ -14,6 +15,76 @@ interface SimplifiedPayoutModalProps {
 }
 
 type PaymentMethod = 'bank_transfer' | 'planettalk_credit'
+
+// Comprehensive list of all major world currencies
+const CURRENCIES = [
+  { code: 'USD', name: 'US Dollar', symbol: '$' },
+  { code: 'EUR', name: 'Euro', symbol: '€' },
+  { code: 'GBP', name: 'British Pound', symbol: '£' },
+  { code: 'JPY', name: 'Japanese Yen', symbol: '¥' },
+  { code: 'AUD', name: 'Australian Dollar', symbol: 'A$' },
+  { code: 'CAD', name: 'Canadian Dollar', symbol: 'C$' },
+  { code: 'CHF', name: 'Swiss Franc', symbol: 'Fr' },
+  { code: 'CNY', name: 'Chinese Yuan', symbol: '¥' },
+  { code: 'INR', name: 'Indian Rupee', symbol: '₹' },
+  { code: 'ZAR', name: 'South African Rand', symbol: 'R' },
+  { code: 'NGN', name: 'Nigerian Naira', symbol: '₦' },
+  { code: 'KES', name: 'Kenyan Shilling', symbol: 'KSh' },
+  { code: 'GHS', name: 'Ghanaian Cedi', symbol: '₵' },
+  { code: 'EGP', name: 'Egyptian Pound', symbol: '£' },
+  { code: 'MAD', name: 'Moroccan Dirham', symbol: 'DH' },
+  { code: 'TND', name: 'Tunisian Dinar', symbol: 'DT' },
+  { code: 'XOF', name: 'West African CFA Franc', symbol: 'CFA' },
+  { code: 'XAF', name: 'Central African CFA Franc', symbol: 'FCFA' },
+  { code: 'UGX', name: 'Ugandan Shilling', symbol: 'USh' },
+  { code: 'TZS', name: 'Tanzanian Shilling', symbol: 'TSh' },
+  { code: 'RWF', name: 'Rwandan Franc', symbol: 'FRw' },
+  { code: 'ETB', name: 'Ethiopian Birr', symbol: 'Br' },
+  { code: 'MUR', name: 'Mauritian Rupee', symbol: '₨' },
+  { code: 'AED', name: 'UAE Dirham', symbol: 'د.إ' },
+  { code: 'SAR', name: 'Saudi Riyal', symbol: '﷼' },
+  { code: 'QAR', name: 'Qatari Riyal', symbol: 'QR' },
+  { code: 'KWD', name: 'Kuwaiti Dinar', symbol: 'KD' },
+  { code: 'OMR', name: 'Omani Rial', symbol: 'OMR' },
+  { code: 'BHD', name: 'Bahraini Dinar', symbol: 'BD' },
+  { code: 'JOD', name: 'Jordanian Dinar', symbol: 'JD' },
+  { code: 'ILS', name: 'Israeli Shekel', symbol: '₪' },
+  { code: 'TRY', name: 'Turkish Lira', symbol: '₺' },
+  { code: 'SEK', name: 'Swedish Krona', symbol: 'kr' },
+  { code: 'NOK', name: 'Norwegian Krone', symbol: 'kr' },
+  { code: 'DKK', name: 'Danish Krone', symbol: 'kr' },
+  { code: 'PLN', name: 'Polish Zloty', symbol: 'zł' },
+  { code: 'CZK', name: 'Czech Koruna', symbol: 'Kč' },
+  { code: 'HUF', name: 'Hungarian Forint', symbol: 'Ft' },
+  { code: 'RON', name: 'Romanian Leu', symbol: 'lei' },
+  { code: 'BGN', name: 'Bulgarian Lev', symbol: 'лв' },
+  { code: 'RUB', name: 'Russian Ruble', symbol: '₽' },
+  { code: 'UAH', name: 'Ukrainian Hryvnia', symbol: '₴' },
+  { code: 'BRL', name: 'Brazilian Real', symbol: 'R$' },
+  { code: 'MXN', name: 'Mexican Peso', symbol: '$' },
+  { code: 'ARS', name: 'Argentine Peso', symbol: '$' },
+  { code: 'CLP', name: 'Chilean Peso', symbol: '$' },
+  { code: 'COP', name: 'Colombian Peso', symbol: '$' },
+  { code: 'PEN', name: 'Peruvian Sol', symbol: 'S/' },
+  { code: 'VES', name: 'Venezuelan Bolívar', symbol: 'Bs' },
+  { code: 'SGD', name: 'Singapore Dollar', symbol: 'S$' },
+  { code: 'HKD', name: 'Hong Kong Dollar', symbol: 'HK$' },
+  { code: 'NZD', name: 'New Zealand Dollar', symbol: 'NZ$' },
+  { code: 'KRW', name: 'South Korean Won', symbol: '₩' },
+  { code: 'THB', name: 'Thai Baht', symbol: '฿' },
+  { code: 'MYR', name: 'Malaysian Ringgit', symbol: 'RM' },
+  { code: 'IDR', name: 'Indonesian Rupiah', symbol: 'Rp' },
+  { code: 'PHP', name: 'Philippine Peso', symbol: '₱' },
+  { code: 'VND', name: 'Vietnamese Dong', symbol: '₫' },
+  { code: 'PKR', name: 'Pakistani Rupee', symbol: '₨' },
+  { code: 'BDT', name: 'Bangladeshi Taka', symbol: '৳' },
+  { code: 'LKR', name: 'Sri Lankan Rupee', symbol: '₨' },
+  { code: 'NPR', name: 'Nepalese Rupee', symbol: '₨' },
+  { code: 'MMK', name: 'Myanmar Kyat', symbol: 'K' },
+  { code: 'IQD', name: 'Iraqi Dinar', symbol: 'د.ع' },
+  { code: 'IRR', name: 'Iranian Rial', symbol: '﷼' },
+  { code: 'AFN', name: 'Afghan Afghani', symbol: '؋' }
+]
 
 // Supported countries for PlanetTalk Credit
 const countryCodes = [
@@ -37,10 +108,13 @@ export default function SimplifiedPayoutModal({
   
   // Bank Transfer Details
   const [bankDetails, setBankDetails] = useState({
-    accountNumber: '',
-    routingNumber: '',
+    bankName: '',
+    branchNameOrCode: '',
     accountName: '',
-    bankName: ''
+    accountNumberOrIban: '',
+    swiftBicCode: '',
+    currency: 'USD',
+    bankCountry: ''
   })
   
   // PlanetTalk Credit Details
@@ -59,7 +133,7 @@ export default function SimplifiedPayoutModal({
     setAmount('')
     setMethod('bank_transfer')
     setDescription('')
-    setBankDetails({ accountNumber: '', routingNumber: '', accountName: '', bankName: '' })
+    setBankDetails({ bankName: '', branchNameOrCode: '', accountName: '', accountNumberOrIban: '', swiftBicCode: '', currency: 'USD', bankCountry: '' })
     setSelectedCountryCode('+44')
     setPhoneNumber('')
     setAccountName('')
@@ -96,7 +170,8 @@ export default function SimplifiedPayoutModal({
     const paymentDetails: any = {}
     
     if (method === 'bank_transfer') {
-      if (!bankDetails.accountNumber || !bankDetails.routingNumber || !bankDetails.accountName || !bankDetails.bankName) {
+      if (!bankDetails.bankName || !bankDetails.branchNameOrCode || !bankDetails.accountName || 
+          !bankDetails.accountNumberOrIban || !bankDetails.swiftBicCode || !bankDetails.currency || !bankDetails.bankCountry) {
         alert('Please fill in all bank account details')
         return
       }
@@ -236,23 +311,25 @@ export default function SimplifiedPayoutModal({
                 
                 <div className="grid grid-cols-1 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Account Number</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Bank Name</label>
                     <input
                       type="text"
-                      value={bankDetails.accountNumber}
-                      onChange={(e) => setBankDetails({...bankDetails, accountNumber: e.target.value})}
+                      value={bankDetails.bankName}
+                      onChange={(e) => setBankDetails({...bankDetails, bankName: e.target.value})}
                       className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      placeholder="e.g., Standard Bank"
                       required
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Routing Number</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Branch Name or Code</label>
                     <input
                       type="text"
-                      value={bankDetails.routingNumber}
-                      onChange={(e) => setBankDetails({...bankDetails, routingNumber: e.target.value})}
+                      value={bankDetails.branchNameOrCode}
+                      onChange={(e) => setBankDetails({...bankDetails, branchNameOrCode: e.target.value})}
                       className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      placeholder="e.g., Main Branch / 001234"
                       required
                     />
                   </div>
@@ -264,20 +341,76 @@ export default function SimplifiedPayoutModal({
                       value={bankDetails.accountName}
                       onChange={(e) => setBankDetails({...bankDetails, accountName: e.target.value})}
                       className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      placeholder="e.g., John Doe"
                       required
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Bank Name</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Account Number or IBAN</label>
                     <input
                       type="text"
-                      value={bankDetails.bankName}
-                      onChange={(e) => setBankDetails({...bankDetails, bankName: e.target.value})}
+                      value={bankDetails.accountNumberOrIban}
+                      onChange={(e) => setBankDetails({...bankDetails, accountNumberOrIban: e.target.value})}
                       className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      placeholder="e.g., GB29NWBK60161331926819"
                       required
                     />
                   </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">SWIFT/BIC Code</label>
+                    <input
+                      type="text"
+                      value={bankDetails.swiftBicCode}
+                      onChange={(e) => setBankDetails({...bankDetails, swiftBicCode: e.target.value})}
+                      className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      placeholder="e.g., SBZAZAJJ"
+                      required
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Currency</label>
+                    <select
+                      value={bankDetails.currency}
+                      onChange={(e) => setBankDetails({...bankDetails, currency: e.target.value})}
+                      className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      required
+                    >
+                      {CURRENCIES.map(currency => (
+                        <option key={currency.code} value={currency.code}>
+                          {currency.code} - {currency.name} ({currency.symbol})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Bank Country</label>
+                    <div className="payout-country-picker">
+                      <CountryPicker
+                        value={bankDetails.bankCountry}
+                        onChange={(value) => setBankDetails({...bankDetails, bankCountry: value})}
+                        placeholder="Select bank country"
+                        required
+                      />
+                    </div>
+                  </div>
+                  
+                  <style jsx>{`
+                    .payout-country-picker :global(button) {
+                      padding: 0.75rem 1rem !important;
+                      border-radius: 0.5rem !important;
+                      border-width: 1px !important;
+                      border-color: rgb(209, 213, 219) !important;
+                    }
+                    .payout-country-picker :global(button:focus) {
+                      ring: 2px;
+                      ring-color: rgb(59, 130, 246);
+                      border-color: rgb(59, 130, 246) !important;
+                    }
+                  `}</style>
                 </div>
               </div>
             )}

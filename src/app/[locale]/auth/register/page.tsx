@@ -392,7 +392,7 @@ export default function RegisterPage() {
                 <p className="text-white/90 mt-1 sm:mt-2 text-sm sm:text-base md:text-lg">
                   I agree to the{' '}
                   <a 
-                    href="/agent_program_terms_&_conditions.pdf"
+                    href="/terms-and-conditions.pdf"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-white underline hover:text-gray-100 font-semibold decoration-2 underline-offset-2"

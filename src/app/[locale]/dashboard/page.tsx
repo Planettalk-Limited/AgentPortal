@@ -470,7 +470,7 @@ export default function DashboardPage() {
                     
                     <div className="space-y-2">
                       <div className="flex justify-between text-sm">
-                        <span className="text-gray-500">{t('progressTo')} ${MINIMUM_PAYOUT_AMOUNT}</span>
+                        <span className="text-gray-500">{t('progressTo', { amount: `$${MINIMUM_PAYOUT_AMOUNT}` })}</span>
                         <span className="font-medium">{Math.round((parseCurrency(agent.availableBalance) / MINIMUM_PAYOUT_AMOUNT) * 100)}%</span>
                       </div>
                       <div className="w-full bg-gray-200 rounded-full h-3">

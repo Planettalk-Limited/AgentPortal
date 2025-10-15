@@ -38,10 +38,10 @@ export class UserService extends BaseService {
   async createUser(data: {
     firstName: string;
     lastName: string;
+    country: string;
+    username: string;
     email: string;
     password: string;
-    role: string;
-    phoneNumber?: string;
   }): Promise<User> {
     return this.create<User>('admin/users', data);
   }

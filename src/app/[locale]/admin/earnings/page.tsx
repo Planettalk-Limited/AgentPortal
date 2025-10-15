@@ -75,10 +75,15 @@ export default function EarningsPage() {
   const [showBulkUpload, setShowBulkUpload] = useState(false)
   const [csvFile, setCsvFile] = useState<File | null>(null)
   const [batchDescription, setBatchDescription] = useState('')
-  const [autoConfirm, setAutoConfirm] = useState(false)
+  const [autoConfirm, setAutoConfirm] = useState(true)
   const [isUploading, setIsUploading] = useState(false)
   const [isExporting, setIsExporting] = useState(false)
   const [lastUploadResult, setLastUploadResult] = useState<BulkUploadResult | null>(null)
+  const [showResultsModal, setShowResultsModal] = useState(false)
+  const [selectedEarnings, setSelectedEarnings] = useState<string[]>([])
+  const [showBulkApproveModal, setShowBulkApproveModal] = useState(false)
+  const [bulkApproveNotes, setBulkApproveNotes] = useState('')
+  const [approvingEarning, setApprovingEarning] = useState<string | null>(null)
   const [filtersExpanded, setFiltersExpanded] = useState(false)
   const [filters, setFilters] = useState({
     page: 1,
@@ -126,14 +131,14 @@ export default function EarningsPage() {
       // Handle paginated response structure
       let earningsData: Earning[] = []
       let paginationData: any = {}
-      let statsData: any = {}
+      let metricsData: any = {}
       
       if (Array.isArray(response)) {
         earningsData = response
       } else {
         earningsData = (response as any).earnings || (response as any).data || []
         paginationData = (response as any).pagination || {}
-        statsData = (response as any).stats || {}
+        metricsData = (response as any).metrics || (response as any).stats || {}
       }
       
       setEarnings(Array.isArray(earningsData) ? earningsData : [])
@@ -146,12 +151,13 @@ export default function EarningsPage() {
         totalPages: paginationData.totalPages || 1
       })
 
-      // Update stats
-        setStats({
-        total: statsData.total || earningsData.length,
-        pending: statsData.pending || 0,
-        confirmed: statsData.confirmed || 0,
-        totalAmount: statsData.totalAmount || 0
+      // Update stats from metrics.overview
+      const overview = metricsData.overview || {}
+      setStats({
+        total: overview.totalEarnings || earningsData.length,
+        pending: overview.pendingEarnings || 0,
+        confirmed: overview.confirmedEarnings || 0,
+        totalAmount: overview.totalAmount || 0
       })
     } catch (error) {
       setError('Failed to load earnings')
@@ -255,14 +261,8 @@ export default function EarningsPage() {
       })
       
       setLastUploadResult(response)
-      
-      if (response.failed > 0) {
-        setError(`Upload completed: ${response.successful} successful, ${response.failed} failed, ${response.skipped} skipped`)
-      } else {
-        setSuccess(`Successfully uploaded ${response.successful} earnings (${formatCurrencyWithSymbol(response.totalAmount)})`)
-      }
-      
       setShowBulkUpload(false)
+      setShowResultsModal(true)
       setCsvFile(null)
       setBatchDescription('')
       await loadEarnings()
@@ -271,6 +271,68 @@ export default function EarningsPage() {
       setError(error instanceof Error ? error.message : 'Failed to upload earnings')
     } finally {
       setIsUploading(false)
+    }
+  }
+
+  const handleApproveEarning = async (earningId: string) => {
+    try {
+      setApprovingEarning(earningId)
+      setError(null)
+      
+      await api.admin.approveEarning(earningId)
+      
+      await loadEarnings()
+      setSuccess('Earning approved and balance updated successfully')
+      setTimeout(() => setSuccess(null), 3000)
+    } catch (error) {
+      console.error('Error approving earning:', error)
+      setError(error instanceof Error ? error.message : 'Failed to approve earning')
+    } finally {
+      setApprovingEarning(null)
+    }
+  }
+
+  const handleBulkApprove = async () => {
+    if (selectedEarnings.length === 0) return
+    
+    try {
+      setIsUploading(true)
+      setError(null)
+      
+      const response = await api.admin.bulkApproveEarnings({
+        earningIds: selectedEarnings,
+        notes: bulkApproveNotes
+      })
+      
+      setShowBulkApproveModal(false)
+      setBulkApproveNotes('')
+      setSelectedEarnings([])
+      
+      await loadEarnings()
+      setSuccess(`${response.approved} earnings approved successfully. Agent balances have been updated.`)
+      setTimeout(() => setSuccess(null), 5000)
+    } catch (error) {
+      console.error('Error with bulk approve:', error)
+      setError(error instanceof Error ? error.message : 'Failed to approve earnings')
+    } finally {
+      setIsUploading(false)
+    }
+  }
+
+  const toggleEarningSelection = (earningId: string) => {
+    setSelectedEarnings(prev => 
+      prev.includes(earningId) 
+        ? prev.filter(id => id !== earningId)
+        : [...prev, earningId]
+    )
+  }
+
+  const toggleAllEarnings = () => {
+    const pendingEarnings = earnings.filter(e => e.status === 'pending')
+    if (selectedEarnings.length === pendingEarnings.length) {
+      setSelectedEarnings([])
+    } else {
+      setSelectedEarnings(pendingEarnings.map(e => e.id))
     }
   }
 
@@ -412,7 +474,7 @@ export default function EarningsPage() {
       </div>
 
       {/* Success/Error Alerts */}
-      {success && (
+      {success && !showResultsModal && (
         <div className="bg-green-50 border border-green-200 text-green-700 px-6 py-4 rounded-xl mb-6 flex items-center justify-between">
           <div className="flex items-center">
             <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mr-3">
@@ -421,22 +483,11 @@ export default function EarningsPage() {
               </svg>
             </div>
             <span className="font-medium">{success}</span>
-            </div>
-          {lastUploadResult && (
-            <button
-              onClick={downloadUploadReport}
-              className="ml-4 px-3 py-1 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors duration-200 flex items-center"
-            >
-              <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              Download Report
-            </button>
-          )}
           </div>
+        </div>
       )}
 
-      {error && (
+      {error && !showResultsModal && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-xl mb-6 flex items-center justify-between">
           <div className="flex items-center">
             <div className="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center mr-3">
@@ -445,19 +496,8 @@ export default function EarningsPage() {
               </svg>
             </div>
             <span className="font-medium">{error}</span>
-            </div>
-          {lastUploadResult && (
-            <button
-              onClick={downloadUploadReport}
-              className="ml-4 px-3 py-1 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition-colors duration-200 flex items-center"
-            >
-              <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              Download Report
-            </button>
-          )}
           </div>
+        </div>
       )}
 
       {/* Stats Cards */}
@@ -666,6 +706,27 @@ export default function EarningsPage() {
         </div>
             </div>
             
+      {/* Bulk Actions Bar */}
+      {selectedEarnings.length > 0 && (
+        <div className="bg-green-50 border border-green-300 rounded-xl p-4 mb-6 flex items-center justify-between">
+          <div className="flex items-center">
+            <svg className="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span className="text-green-800 font-medium">{selectedEarnings.length} earning(s) selected</span>
+          </div>
+          <button
+            onClick={() => setShowBulkApproveModal(true)}
+            className="px-6 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 flex items-center font-medium shadow-md"
+          >
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Bulk Approve Selected
+          </button>
+        </div>
+      )}
+
       {/* Earnings Table */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         {loading ? (
@@ -694,17 +755,42 @@ export default function EarningsPage() {
             <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
+                  {earnings.some(e => e.status === 'pending') && (
+                    <th className="px-4 py-4 text-left">
+                      <input
+                        type="checkbox"
+                        onChange={toggleAllEarnings}
+                        checked={selectedEarnings.length > 0 && selectedEarnings.length === earnings.filter(e => e.status === 'pending').length}
+                        className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                      />
+                    </th>
+                  )}
                   <th className="px-6 py-4 text-left text-xs font-semibold text-pt-dark-gray uppercase tracking-wider">Agent</th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-pt-dark-gray uppercase tracking-wider">Amount</th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-pt-dark-gray uppercase tracking-wider">Type</th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-pt-dark-gray uppercase tracking-wider">Status</th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-pt-dark-gray uppercase tracking-wider">Description</th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-pt-dark-gray uppercase tracking-wider">Earned Date</th>
+                  {earnings.some(e => e.status === 'pending') && (
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-pt-dark-gray uppercase tracking-wider">Actions</th>
+                  )}
               </tr>
             </thead>
               <tbody className="divide-y divide-gray-200">
               {earnings.map((earning) => (
                   <tr key={earning.id} className="hover:bg-gray-50 transition-colors duration-200">
+                    {earnings.some(e => e.status === 'pending') && (
+                      <td className="px-4 py-4">
+                        {earning.status === 'pending' && (
+                          <input
+                            type="checkbox"
+                            checked={selectedEarnings.includes(earning.id)}
+                            onChange={() => toggleEarningSelection(earning.id)}
+                            className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                          />
+                        )}
+                      </td>
+                    )}
                     <td className="px-6 py-4">
                       <div className="flex items-center">
                         <div className="w-8 h-8 bg-pt-turquoise rounded-full flex items-center justify-center mr-3">
@@ -754,6 +840,34 @@ export default function EarningsPage() {
                     <td className="px-6 py-4 text-sm text-pt-dark-gray">
                       {new Date(earning.earnedAt).toLocaleDateString()}
                     </td>
+                    {earnings.some(e => e.status === 'pending') && (
+                      <td className="px-6 py-4">
+                        {earning.status === 'pending' && (
+                          <button
+                            onClick={() => handleApproveEarning(earning.id)}
+                            disabled={approvingEarning === earning.id}
+                            className="px-3 py-1.5 bg-green-600 text-white text-xs rounded-lg hover:bg-green-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                          >
+                            {approvingEarning === earning.id ? (
+                              <>
+                                <svg className="animate-spin h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24">
+                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                Approving...
+                              </>
+                            ) : (
+                              <>
+                                <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                Approve
+                              </>
+                            )}
+                          </button>
+                        )}
+                      </td>
+                    )}
                 </tr>
               ))}
             </tbody>
@@ -927,23 +1041,52 @@ export default function EarningsPage() {
                 />
               </div>
               
-              {/* Auto Confirm */}
-              <div className="flex items-start space-x-3">
-                <input
-                  type="checkbox"
-                  id="auto-confirm"
-                  checked={autoConfirm}
-                  onChange={(e) => setAutoConfirm(e.target.checked)}
-                  className="mt-1 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-                />
-                <div>
-                  <label htmlFor="auto-confirm" className="block text-sm font-medium text-gray-900">
-                    Auto-confirm earnings
-                  </label>
-                  <p className="text-sm text-gray-600">
-                    When checked, earnings will be immediately confirmed and agent balances updated. 
-                    Otherwise, earnings will be created as pending and require manual approval.
-                  </p>
+              {/* Auto Confirm - Prominent Default */}
+              <div className={`border-2 rounded-lg p-4 transition-all ${
+                autoConfirm 
+                  ? 'bg-green-50 border-green-300' 
+                  : 'bg-gray-50 border-gray-300'
+              }`}>
+                <div className="flex items-start space-x-3">
+                  <input
+                    type="checkbox"
+                    id="auto-confirm"
+                    checked={autoConfirm}
+                    onChange={(e) => setAutoConfirm(e.target.checked)}
+                    className="mt-1 w-5 h-5 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 focus:ring-2"
+                  />
+                  <div className="flex-1">
+                    <label htmlFor="auto-confirm" className="flex items-center text-sm font-semibold text-gray-900 mb-2 cursor-pointer">
+                      <svg className="w-5 h-5 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      Auto-Confirm Earnings & Update Balances
+                      <span className="ml-2 px-2 py-0.5 bg-green-600 text-white text-xs rounded-full font-bold">RECOMMENDED</span>
+                    </label>
+                    <div className={`text-sm space-y-2 ${autoConfirm ? 'text-green-800' : 'text-gray-600'}`}>
+                      <p className="font-medium">
+                        ✓ When enabled (default):
+                      </p>
+                      <ul className="ml-4 space-y-1">
+                        <li>• Earnings are immediately confirmed</li>
+                        <li>• Agent balances are automatically updated</li>
+                        <li>• Payouts can be processed right away</li>
+                        <li>• No manual approval required</li>
+                      </ul>
+                      {!autoConfirm && (
+                        <>
+                          <p className="font-medium text-yellow-700 mt-2">
+                            ⚠ When disabled:
+                          </p>
+                          <ul className="ml-4 space-y-1 text-yellow-700">
+                            <li>• Earnings created as "pending"</li>
+                            <li>• Balances NOT updated automatically</li>
+                            <li>• Requires manual approval for each earning</li>
+                          </ul>
+                        </>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -967,7 +1110,7 @@ export default function EarningsPage() {
                     setShowBulkUpload(false)
                     setCsvFile(null)
                     setBatchDescription('')
-                    setAutoConfirm(false)
+                    setAutoConfirm(true)
                   }}
                   className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors duration-200"
                 >
@@ -995,6 +1138,325 @@ export default function EarningsPage() {
                     </>
                   )}
                 </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Bulk Approve Modal */}
+      {showBulkApproveModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 overflow-y-auto">
+          <div className="min-h-screen flex items-center justify-center p-4 sm:p-6">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full">
+              {/* Modal Header */}
+              <div className="relative bg-gradient-to-r from-green-500 to-green-600 px-8 py-6 rounded-t-2xl">
+                <button
+                  onClick={() => {
+                    setShowBulkApproveModal(false)
+                    setBulkApproveNotes('')
+                  }}
+                  className="absolute top-4 right-4 text-white/80 hover:text-white transition-colors duration-200"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+                <h2 className="text-2xl font-bold text-white">Bulk Approve Earnings</h2>
+                <p className="text-green-100 text-sm mt-1">Approve {selectedEarnings.length} pending earning(s)</p>
+              </div>
+
+              {/* Modal Content */}
+              <div className="p-8 space-y-6">
+                {/* Info Box */}
+                <div className="bg-green-50 border border-green-300 rounded-lg p-4">
+                  <div className="flex items-start">
+                    <svg className="w-6 h-6 text-green-600 mt-0.5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div className="flex-1">
+                      <h3 className="text-sm font-bold text-green-900 mb-2">What happens when you approve:</h3>
+                      <ul className="text-sm text-green-800 space-y-1">
+                        <li>✓ All {selectedEarnings.length} earning(s) will be confirmed</li>
+                        <li>✓ Agent balances will be automatically updated</li>
+                        <li>✓ Agents can request payouts immediately</li>
+                        <li>✓ Changes are permanent and cannot be undone</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Notes Field */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Notes (Optional)
+                  </label>
+                  <textarea
+                    value={bulkApproveNotes}
+                    onChange={(e) => setBulkApproveNotes(e.target.value)}
+                    rows={3}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors duration-200"
+                    placeholder="e.g., Batch approval for October 2025 commissions"
+                  />
+                </div>
+
+                {/* Modal Footer */}
+                <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
+                  <button
+                    onClick={() => {
+                      setShowBulkApproveModal(false)
+                      setBulkApproveNotes('')
+                    }}
+                    className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors duration-200"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleBulkApprove}
+                    disabled={isUploading}
+                    className="px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg font-medium hover:from-green-600 hover:to-green-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  >
+                    {isUploading ? (
+                      <>
+                        <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Approving...
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Approve {selectedEarnings.length} Earnings
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Upload Results Modal */}
+      {showResultsModal && lastUploadResult && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 overflow-y-auto">
+          <div className="min-h-screen flex items-center justify-center p-4 sm:p-6">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full my-8">
+              {/* Modal Header */}
+              <div className={`relative px-8 py-6 rounded-t-2xl ${
+                lastUploadResult.failed > 0 || lastUploadResult.skipped > 0
+                  ? 'bg-gradient-to-r from-yellow-500 to-orange-500'
+                  : 'bg-gradient-to-r from-green-500 to-green-600'
+              }`}>
+                <button
+                  onClick={() => setShowResultsModal(false)}
+                  className="absolute top-4 right-4 text-white/80 hover:text-white transition-colors duration-200"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+                <h2 className="text-2xl font-bold text-white">Bulk Upload Results</h2>
+                <p className="text-white/90 text-sm mt-1">Batch ID: {lastUploadResult.batchInfo.batchId}</p>
+              </div>
+
+              {/* Summary Stats */}
+              <div className="p-8 space-y-6">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center">
+                    <div className="text-3xl font-bold text-blue-600">{lastUploadResult.totalProcessed}</div>
+                    <div className="text-sm text-blue-700 font-medium mt-1">Total Processed</div>
+                  </div>
+                  <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-center">
+                    <div className="text-3xl font-bold text-green-600">{lastUploadResult.successful}</div>
+                    <div className="text-sm text-green-700 font-medium mt-1">Successful</div>
+                  </div>
+                  <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-center">
+                    <div className="text-3xl font-bold text-red-600">{lastUploadResult.failed}</div>
+                    <div className="text-sm text-red-700 font-medium mt-1">Failed</div>
+                  </div>
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 text-center">
+                    <div className="text-3xl font-bold text-yellow-600">{lastUploadResult.skipped}</div>
+                    <div className="text-sm text-yellow-700 font-medium mt-1">Skipped</div>
+                  </div>
+                </div>
+
+                {/* Total Amount */}
+                <div className="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-xl p-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-purple-700">Total Amount Processed:</span>
+                    <span className="text-2xl font-bold text-purple-900">{formatCurrencyWithSymbol(lastUploadResult.totalAmount)}</span>
+                  </div>
+                </div>
+
+                {/* Batch Information */}
+                <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
+                  <h3 className="font-semibold text-gray-900 mb-3 flex items-center">
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Batch Information
+                  </h3>
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                      <span className="text-gray-500">Batch ID:</span>
+                      <p className="font-mono text-gray-900">{lastUploadResult.batchInfo.batchId}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">Processed At:</span>
+                      <p className="text-gray-900">{new Date(lastUploadResult.batchInfo.processedAt).toLocaleString()}</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">Processing Time:</span>
+                      <p className="text-gray-900">{lastUploadResult.batchInfo.processingTimeMs}ms</p>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">Uploaded By:</span>
+                      <p className="text-gray-900">{lastUploadResult.batchInfo.uploadedBy}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Error Summary */}
+                {(lastUploadResult.errorSummary.duplicateReferences.length > 0 || 
+                  lastUploadResult.errorSummary.invalidAgentCodes.length > 0 ||
+                  lastUploadResult.errorSummary.validationErrors.length > 0 ||
+                  lastUploadResult.errorSummary.otherErrors.length > 0) && (
+                  <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+                    <h3 className="font-semibold text-red-900 mb-3 flex items-center">
+                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      Error Summary
+                    </h3>
+                    <div className="space-y-3 text-sm">
+                      {lastUploadResult.errorSummary.duplicateReferences.length > 0 && (
+                        <div>
+                          <p className="font-medium text-red-900 mb-1">Duplicate Reference IDs ({lastUploadResult.errorSummary.duplicateReferences.length}):</p>
+                          <div className="bg-white rounded p-2 max-h-24 overflow-y-auto">
+                            <div className="flex flex-wrap gap-1">
+                              {lastUploadResult.errorSummary.duplicateReferences.map((ref, idx) => (
+                                <span key={idx} className="inline-block px-2 py-1 bg-red-100 text-red-800 rounded text-xs font-mono">
+                                  {ref}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      {lastUploadResult.errorSummary.invalidAgentCodes.length > 0 && (
+                        <div>
+                          <p className="font-medium text-red-900 mb-1">Invalid Agent Codes ({lastUploadResult.errorSummary.invalidAgentCodes.length}):</p>
+                          <div className="bg-white rounded p-2 max-h-24 overflow-y-auto">
+                            <div className="flex flex-wrap gap-1">
+                              {lastUploadResult.errorSummary.invalidAgentCodes.map((code, idx) => (
+                                <span key={idx} className="inline-block px-2 py-1 bg-red-100 text-red-800 rounded text-xs font-mono">
+                                  {code}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      {lastUploadResult.errorSummary.validationErrors.length > 0 && (
+                        <div>
+                          <p className="font-medium text-red-900 mb-1">Validation Errors:</p>
+                          <ul className="bg-white rounded p-2 space-y-1 text-red-700">
+                            {lastUploadResult.errorSummary.validationErrors.map((err, idx) => (
+                              <li key={idx}>• {err}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      {lastUploadResult.errorSummary.otherErrors.length > 0 && (
+                        <div>
+                          <p className="font-medium text-red-900 mb-1">Other Errors:</p>
+                          <ul className="bg-white rounded p-2 space-y-1 text-red-700">
+                            {lastUploadResult.errorSummary.otherErrors.map((err, idx) => (
+                              <li key={idx}>• {err}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Detailed Results */}
+                <div className="border border-gray-200 rounded-xl overflow-hidden">
+                  <div className="bg-gray-100 px-4 py-3 border-b border-gray-200">
+                    <h3 className="font-semibold text-gray-900 flex items-center">
+                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      Detailed Results ({lastUploadResult.details.length} items)
+                    </h3>
+                  </div>
+                  <div className="max-h-96 overflow-y-auto">
+                    <table className="w-full text-sm">
+                      <thead className="bg-gray-50 sticky top-0">
+                        <tr className="border-b border-gray-200">
+                          <th className="px-4 py-3 text-left font-semibold text-gray-700">Agent Code</th>
+                          <th className="px-4 py-3 text-left font-semibold text-gray-700">Amount</th>
+                          <th className="px-4 py-3 text-left font-semibold text-gray-700">Status</th>
+                          <th className="px-4 py-3 text-left font-semibold text-gray-700">Details</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {lastUploadResult.details.map((detail, idx) => (
+                          <tr key={idx} className="border-b border-gray-100 hover:bg-gray-50">
+                            <td className="px-4 py-3 font-mono text-gray-900">{detail.agentCode}</td>
+                            <td className="px-4 py-3 font-semibold">{formatCurrencyWithSymbol(detail.amount)}</td>
+                            <td className="px-4 py-3">
+                              <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${
+                                detail.status === 'success' 
+                                  ? 'bg-green-100 text-green-800'
+                                  : detail.status === 'failed'
+                                  ? 'bg-red-100 text-red-800'
+                                  : 'bg-yellow-100 text-yellow-800'
+                              }`}>
+                                {detail.status === 'success' ? '✓ Success' : detail.status === 'failed' ? '✗ Failed' : '⊘ Skipped'}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 text-gray-600">
+                              {detail.error && (
+                                <span className="text-red-600">{detail.error}</span>
+                              )}
+                              {detail.message && !detail.error && (
+                                <span className="text-gray-600">{detail.message}</span>
+                              )}
+                              {detail.earningId && (
+                                <span className="text-green-600 text-xs">ID: {detail.earningId}</span>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Modal Footer */}
+                <div className="flex justify-between items-center pt-4 border-t border-gray-200">
+                  <button
+                    onClick={downloadUploadReport}
+                    className="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200 flex items-center font-medium"
+                  >
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Download Full Report
+                  </button>
+                  <button
+                    onClick={() => setShowResultsModal(false)}
+                    className="px-6 py-3 bg-gradient-to-r from-purple-500 to-indigo-600 text-white rounded-lg hover:from-purple-600 hover:to-indigo-700 transition-all duration-200 font-medium"
+                  >
+                    Close
+                  </button>
+                </div>
               </div>
             </div>
           </div>

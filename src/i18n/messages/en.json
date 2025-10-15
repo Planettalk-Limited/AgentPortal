@@ -442,8 +442,7 @@
         "loginButton": "Go to Login"
       },
       "alreadyHaveAccount": "Already have an account?",
-      "signInLink": "Sign in here",
-      "passwordRequirement": "Must be at least 8 characters long"
+      "signInLink": "Sign in here"
     },
     "verifyEmail": {
       "title": "Verify Your Email",
@@ -615,7 +614,6 @@
     "getSupportDescription": "24/7 assistance for all your questions",
     "commissionRate": "Commission Rate",
     "currentMonth": "This Month",
-    "totalReferrals": "Total Referrals",
     "shareAndEarn": "Share & Earn Commissions", 
     "shareDescription": "Share the PlanetTalk app with your agent code to earn commissions when customers use it during signup",
     "yourAgentCode": "YOUR AGENT CODE",
@@ -641,7 +639,6 @@
     "payoutRequirements": "Payout Requirements",
     "minimumBalance": "Minimum balance: {amount}",
     "howToReachMinimum": "How to Reach Minimum",
-    "shareAgentCode": "Share your agent code with friends & family",
     "postOnSocialMedia": "Post on social media using the share buttons above",
     "earnCommission": "Earn {rate}% commission on all referral activity",
     "quickStats": "Quick Stats",
@@ -679,7 +676,6 @@
     "shareReferralLink": "Share Referral Link",
     "referralUrl": "Referral URL:",
     "thisMonth": "this month",
-    "progressTo": "Progress to",
     "sharing": "Sharing...",
     "failedToShareLink": "Failed to share link",
     "justNow": "Just now",
@@ -699,6 +695,7 @@
       "featured": "Featured"
     },
     "categories": {
+      "all": "All Resources",
       "featured": "Featured",
       "training": "Training Materials",
       "bankForms": "Bank Forms",
@@ -873,5 +870,32 @@
     "saveNotificationPreferences": "Save Notification Preferences",
     "changePassword": "Change Password",
     "changingPassword": "Changing Password..."
+  },
+
+  "termsPage": {
+    "pageTitle": "Agent Program Terms & Conditions",
+    "metaDescription": "Please read our terms and conditions carefully before participating in the PlanetTalk Agent Program.",
+    "breadcrumb": {
+      "home": "Home",
+      "current": "Terms & Conditions"
+    },
+    "header": {
+      "title": "Agent Program Terms & Conditions",
+      "subtitle": "Please read our terms and conditions carefully before participating in the PlanetTalk Agent Program."
+    },
+    "document": {
+      "title": "Terms & Conditions Document",
+      "format": "PDF Format"
+    },
+    "download": "Download PDF",
+    "fallback": {
+      "noSupport": "Your browser does not support viewing PDFs inline.",
+      "pleaseDownload": "Please download the PDF to view it."
+    },
+    "help": {
+      "title": "Questions about our terms?",
+      "description": "If you have any questions about these terms and conditions, please don't hesitate to contact us.",
+      "email": "agent@planettalk.com"
+    }
   }
 }

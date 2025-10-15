@@ -40,6 +40,8 @@ import {
   BulkResourceDeleteRequest,
   ResourceStats,
   ResourceDownloadResponse,
+  BulkAgentDataUploadRequest,
+  BulkAgentDataUploadResponse,
 } from '../types';
 
 export class AdminService extends BaseService {
@@ -135,35 +137,35 @@ export class AdminService extends BaseService {
    * Approve payout (admin)
    */
   async approvePayout(id: string): Promise<Payout> {
-    return this.actionWithResult<Payout>(`admin/payouts/${id}/approve`);
+    return this.update<Payout>(`admin/payouts/${id}/approve`, {});
   }
 
   /**
    * Reject payout (admin)
    */
   async rejectPayout(id: string, data: { rejectionReason: string; adminNotes?: string }): Promise<Payout> {
-    return this.actionWithResult<Payout>(`admin/payouts/${id}/reject`, data);
+    return this.update<Payout>(`admin/payouts/${id}/reject`, data);
   }
 
   /**
    * Process payout (admin)
    */
   async processPayout(id: string): Promise<Payout> {
-    return this.actionWithResult<Payout>(`admin/payouts/${id}/process`);
+    return this.update<Payout>(`admin/payouts/${id}/process`, {});
   }
 
   /**
    * Complete payout (admin)
    */
   async completePayout(id: string, data: { transactionId: string; fees?: number; adminNotes?: string }): Promise<Payout> {
-    return this.actionWithResult<Payout>(`admin/payouts/${id}/complete`, data);
+    return this.update<Payout>(`admin/payouts/${id}/complete`, data);
   }
 
   /**
    * Bulk process payouts (admin)
    */
   async bulkProcessPayouts(data: BulkPayoutActionRequest): Promise<{ success: number; failed: number; errors?: any[] }> {
-    return this.actionWithResult(`admin/payouts/bulk-process`, data);
+    return this.update(`admin/payouts/bulk-process`, data);
   }
 
   // ===== Agent Management =====
@@ -325,6 +327,15 @@ export class AdminService extends BaseService {
     return new Blob([response], { 
       type: params?.format === 'xlsx' ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' : 'text/csv' 
     });
+  }
+
+  /**
+   * Bulk upload agent data (earnings, referrals, balances, payouts)
+   */
+  async bulkUploadAgentData(payload: BulkAgentDataUploadRequest): Promise<BulkAgentDataUploadResponse> {
+    return this.execute(() => 
+      this.client.post('admin/earnings/bulk-upload-data', payload)
+    );
   }
 
   // ===== Resource Management =====

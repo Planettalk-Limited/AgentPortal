@@ -7,34 +7,82 @@ import { formatCurrencyWithSymbol } from '@/lib/utils/currency'
 import CountryPicker from '@/components/CountryPicker'
 import PhoneNumberInput from '@/components/PhoneNumberInput'
 
-// Mapping from country codes to phone codes
+// Comprehensive mapping from country codes (ISO 3166-1 alpha-2) to phone codes
 const countryToPhoneCodeMap: Record<string, string> = {
-  'US': '+1', 'CA': '+1', 'GB': '+44', 'AU': '+61', 'DE': '+49', 'FR': '+33', 'IT': '+39', 'ES': '+34',
-  'NL': '+31', 'BE': '+32', 'CH': '+41', 'AT': '+43', 'SE': '+46', 'NO': '+47', 'DK': '+45', 'FI': '+358',
-  'IE': '+353', 'PT': '+351', 'GR': '+30', 'PL': '+48', 'CZ': '+420', 'HU': '+36', 'RO': '+40',
-  'BG': '+359', 'HR': '+385', 'SI': '+386', 'SK': '+421', 'LT': '+370', 'LV': '+371', 'EE': '+372',
-  'RU': '+7', 'CN': '+86', 'JP': '+81', 'KR': '+82', 'IN': '+91', 'PK': '+92', 'BD': '+880', 'LK': '+94',
-  'TH': '+66', 'VN': '+84', 'MY': '+60', 'SG': '+65', 'ID': '+62', 'PH': '+63', 'TW': '+886', 'HK': '+852',
-  'MO': '+853', 'BR': '+55', 'AR': '+54', 'CL': '+56', 'CO': '+57', 'PE': '+51', 'VE': '+58', 'UY': '+598',
-  'PY': '+595', 'BO': '+591', 'EC': '+593', 'GY': '+592', 'SR': '+597', 'MX': '+52', 'GT': '+502',
-  'BZ': '+501', 'SV': '+503', 'HN': '+504', 'NI': '+505', 'CR': '+506', 'PA': '+507', 'CU': '+53',
-  'JM': '+1876', 'HT': '+509', 'DO': '+1849', 'PR': '+1939', 'TT': '+1868', 'BB': '+1246', 'GD': '+1473',
-  'LC': '+1758', 'VC': '+1784', 'AG': '+1268', 'DM': '+1767', 'KN': '+1869', 'EG': '+20', 'LY': '+218',
-  'SD': '+249', 'TN': '+216', 'DZ': '+213', 'MA': '+212', 'ZA': '+27', 'ZW': '+263', 'ZM': '+260',
-  'MW': '+265', 'MZ': '+258', 'MG': '+261', 'MU': '+230', 'RE': '+262', 'YT': '+262', 'KM': '+269',
-  'SC': '+248', 'KE': '+254', 'UG': '+256', 'TZ': '+255', 'RW': '+250', 'BI': '+257', 'DJ': '+253',
-  'SO': '+252', 'ET': '+251', 'ER': '+291', 'SS': '+211', 'NG': '+234', 'GH': '+233', 'CI': '+225',
-  'BF': '+226', 'ML': '+223', 'NE': '+227', 'TD': '+235', 'SN': '+221', 'GM': '+220', 'GW': '+245',
-  'GN': '+224', 'SL': '+232', 'LR': '+231', 'BJ': '+229', 'TG': '+228', 'GA': '+241', 'GQ': '+240',
-  'CM': '+237', 'CF': '+236', 'CG': '+242', 'CD': '+243', 'AO': '+244', 'NA': '+264', 'BW': '+267',
-  'LS': '+266', 'SZ': '+268', 'TR': '+90', 'GE': '+995', 'AM': '+374', 'AZ': '+994', 'BY': '+375',
-  'UA': '+380', 'MD': '+373', 'IL': '+972', 'PS': '+970', 'JO': '+962', 'LB': '+961', 'SY': '+963',
-  'IQ': '+964', 'KW': '+965', 'SA': '+966', 'YE': '+967', 'OM': '+968', 'AE': '+971', 'QA': '+974',
-  'BH': '+973', 'IR': '+98', 'AF': '+93', 'UZ': '+998', 'TM': '+993', 'TJ': '+992', 'KG': '+996',
-  'KZ': '+7', 'MN': '+976', 'NP': '+977', 'BT': '+975', 'MM': '+95', 'LA': '+856', 'KH': '+855',
-  'FJ': '+679', 'NC': '+687', 'PF': '+689', 'TO': '+676', 'WS': '+685', 'KI': '+686', 'TV': '+688',
-  'NR': '+674', 'PW': '+680', 'FM': '+691', 'MH': '+692', 'PG': '+675', 'SB': '+677', 'VU': '+678',
-  'NU': '+683', 'CK': '+682', 'TK': '+690', 'AS': '+1684', 'GU': '+1671', 'MP': '+1670'
+  // North America
+  'US': '+1', 'CA': '+1', 'MX': '+52', 'GT': '+502', 'BZ': '+501', 'SV': '+503', 'HN': '+504',
+  'NI': '+505', 'CR': '+506', 'PA': '+507',
+  
+  // Caribbean
+  'CU': '+53', 'JM': '+1876', 'HT': '+509', 'DO': '+1849', 'PR': '+1939', 'TT': '+1868',
+  'BB': '+1246', 'GD': '+1473', 'LC': '+1758', 'VC': '+1784', 'AG': '+1268', 'DM': '+1767',
+  'KN': '+1869', 'BS': '+1242',
+  
+  // South America
+  'BR': '+55', 'AR': '+54', 'CL': '+56', 'CO': '+57', 'PE': '+51', 'VE': '+58', 'UY': '+598',
+  'PY': '+595', 'BO': '+591', 'EC': '+593', 'GY': '+592', 'SR': '+597',
+  
+  // Europe - Western
+  'GB': '+44', 'IE': '+353', 'FR': '+33', 'ES': '+34', 'PT': '+351', 'NL': '+31', 'BE': '+32',
+  'LU': '+352', 'CH': '+41', 'AT': '+43', 'DE': '+49', 'IT': '+39', 'MC': '+377', 'AD': '+376',
+  'SM': '+378', 'VA': '+379', 'MT': '+356', 'LI': '+423', 'IS': '+354',
+  
+  // Europe - Nordic
+  'SE': '+46', 'NO': '+47', 'DK': '+45', 'FI': '+358',
+  
+  // Europe - Eastern
+  'PL': '+48', 'CZ': '+420', 'SK': '+421', 'HU': '+36', 'RO': '+40', 'BG': '+359',
+  'HR': '+385', 'SI': '+386', 'BA': '+387', 'RS': '+381', 'ME': '+382', 'MK': '+389',
+  'AL': '+355', 'GR': '+30', 'CY': '+357', 'LT': '+370', 'LV': '+371', 'EE': '+372',
+  'BY': '+375', 'UA': '+380', 'MD': '+373', 'RU': '+7', 'KZ': '+7',
+  
+  // Middle East
+  'TR': '+90', 'IL': '+972', 'PS': '+970', 'JO': '+962', 'LB': '+961', 'SY': '+963',
+  'IQ': '+964', 'KW': '+965', 'SA': '+966', 'YE': '+967', 'OM': '+968', 'AE': '+971',
+  'QA': '+974', 'BH': '+973', 'IR': '+98',
+  
+  // Central Asia
+  'AF': '+93', 'UZ': '+998', 'TM': '+993', 'TJ': '+992', 'KG': '+996', 'MN': '+976',
+  
+  // South Asia
+  'IN': '+91', 'PK': '+92', 'BD': '+880', 'LK': '+94', 'NP': '+977', 'BT': '+975', 'MV': '+960',
+  
+  // East Asia
+  'CN': '+86', 'JP': '+81', 'KR': '+82', 'KP': '+850', 'TW': '+886', 'HK': '+852', 'MO': '+853',
+  
+  // Southeast Asia
+  'TH': '+66', 'VN': '+84', 'MY': '+60', 'SG': '+65', 'ID': '+62', 'PH': '+63', 'MM': '+95',
+  'LA': '+856', 'KH': '+855', 'BN': '+673', 'TL': '+670',
+  
+  // Oceania
+  'AU': '+61', 'NZ': '+64', 'FJ': '+679', 'PG': '+675', 'NC': '+687', 'PF': '+689',
+  'TO': '+676', 'WS': '+685', 'KI': '+686', 'TV': '+688', 'NR': '+674', 'PW': '+680',
+  'FM': '+691', 'MH': '+692', 'SB': '+677', 'VU': '+678', 'NU': '+683', 'CK': '+682',
+  'TK': '+690', 'AS': '+1684', 'GU': '+1671', 'MP': '+1670',
+  
+  // North Africa
+  'EG': '+20', 'LY': '+218', 'TN': '+216', 'DZ': '+213', 'MA': '+212', 'SD': '+249', 'SS': '+211',
+  
+  // West Africa
+  'NG': '+234', 'GH': '+233', 'CI': '+225', 'BF': '+226', 'ML': '+223', 'NE': '+227',
+  'TD': '+235', 'SN': '+221', 'GM': '+220', 'GW': '+245', 'GN': '+224', 'SL': '+232',
+  'LR': '+231', 'BJ': '+229', 'TG': '+228', 'MR': '+222', 'CV': '+238',
+  
+  // Central Africa
+  'GA': '+241', 'GQ': '+240', 'CM': '+237', 'CF': '+236', 'CG': '+242', 'CD': '+243',
+  'AO': '+244', 'ST': '+239',
+  
+  // East Africa
+  'KE': '+254', 'UG': '+256', 'TZ': '+255', 'RW': '+250', 'BI': '+257', 'DJ': '+253',
+  'SO': '+252', 'ET': '+251', 'ER': '+291', 'KM': '+269', 'SC': '+248', 'MU': '+230',
+  'MG': '+261', 'RE': '+262', 'YT': '+262',
+  
+  // Southern Africa
+  'ZA': '+27', 'ZW': '+263', 'ZM': '+260', 'MW': '+265', 'MZ': '+258', 'NA': '+264',
+  'BW': '+267', 'LS': '+266', 'SZ': '+268',
+  
+  // Caucasus
+  'GE': '+995', 'AM': '+374', 'AZ': '+994'
 }
 
 export default function AgentsPage() {
@@ -51,6 +99,14 @@ export default function AgentsPage() {
   const [createdAgentFormData, setCreatedAgentFormData] = useState<any>(null)
   const [filtersExpanded, setFiltersExpanded] = useState(false)
   const [phoneCountryCode, setPhoneCountryCode] = useState('+44') // Default to UK
+  const [showBulkUpload, setShowBulkUpload] = useState(false)
+  const [csvFile, setCsvFile] = useState<File | null>(null)
+  const [jsonData, setJsonData] = useState('')
+  const [batchDescription, setBatchDescription] = useState('')
+  const [autoUpdate, setAutoUpdate] = useState(true)
+  const [uploadMode, setUploadMode] = useState<'csv' | 'json'>('csv')
+  const [isUploading, setIsUploading] = useState(false)
+  const [uploadResult, setUploadResult] = useState<any>(null)
   const [newAgent, setNewAgent] = useState({
     firstName: '',
     lastName: '',
@@ -316,15 +372,26 @@ export default function AgentsPage() {
           <h1 className="text-3xl font-bold text-pt-dark-gray mb-2">Agent Management</h1>
           <p className="text-pt-light-gray">Manage agents and monitor performance</p>
         </div>
-        <button
-          onClick={() => setShowCreateModal(true)}
-          className="px-6 py-3 bg-pt-turquoise text-white rounded-lg hover:bg-pt-turquoise-600 transition-colors font-semibold shadow-lg flex items-center"
-        >
-          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-          </svg>
-          Create New Agent
-        </button>
+        <div className="flex gap-3">
+          <button
+            onClick={() => setShowBulkUpload(true)}
+            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold shadow-lg flex items-center"
+          >
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+            </svg>
+            Bulk Upload Data
+          </button>
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className="px-6 py-3 bg-pt-turquoise text-white rounded-lg hover:bg-pt-turquoise-600 transition-colors font-semibold shadow-lg flex items-center"
+          >
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+            </svg>
+            Create New Agent
+          </button>
+        </div>
       </div>
 
       {/* Stats Cards */}
@@ -859,10 +926,11 @@ export default function AgentsPage() {
 
       {/* Create Agent Modal */}
       {showCreateModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full my-8">
-            {/* Modal Header */}
-            <div className="relative bg-gradient-to-r from-pt-turquoise to-pt-turquoise-600 px-8 py-6 rounded-t-2xl">
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 overflow-y-auto">
+          <div className="min-h-screen flex items-center justify-center p-4 sm:p-6">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full my-8">
+              {/* Modal Header */}
+              <div className="relative bg-gradient-to-r from-pt-turquoise to-pt-turquoise-600 px-8 py-6 rounded-t-2xl">
               <button
                 onClick={() => setShowCreateModal(false)}
                 className="absolute top-4 right-4 text-white/80 hover:text-white transition-colors duration-200"
@@ -876,8 +944,8 @@ export default function AgentsPage() {
             </div>
 
             {/* Modal Content */}
-            <div className="p-8 space-y-6 max-h-[calc(100vh-250px)] overflow-y-auto">
-              {/* Required Fields */}
+            <div className="p-8 space-y-6">
+              {/* All Fields Required */}
               <div className="space-y-5">
                 <div className="flex items-center">
                   <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center mr-3">
@@ -885,7 +953,8 @@ export default function AgentsPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
                     </svg>
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900">Required Information</h3>
+                  <h3 className="text-lg font-semibold text-gray-900">Agent Information</h3>
+                  <span className="ml-2 text-xs text-red-500 font-semibold">(All fields required)</span>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -930,27 +999,11 @@ export default function AgentsPage() {
                       required
                     />
                   </div>
-                </div>
-              </div>
 
-              {/* Divider */}
-              <div className="border-t border-gray-200"></div>
-
-              {/* Optional Fields */}
-              <div className="space-y-5">
-                <div className="flex items-center">
-                  <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-900">Additional Information</h3>
-                  <span className="ml-2 text-xs text-gray-500 font-normal">(Optional)</span>
-                </div>
-
-                <div className="space-y-5">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Country</label>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Country <span className="text-red-500">*</span>
+                    </label>
                     <CountryPicker
                       value={newAgent.country}
                       onChange={(countryCode) => {
@@ -965,10 +1018,11 @@ export default function AgentsPage() {
                         }
                       }}
                       className="w-full"
+                      required
                     />
                   </div>
 
-                  <div>
+                  <div className="md:col-span-2">
                     <PhoneNumberInput
                       value={newAgent.phone}
                       onChange={(value) => setNewAgent(prev => ({ ...prev, phone: value }))}
@@ -976,23 +1030,27 @@ export default function AgentsPage() {
                       onCountryCodeChange={setPhoneCountryCode}
                       className="w-full"
                       label="Phone Number"
+                      required
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Address</label>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Address <span className="text-red-500">*</span>
+                    </label>
                     <input
                       type="text"
                       value={newAgent.address}
                       onChange={(e) => setNewAgent(prev => ({ ...prev, address: e.target.value }))}
                       className="w-full px-4 sm:px-6 py-3 sm:py-4 h-[48px] sm:h-[60px] border-2 border-gray-200 rounded-xl sm:rounded-2xl bg-gray-50 focus:bg-white focus:ring-0 focus:border-pt-turquoise hover:border-pt-turquoise transition-all text-base sm:text-lg"
                       placeholder="123 Main St, City, Country"
+                      required
                     />
                   </div>
 
-                  <div>
+                  <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Notes
+                      Notes <span className="text-red-500">*</span>
                       <span className="ml-2 text-xs text-gray-500 font-normal">({newAgent.notes.length}/1000)</span>
                     </label>
                     <textarea
@@ -1002,6 +1060,7 @@ export default function AgentsPage() {
                       maxLength={1000}
                       className="w-full px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-200 rounded-xl sm:rounded-2xl bg-gray-50 focus:bg-white focus:ring-0 focus:border-pt-turquoise hover:border-pt-turquoise transition-all resize-none text-base sm:text-lg"
                       placeholder="Add any additional notes about this agent..."
+                      required
                     />
                   </div>
                 </div>
@@ -1039,14 +1098,16 @@ export default function AgentsPage() {
                 )}
               </button>
             </div>
+            </div>
           </div>
         </div>
       )}
 
       {/* Agent Credentials Modal */}
       {showCredentialsModal && createdAgentData && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full my-8">
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 overflow-y-auto">
+          <div className="min-h-screen flex items-center justify-center p-4 sm:p-6">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full my-8">
             {/* Modal Header */}
             <div className="relative bg-gradient-to-r from-green-500 to-green-600 px-8 py-6 rounded-t-2xl">
               <div className="flex items-center">
@@ -1279,6 +1340,498 @@ Login at: ${window.location.origin}/en/auth/login`
                 </svg>
                 Done
               </button>
+            </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Bulk Upload Modal */}
+      {showBulkUpload && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full my-8 max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200 sticky top-0 bg-white z-10">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-gray-900">Bulk Upload Agent Data</h2>
+                <button
+                  onClick={() => {
+                    setShowBulkUpload(false)
+                    setCsvFile(null)
+                    setJsonData('')
+                    setBatchDescription('')
+                    setUploadResult(null)
+                  }}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6">
+              {/* Upload Mode Tabs */}
+              <div className="flex border-b border-gray-200 mb-6">
+                <button
+                  onClick={() => setUploadMode('csv')}
+                  className={`flex-1 px-6 py-3 text-center font-medium transition-colors ${
+                    uploadMode === 'csv'
+                      ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50'
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                  }`}
+                >
+                  📄 CSV Upload
+                </button>
+                <button
+                  onClick={() => setUploadMode('json')}
+                  className={`flex-1 px-6 py-3 text-center font-medium transition-colors ${
+                    uploadMode === 'json'
+                      ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50'
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                  }`}
+                >
+                  📋 JSON Upload
+                </button>
+              </div>
+
+              {uploadMode === 'csv' ? (
+                <div className="space-y-6">
+                  {/* CSV Upload */}
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-semibold text-gray-900">Upload CSV File</h3>
+                      <button
+                        onClick={() => {
+                          const template = `agent_code,total_earnings,earnings_for_current_month,total_referrals,referrals_for_current_month,available_balance,total_payout_amount,available_month
+AG123456,1250.50,150.75,45,5,1100.50,950.00,2025-10
+AG789012,2500.00,300.00,80,10,2200.00,1800.00,2025-10`
+                          const blob = new Blob([template], { type: 'text/csv' })
+                          const url = window.URL.createObjectURL(blob)
+                          const a = document.createElement('a')
+                          a.href = url
+                          a.download = 'agent_data_template.csv'
+                          document.body.appendChild(a)
+                          a.click()
+                          document.body.removeChild(a)
+                          window.URL.revokeObjectURL(url)
+                        }}
+                        className="text-sm text-blue-600 hover:text-blue-800 flex items-center"
+                      >
+                        <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Download CSV Template
+                      </button>
+                    </div>
+
+                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 transition-colors">
+                      <input
+                        type="file"
+                        accept=".csv"
+                        onChange={(e) => setCsvFile(e.target.files?.[0] || null)}
+                        className="hidden"
+                        id="csv-upload"
+                      />
+                      <label htmlFor="csv-upload" className="cursor-pointer">
+                        <svg className="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                        </svg>
+                        <p className="text-sm font-medium text-gray-900">
+                          {csvFile ? csvFile.name : 'Click to upload or drag and drop'}
+                        </p>
+                        <p className="text-xs text-gray-500 mt-1">CSV file with agent data</p>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Batch Description (Optional)
+                    </label>
+                    <input
+                      type="text"
+                      value={batchDescription}
+                      onChange={(e) => setBatchDescription(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      placeholder="e.g., Monthly earnings data upload - October 2025"
+                    />
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      checked={autoUpdate}
+                      onChange={(e) => setAutoUpdate(e.target.checked)}
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      id="auto-update"
+                    />
+                    <label htmlFor="auto-update" className="text-sm text-gray-700">
+                      Auto-update agent data (if unchecked, requires manual approval)
+                    </label>
+                  </div>
+
+                  <button
+                    onClick={async () => {
+                      if (!csvFile) {
+                        setError('Please select a CSV file')
+                        return
+                      }
+
+                      try {
+                        setIsUploading(true)
+                        setError(null)
+                        setUploadResult(null)
+
+                        const text = await csvFile.text()
+                        const lines = text.split('\n').filter(line => line.trim())
+                        
+                        if (lines.length < 2) {
+                          setError('CSV file must contain at least a header row and one data row')
+                          return
+                        }
+
+                        const headers = lines[0].toLowerCase().split(',').map(h => h.trim())
+                        
+                        const agentCodeIndex = headers.findIndex(h => 
+                          ['agent_code', 'agentcode', 'agent'].includes(h)
+                        )
+
+                        if (agentCodeIndex === -1) {
+                          setError('CSV must contain an "agent_code" column')
+                          return
+                        }
+
+                        const agentsData: any[] = []
+                        
+                        for (let i = 1; i < lines.length; i++) {
+                          const columns = lines[i].split(',').map(col => col.trim())
+                          if (columns.length < 1 || !columns[agentCodeIndex]) continue
+
+                          const agentData: any = {
+                            agentCode: columns[agentCodeIndex]
+                          }
+
+                          const totalEarningsIndex = headers.findIndex(h => 
+                            ['total_earnings', 'totalearnings', 'earnings'].includes(h)
+                          )
+                          if (totalEarningsIndex !== -1 && columns[totalEarningsIndex]) {
+                            agentData.totalEarnings = parseFloat(columns[totalEarningsIndex])
+                          }
+
+                          const earningsMonthIndex = headers.findIndex(h => 
+                            ['earnings_for_current_month', 'earningsforcurrentmonth', 'monthly_earnings', 'earningsthismonth'].includes(h)
+                          )
+                          if (earningsMonthIndex !== -1 && columns[earningsMonthIndex]) {
+                            agentData.earningsForCurrentMonth = parseFloat(columns[earningsMonthIndex])
+                          }
+
+                          const totalReferralsIndex = headers.findIndex(h => 
+                            ['total_referrals', 'totalreferrals', 'referrals'].includes(h)
+                          )
+                          if (totalReferralsIndex !== -1 && columns[totalReferralsIndex]) {
+                            agentData.totalReferrals = parseInt(columns[totalReferralsIndex])
+                          }
+
+                          const referralsMonthIndex = headers.findIndex(h => 
+                            ['referrals_for_current_month', 'referralsforcurrentmonth', 'monthly_referrals', 'referralsthismonth'].includes(h)
+                          )
+                          if (referralsMonthIndex !== -1 && columns[referralsMonthIndex]) {
+                            agentData.referralsForCurrentMonth = parseInt(columns[referralsMonthIndex])
+                          }
+
+                          const availableBalanceIndex = headers.findIndex(h => 
+                            ['available_balance', 'availablebalance', 'balance'].includes(h)
+                          )
+                          if (availableBalanceIndex !== -1 && columns[availableBalanceIndex]) {
+                            agentData.availableBalance = parseFloat(columns[availableBalanceIndex])
+                          }
+
+                          const totalPayoutIndex = headers.findIndex(h => 
+                            ['total_payout_amount', 'totalpayoutamount', 'payout', 'payouts'].includes(h)
+                          )
+                          if (totalPayoutIndex !== -1 && columns[totalPayoutIndex]) {
+                            agentData.totalPayoutAmount = parseFloat(columns[totalPayoutIndex])
+                          }
+
+                          const availableMonthIndex = headers.findIndex(h => 
+                            ['available_month', 'availablemonth', 'month'].includes(h)
+                          )
+                          if (availableMonthIndex !== -1 && columns[availableMonthIndex]) {
+                            agentData.availableMonth = columns[availableMonthIndex]
+                          }
+
+                          agentsData.push(agentData)
+                        }
+
+                        if (agentsData.length === 0) {
+                          setError('No valid agent data found in CSV file')
+                          return
+                        }
+
+                        const response = await api.admin.bulkUploadAgentData({
+                          agentsData,
+                          batchDescription: batchDescription || `CSV Upload - ${new Date().toLocaleString()}`,
+                          autoUpdate,
+                          metadata: {
+                            uploadSource: 'Admin Panel CSV',
+                            filename: csvFile.name
+                          }
+                        })
+
+                        setUploadResult(response)
+
+                        if (response.failed > 0) {
+                          setError(`Upload completed: ${response.successful} successful, ${response.failed} failed, ${response.skipped} skipped`)
+                        } else {
+                          setSuccessMessage(`Successfully uploaded data for ${response.successful} agents`)
+                          setTimeout(() => setSuccessMessage(null), 5000)
+                        }
+
+                        setCsvFile(null)
+                        setBatchDescription('')
+                        await loadData()
+                      } catch (error) {
+                        console.error('Error with bulk upload:', error)
+                        setError(error instanceof Error ? error.message : 'Failed to upload agent data')
+                      } finally {
+                        setIsUploading(false)
+                      }
+                    }}
+                    disabled={!csvFile || isUploading}
+                    className="w-full bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-semibold"
+                  >
+                    {isUploading ? 'Uploading...' : 'Upload CSV'}
+                  </button>
+
+                  {/* CSV Format Info */}
+                  <div className="bg-blue-50 rounded-lg p-4">
+                    <h4 className="font-semibold text-blue-900 mb-2">📊 CSV Format</h4>
+                    <p className="text-sm text-blue-800 mb-2">Required column:</p>
+                    <ul className="text-sm text-blue-700 space-y-1 ml-4">
+                      <li>• <code className="bg-white px-1 rounded">agent_code</code> - Agent identifier</li>
+                    </ul>
+                    <p className="text-sm text-blue-800 mt-3 mb-2">Optional columns:</p>
+                    <ul className="text-sm text-blue-700 space-y-1 ml-4">
+                      <li>• <code className="bg-white px-1 rounded">total_earnings</code></li>
+                      <li>• <code className="bg-white px-1 rounded">earnings_for_current_month</code></li>
+                      <li>• <code className="bg-white px-1 rounded">total_referrals</code></li>
+                      <li>• <code className="bg-white px-1 rounded">referrals_for_current_month</code></li>
+                      <li>• <code className="bg-white px-1 rounded">available_balance</code></li>
+                      <li>• <code className="bg-white px-1 rounded">total_payout_amount</code></li>
+                      <li>• <code className="bg-white px-1 rounded">available_month</code> - Format: YYYY-MM</li>
+                    </ul>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {/* JSON Upload */}
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-semibold text-gray-900">Paste JSON Data</h3>
+                      <button
+                        onClick={() => {
+                          const template = {
+                            agentsData: [
+                              {
+                                agentCode: "AG123456",
+                                totalEarnings: 1250.50,
+                                earningsForCurrentMonth: 150.75,
+                                totalReferrals: 45,
+                                referralsForCurrentMonth: 5,
+                                availableBalance: 1100.50,
+                                totalPayoutAmount: 950.00,
+                                availableMonth: "2025-10"
+                              }
+                            ],
+                            batchDescription: "Monthly earnings data upload - October 2025",
+                            autoUpdate: true
+                          }
+                          const blob = new Blob([JSON.stringify(template, null, 2)], { type: 'application/json' })
+                          const url = window.URL.createObjectURL(blob)
+                          const a = document.createElement('a')
+                          a.href = url
+                          a.download = 'agent_data_template.json'
+                          document.body.appendChild(a)
+                          a.click()
+                          document.body.removeChild(a)
+                          window.URL.revokeObjectURL(url)
+                        }}
+                        className="text-sm text-blue-600 hover:text-blue-800 flex items-center"
+                      >
+                        <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Download JSON Template
+                      </button>
+                    </div>
+
+                    <textarea
+                      value={jsonData}
+                      onChange={(e) => setJsonData(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+                      rows={15}
+                      placeholder={`{\n  "agentsData": [\n    {\n      "agentCode": "AG123456",\n      "totalEarnings": 1250.50,\n      "earningsForCurrentMonth": 150.75,\n      "totalReferrals": 45,\n      "referralsForCurrentMonth": 5,\n      "availableBalance": 1100.50,\n      "totalPayoutAmount": 950.00,\n      "availableMonth": "2025-10"\n    }\n  ],\n  "batchDescription": "Monthly earnings data upload - October 2025",\n  "autoUpdate": true\n}`}
+                    />
+                  </div>
+
+                  <button
+                    onClick={async () => {
+                      if (!jsonData.trim()) {
+                        setError('Please enter JSON data')
+                        return
+                      }
+
+                      try {
+                        setIsUploading(true)
+                        setError(null)
+                        setUploadResult(null)
+
+                        const payload = JSON.parse(jsonData)
+
+                        if (!payload.agentsData || !Array.isArray(payload.agentsData)) {
+                          setError('Invalid JSON format. Must contain "agentsData" array')
+                          return
+                        }
+
+                        if (payload.agentsData.length === 0) {
+                          setError('agentsData array cannot be empty')
+                          return
+                        }
+
+                        if (!payload.batchDescription) {
+                          payload.batchDescription = batchDescription || `JSON Upload - ${new Date().toLocaleString()}`
+                        }
+                        if (payload.autoUpdate === undefined) {
+                          payload.autoUpdate = autoUpdate
+                        }
+                        if (!payload.metadata) {
+                          payload.metadata = { uploadSource: 'Admin Panel JSON' }
+                        }
+
+                        const response = await api.admin.bulkUploadAgentData(payload)
+                        setUploadResult(response)
+
+                        if (response.failed > 0) {
+                          setError(`Upload completed: ${response.successful} successful, ${response.failed} failed, ${response.skipped} skipped`)
+                        } else {
+                          setSuccessMessage(`Successfully uploaded data for ${response.successful} agents`)
+                          setTimeout(() => setSuccessMessage(null), 5000)
+                        }
+
+                        setJsonData('')
+                        setBatchDescription('')
+                        await loadData()
+                      } catch (error) {
+                        console.error('Error with bulk upload:', error)
+                        if (error instanceof SyntaxError) {
+                          setError('Invalid JSON format. Please check your JSON syntax')
+                        } else {
+                          setError(error instanceof Error ? error.message : 'Failed to upload agent data')
+                        }
+                      } finally {
+                        setIsUploading(false)
+                      }
+                    }}
+                    disabled={!jsonData.trim() || isUploading}
+                    className="w-full bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-semibold"
+                  >
+                    {isUploading ? 'Uploading...' : 'Upload JSON'}
+                  </button>
+
+                  {/* JSON Format Info */}
+                  <div className="bg-blue-50 rounded-lg p-4">
+                    <h4 className="font-semibold text-blue-900 mb-2">📋 JSON Format</h4>
+                    <p className="text-sm text-blue-800 mb-2">The JSON must have the following structure:</p>
+                    <pre className="text-xs text-blue-700 bg-white p-3 rounded overflow-x-auto">
+{`{
+  "agentsData": [/* array of agent objects */],
+  "batchDescription": "string (optional)",
+  "autoUpdate": true/false (optional)
+}`}
+                    </pre>
+                  </div>
+                </div>
+              )}
+
+              {/* Upload Result */}
+              {uploadResult && (
+                <div className="mt-6 bg-gray-50 rounded-lg p-4">
+                  <h4 className="font-semibold text-gray-900 mb-3">Upload Results</h4>
+                  
+                  <div className="grid grid-cols-4 gap-4 mb-4">
+                    <div className="bg-blue-50 rounded-lg p-3">
+                      <p className="text-sm text-blue-600 font-medium">Processed</p>
+                      <p className="text-2xl font-bold text-blue-900">{uploadResult.totalProcessed}</p>
+                    </div>
+                    <div className="bg-green-50 rounded-lg p-3">
+                      <p className="text-sm text-green-600 font-medium">Successful</p>
+                      <p className="text-2xl font-bold text-green-900">{uploadResult.successful}</p>
+                    </div>
+                    <div className="bg-red-50 rounded-lg p-3">
+                      <p className="text-sm text-red-600 font-medium">Failed</p>
+                      <p className="text-2xl font-bold text-red-900">{uploadResult.failed}</p>
+                    </div>
+                    <div className="bg-yellow-50 rounded-lg p-3">
+                      <p className="text-sm text-yellow-600 font-medium">Skipped</p>
+                      <p className="text-2xl font-bold text-yellow-900">{uploadResult.skipped}</p>
+                    </div>
+                  </div>
+
+                  {uploadResult.errorSummary && (uploadResult.errorSummary.invalidAgentCodes?.length > 0 || 
+                    uploadResult.errorSummary.validationErrors?.length > 0 || 
+                    uploadResult.errorSummary.otherErrors?.length > 0) && (
+                    <div className="bg-red-50 rounded-lg p-3 mb-4">
+                      <h5 className="font-semibold text-red-900 mb-2">Errors</h5>
+                      {uploadResult.errorSummary.invalidAgentCodes?.length > 0 && (
+                        <div className="mb-2">
+                          <p className="text-sm font-medium text-red-800">Invalid Agent Codes:</p>
+                          <p className="text-sm text-red-700">{uploadResult.errorSummary.invalidAgentCodes.join(', ')}</p>
+                        </div>
+                      )}
+                      {uploadResult.errorSummary.validationErrors?.length > 0 && (
+                        <div className="mb-2">
+                          <p className="text-sm font-medium text-red-800">Validation Errors:</p>
+                          <ul className="text-sm text-red-700 list-disc list-inside">
+                            {uploadResult.errorSummary.validationErrors.map((err: string, idx: number) => (
+                              <li key={idx}>{err}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  <div className="max-h-60 overflow-y-auto border border-gray-200 rounded-lg">
+                    <table className="w-full text-sm">
+                      <thead className="bg-gray-100 sticky top-0">
+                        <tr>
+                          <th className="px-4 py-2 text-left font-medium text-gray-700">Agent Code</th>
+                          <th className="px-4 py-2 text-left font-medium text-gray-700">Status</th>
+                          <th className="px-4 py-2 text-left font-medium text-gray-700">Message</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-200">
+                        {uploadResult.details?.map((detail: any, idx: number) => (
+                          <tr key={idx} className={detail.status === 'failed' ? 'bg-red-50' : ''}>
+                            <td className="px-4 py-2 font-mono">{detail.agentCode}</td>
+                            <td className="px-4 py-2">
+                              <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                                detail.status === 'success' ? 'bg-green-100 text-green-800' :
+                                detail.status === 'failed' ? 'bg-red-100 text-red-800' :
+                                'bg-yellow-100 text-yellow-800'
+                              }`}>
+                                {detail.status}
+                              </span>
+                            </td>
+                            <td className="px-4 py-2 text-gray-600">{detail.message || detail.error || '-'}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

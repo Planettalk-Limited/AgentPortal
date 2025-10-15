@@ -65,9 +65,9 @@ const DashboardHeader = ({ onToggleMobileMenu }: DashboardHeaderProps) => {
   }, [userDropdownOpen])
 
   return (
-    <header className="bg-white border-b border-gray-200 h-16 flex items-center px-6">
+    <header className="bg-white border-b border-gray-200 h-16 flex items-center px-6 w-full overflow-x-hidden">
       {/* Left side - Mobile hamburger menu */}
-      <div className="flex items-center">
+      <div className="flex items-center flex-shrink-0">
         {/* Mobile hamburger menu */}
         <button
           onClick={onToggleMobileMenu}
@@ -80,7 +80,7 @@ const DashboardHeader = ({ onToggleMobileMenu }: DashboardHeaderProps) => {
       </div>
 
       {/* Right side - User menu and Language selector */}
-      <div className="flex items-center space-x-4 ml-auto">
+      <div className="flex items-center space-x-4 ml-auto flex-shrink-0">
         <LanguageSelector />
         
         {/* User Dropdown */}

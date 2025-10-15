@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { api, User, UserQueryParams, ApiError } from '@/lib/api'
+import CountryPicker from '@/components/CountryPicker'
 
 // Helper function to get country display info
 const getCountryInfo = (countryCode: string) => {
@@ -78,10 +79,10 @@ export default function UsersPage() {
     firstName: '',
     lastName: '',
     email: '',
-    phoneNumber: '',
-    role: 'admin' as 'admin' | 'pt_admin',
+    country: '',
     password: ''
   })
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({})
 
   useEffect(() => {
     loadUsers()
@@ -222,8 +223,44 @@ export default function UsersPage() {
     return colors[role as keyof typeof colors] || 'bg-gray-100 text-gray-800 border-gray-200'
   }
 
+  const validateForm = () => {
+    const errors: Record<string, string> = {}
+    
+    if (newUserData.firstName.length > 100) {
+      errors.firstName = 'First name must be 100 characters or less'
+    }
+    
+    if (newUserData.lastName.length > 100) {
+      errors.lastName = 'Last name must be 100 characters or less'
+    }
+    
+    if (!newUserData.country || newUserData.country.length !== 2) {
+      errors.country = 'Please select a country'
+    }
+    
+    if (newUserData.username.length < 3 || newUserData.username.length > 50) {
+      errors.username = 'Username must be between 3 and 50 characters'
+    }
+    
+    if (newUserData.email.length > 255) {
+      errors.email = 'Email must be 255 characters or less'
+    }
+    
+    if (newUserData.password.length < 8) {
+      errors.password = 'Password must be at least 8 characters'
+    }
+    
+    setFormErrors(errors)
+    return Object.keys(errors).length === 0
+  }
+
   const handleAddUser = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    if (!validateForm()) {
+      return
+    }
+    
     try {
       setSaving(true)
       setError(null)
@@ -236,15 +273,15 @@ export default function UsersPage() {
         firstName: '',
         lastName: '',
         email: '',
-        phoneNumber: '',
-        role: 'admin',
+        country: '',
         password: ''
       })
+      setFormErrors({})
       setShowAddModal(false)
       
       // Refresh users
       await loadUsers()
-      setSuccess('User created successfully')
+      setSuccess('Admin user created successfully')
       setTimeout(() => setSuccess(null), 3000)
     } catch (error) {
       const apiError = error as ApiError
@@ -260,10 +297,34 @@ export default function UsersPage() {
   }
 
   const handleNewUserChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target
     setNewUserData(prev => ({
       ...prev,
-      [e.target.name]: e.target.value
+      [name]: value
     }))
+    // Clear error for this field
+    if (formErrors[name]) {
+      setFormErrors(prev => {
+        const newErrors = { ...prev }
+        delete newErrors[name]
+        return newErrors
+      })
+    }
+  }
+  
+  const handleCountryChange = (countryCode: string) => {
+    setNewUserData(prev => ({
+      ...prev,
+      country: countryCode
+    }))
+    // Clear error for country field
+    if (formErrors.country) {
+      setFormErrors(prev => {
+        const newErrors = { ...prev }
+        delete newErrors.country
+        return newErrors
+      })
+    }
   }
 
   const handlePageChange = (newPage: number) => {
@@ -689,132 +750,172 @@ export default function UsersPage() {
 
       {/* Add User Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-200">
-              <div className="flex items-center justify-between">
-                <h3 className="text-xl font-semibold text-pt-dark-gray">Add New Admin</h3>
-                <button
-                  onClick={() => setShowAddModal(false)}
-                  className="text-gray-400 hover:text-gray-600 transition-colors duration-200"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 overflow-y-auto">
+          <div className="min-h-screen flex items-center justify-center p-4 sm:p-6">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full my-8">
+            {/* Modal Header */}
+            <div className="relative bg-gradient-to-r from-purple-500 to-indigo-600 px-8 py-6 rounded-t-2xl">
+              <button
+                onClick={() => {
+                  setShowAddModal(false)
+                  setFormErrors({})
+                }}
+                className="absolute top-4 right-4 text-white/80 hover:text-white transition-colors duration-200"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+              <h2 className="text-2xl font-bold text-white">Create New Admin</h2>
+              <p className="text-purple-100 text-sm mt-1">Add a new administrator to the platform</p>
             </div>
             
-            <form onSubmit={handleAddUser} className="p-6 space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-pt-dark-gray mb-2">Username</label>
-                <input
-                  type="text"
-                  name="username"
-                  value={newUserData.username}
-                  onChange={handleNewUserChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pt-turquoise focus:border-pt-turquoise transition-colors duration-200"
-                  required
-                  minLength={3}
-                  maxLength={50}
-                  placeholder="e.g. john.doe"
-                />
-                <p className="text-xs text-pt-light-gray mt-1">3-50 characters, unique identifier</p>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
+            <form onSubmit={handleAddUser} className="p-8 space-y-6">
+              {/* Form Errors */}
+              {Object.keys(formErrors).length > 0 && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                  <div className="flex items-start">
+                    <svg className="w-5 h-5 text-red-600 mt-0.5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div className="flex-1">
+                      <h3 className="text-sm font-medium text-red-800 mb-1">Please fix the following errors:</h3>
+                      <ul className="text-sm text-red-700 space-y-1">
+                        {Object.values(formErrors).map((error, index) => (
+                          <li key={index}>• {error}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-pt-dark-gray mb-2">First Name</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">First Name *</label>
                   <input
                     type="text"
                     name="firstName"
                     value={newUserData.firstName}
                     onChange={handleNewUserChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pt-turquoise focus:border-pt-turquoise transition-colors duration-200"
+                    className={`w-full px-4 py-3 border ${formErrors.firstName ? 'border-red-300' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors duration-200`}
                     required
+                    maxLength={100}
+                    placeholder="John"
                   />
+                  <p className="text-xs text-gray-500 mt-1">Max 100 characters</p>
                 </div>
+                
                 <div>
-                  <label className="block text-sm font-medium text-pt-dark-gray mb-2">Last Name</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Last Name *</label>
                   <input
                     type="text"
                     name="lastName"
                     value={newUserData.lastName}
                     onChange={handleNewUserChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pt-turquoise focus:border-pt-turquoise transition-colors duration-200"
+                    className={`w-full px-4 py-3 border ${formErrors.lastName ? 'border-red-300' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors duration-200`}
                     required
+                    maxLength={100}
+                    placeholder="Doe"
                   />
+                  <p className="text-xs text-gray-500 mt-1">Max 100 characters</p>
                 </div>
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-pt-dark-gray mb-2">Email</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Username *</label>
+                <input
+                  type="text"
+                  name="username"
+                  value={newUserData.username}
+                  onChange={handleNewUserChange}
+                  className={`w-full px-4 py-3 border ${formErrors.username ? 'border-red-300' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors duration-200`}
+                  required
+                  minLength={3}
+                  maxLength={50}
+                  placeholder="john.doe"
+                />
+                <p className="text-xs text-gray-500 mt-1">3-50 characters, must be unique</p>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Email Address *</label>
                 <input
                   type="email"
                   name="email"
                   value={newUserData.email}
                   onChange={handleNewUserChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pt-turquoise focus:border-pt-turquoise transition-colors duration-200"
+                  className={`w-full px-4 py-3 border ${formErrors.email ? 'border-red-300' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors duration-200`}
+                  required
+                  maxLength={255}
+                  placeholder="john.doe@example.com"
+                />
+                <p className="text-xs text-gray-500 mt-1">Max 255 characters, must be unique</p>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Country *</label>
+                <CountryPicker
+                  value={newUserData.country}
+                  onChange={handleCountryChange}
+                  placeholder="Select country"
+                  error={formErrors.country}
                   required
                 />
+                <p className="text-xs text-gray-500 mt-1">ISO 3166-1 alpha-2 code (2 characters)</p>
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-pt-dark-gray mb-2">Phone Number</label>
-                <input
-                  type="tel"
-                  name="phoneNumber"
-                  value={newUserData.phoneNumber}
-                  onChange={handleNewUserChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pt-turquoise focus:border-pt-turquoise transition-colors duration-200"
-                  placeholder="+1 (555) 123-4567"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-pt-dark-gray mb-2">Role</label>
-                <select
-                  name="role"
-                  value={newUserData.role}
-                  onChange={handleNewUserChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pt-turquoise focus:border-pt-turquoise transition-colors duration-200"
-                >
-                  <option value="admin">Admin</option>
-                  <option value="pt_admin">PT Admin</option>
-                </select>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-pt-dark-gray mb-2">Password</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Password *</label>
                 <input
                   type="password"
                   name="password"
                   value={newUserData.password}
                   onChange={handleNewUserChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pt-turquoise focus:border-pt-turquoise transition-colors duration-200"
+                  className={`w-full px-4 py-3 border ${formErrors.password ? 'border-red-300' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors duration-200`}
                   required
                   minLength={8}
+                  placeholder="••••••••"
                 />
-                <p className="text-xs text-pt-light-gray mt-1">Must be at least 8 characters</p>
+                <p className="text-xs text-gray-500 mt-1">Minimum 8 characters</p>
               </div>
               
-              <div className="flex justify-end space-x-3 pt-4">
+              <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
                 <button
                   type="button"
-                  onClick={() => setShowAddModal(false)}
-                  className="px-4 py-2 border border-gray-300 text-pt-dark-gray rounded-lg font-medium hover:bg-gray-50 transition-colors duration-200"
+                  onClick={() => {
+                    setShowAddModal(false)
+                    setFormErrors({})
+                  }}
+                  className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors duration-200"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="bg-pt-turquoise text-white px-6 py-2 rounded-lg font-medium hover:bg-pt-turquoise-600 transition-colors duration-200 disabled:opacity-50"
+                  className="px-6 py-3 bg-gradient-to-r from-purple-500 to-indigo-600 text-white rounded-lg font-medium hover:from-purple-600 hover:to-indigo-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 >
-                  {saving ? 'Creating...' : 'Create Admin'}
+                  {saving ? (
+                    <>
+                      <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Creating...
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                      </svg>
+                      Create Admin
+                    </>
+                  )}
                 </button>
               </div>
             </form>
+            </div>
           </div>
         </div>
       )}

@@ -499,10 +499,13 @@ export interface CreatePayoutRequest {
   description?: string;
   paymentDetails: {
     bankAccount?: {
-      accountNumber: string;
-      routingNumber: string;
-      accountName: string;
       bankName: string;
+      branchNameOrCode: string;
+      accountName: string;
+      accountNumberOrIban: string;
+      swiftBicCode: string;
+      currency: string;
+      bankCountry: string;
     };
     planettalkCredit?: {
       planettalkMobile: string;
@@ -840,4 +843,48 @@ export interface AuditLogQueryParams extends PaginationParams {
   resource?: string;
   dateFrom?: string;
   dateTo?: string;
+}
+
+// Bulk Agent Data Upload Types
+export interface BulkAgentDataUploadRequest {
+  agentsData: Array<{
+    agentCode: string;
+    totalEarnings?: number;
+    earningsForCurrentMonth?: number;
+    totalReferrals?: number;
+    referralsForCurrentMonth?: number;
+    availableBalance?: number;
+    totalPayoutAmount?: number;
+    availableMonth?: string; // Format: "YYYY-MM"
+  }>;
+  batchDescription?: string;
+  autoUpdate?: boolean;
+  metadata?: Record<string, any>;
+}
+
+export interface BulkAgentDataUploadResponse {
+  totalProcessed: number;
+  successful: number;
+  failed: number;
+  skipped: number;
+  updatedAgents: string[];
+  details: Array<{
+    agentCode: string;
+    status: 'success' | 'failed' | 'skipped';
+    message?: string;
+    error?: string;
+    updatedFields?: string[];
+  }>;
+  errorSummary: {
+    invalidAgentCodes: string[];
+    validationErrors: string[];
+    otherErrors: string[];
+  };
+  batchInfo: {
+    batchId: string;
+    processedAt: string;
+    processingTimeMs: number;
+    uploadedBy: string;
+    description?: string;
+  };
 }
