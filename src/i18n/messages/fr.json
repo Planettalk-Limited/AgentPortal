@@ -185,7 +185,7 @@
   },
   "footer": {
     "agentPortal": "Portail Agent",
-    "description": "Autonomiser les agents de télécommunications dans le monde entier avec des outils de gestion complets et des analyses en temps réel pour développer leur entreprise efficacement.",
+    "description": "helping you connect and support your loved ones!",
     "downloadApp": "Télécharger l'App PlanetTalk",
     "sections": {
       "platform": "Plateforme",
@@ -622,7 +622,7 @@
     }
   },
   "dashboardFooter": {
-    "description": "Portail Agent - Autonomiser les télécommunications mondiales",
+    "description": "helping you connect and support your loved ones!",
     "support": "Support",
     "terms": "Conditions",
     "privacy": "Confidentialité"

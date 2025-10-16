@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useLocale, useTranslations } from 'next-intl'
 import PlanetTalkLogo from './PlanetTalkLogo'
-import { FaFacebook, FaInstagram, FaYoutube, FaLinkedin, FaTiktok } from 'react-icons/fa'
+import { FaFacebook, FaInstagram, FaYoutube, FaLinkedin, FaTiktok, FaWhatsapp } from 'react-icons/fa'
 
 const Footer = () => {
   const currentYear = new Date().getFullYear()
@@ -65,6 +65,11 @@ const Footer = () => {
   }
 
   const socialLinks = [
+    {
+      name: 'WhatsApp Channel',
+      href: 'https://www.whatsapp.com/channel/0029VbAgkQJJf05cXRvh8e3s',
+      icon: FaWhatsapp
+    },
     {
       name: 'Facebook',
       href: 'https://www.facebook.com/PlanetTalkUK',

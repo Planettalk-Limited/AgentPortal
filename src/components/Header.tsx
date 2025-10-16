@@ -72,13 +72,17 @@ const Header = () => {
         )
       }
 
-      baseItems.push({ href: createLocalizedPath('/profile'), label: t('profile'), external: false })
+      baseItems.push(
+        { href: createLocalizedPath('/profile'), label: t('profile'), external: false },
+        { href: 'https://www.whatsapp.com/channel/0029VbAgkQJJf05cXRvh8e3s', label: t('chatWithUs'), external: true, isWhatsApp: true }
+      )
       
       return baseItems
     } else {
       // Public navigation
       return [
         { href: 'https://planettalk.com', label: t('planettalkWebsite'), external: true },
+        { href: 'https://www.whatsapp.com/channel/0029VbAgkQJJf05cXRvh8e3s', label: t('chatWithUs'), external: true, isWhatsApp: true }
       ]
     }
   }

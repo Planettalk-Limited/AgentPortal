@@ -65,6 +65,170 @@ export default function MediaPage() {
     updatedAt: new Date().toISOString()
   }
 
+  // Static YouTube Training Videos
+  const trainingVideos: any[] = [
+    {
+      id: 'video-top-up-credit',
+      title: 'How to top up your PlanetTalk calling credit',
+      description: 'Learn how to easily add credit to your PlanetTalk account for international calls',
+      fileSize: 0,
+      mimeType: 'video/youtube',
+      type: 'video',
+      category: 'training',
+      visibility: 'public',
+      isFeatured: false,
+      isExternal: true,
+      isEmbedded: true,
+      externalUrl: 'https://youtube.com/shorts/zwiWrohtXAg',
+      embedUrl: 'https://www.youtube.com/embed/zwiWrohtXAg',
+      viewCount: 0,
+      downloadCount: 0,
+      tags: ['tutorial', 'top-up', 'credit', 'calling'],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: 'video-airtime-data',
+      title: 'How to Send Airtime and Data credit',
+      description: 'Send mobile airtime and data credit to loved ones across the world with PlanetTalk',
+      fileSize: 0,
+      mimeType: 'video/youtube',
+      type: 'video',
+      category: 'training',
+      visibility: 'public',
+      isFeatured: false,
+      isExternal: true,
+      isEmbedded: true,
+      externalUrl: 'https://youtube.com/shorts/v_IZ33bLLMk',
+      embedUrl: 'https://www.youtube.com/embed/v_IZ33bLLMk',
+      viewCount: 0,
+      downloadCount: 0,
+      tags: ['tutorial', 'airtime', 'data', 'mobile'],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: 'video-utility-bills',
+      title: 'Pay Utility Bills in few easy steps',
+      description: 'Learn how to pay utility bills for loved ones using the PlanetTalk app',
+      fileSize: 0,
+      mimeType: 'video/youtube',
+      type: 'video',
+      category: 'training',
+      visibility: 'public',
+      isFeatured: false,
+      isExternal: true,
+      isEmbedded: true,
+      externalUrl: 'https://youtube.com/shorts/kqRChnL7jhY',
+      embedUrl: 'https://www.youtube.com/embed/kqRChnL7jhY',
+      viewCount: 0,
+      downloadCount: 0,
+      tags: ['tutorial', 'utility', 'bills', 'payments'],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: 'video-app-overview',
+      title: 'PlanetTalk App Overview',
+      description: 'Pay bills, send top-up and data, and make low cost international calls with PlanetTalk',
+      fileSize: 0,
+      mimeType: 'video/youtube',
+      type: 'video',
+      category: 'training',
+      visibility: 'public',
+      isFeatured: false,
+      isExternal: true,
+      isEmbedded: true,
+      externalUrl: 'https://youtube.com/shorts/CRo9arhTob4',
+      embedUrl: 'https://www.youtube.com/embed/CRo9arhTob4',
+      viewCount: 0,
+      downloadCount: 0,
+      tags: ['overview', 'features', 'app'],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: 'video-add-payment-card',
+      title: 'How to Add Payment Card',
+      description: 'Step-by-step guide to adding your payment card on the PlanetTalk app',
+      fileSize: 0,
+      mimeType: 'video/youtube',
+      type: 'video',
+      category: 'training',
+      visibility: 'public',
+      isFeatured: false,
+      isExternal: true,
+      isEmbedded: true,
+      externalUrl: 'https://youtube.com/shorts/xUrT6Zq2W90',
+      embedUrl: 'https://www.youtube.com/embed/xUrT6Zq2W90',
+      viewCount: 0,
+      downloadCount: 0,
+      tags: ['tutorial', 'payment', 'card', 'setup'],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: 'video-auto-topup',
+      title: 'Enable and Disable Auto Top-up',
+      description: 'Learn how to manage auto top-up settings on the PlanetTalk App',
+      fileSize: 0,
+      mimeType: 'video/youtube',
+      type: 'video',
+      category: 'training',
+      visibility: 'public',
+      isFeatured: false,
+      isExternal: true,
+      isEmbedded: true,
+      externalUrl: 'https://youtube.com/shorts/OhhqjXuKsh0',
+      embedUrl: 'https://www.youtube.com/embed/OhhqjXuKsh0',
+      viewCount: 0,
+      downloadCount: 0,
+      tags: ['tutorial', 'auto-topup', 'settings'],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: 'video-call-rates',
+      title: 'Check Destination Call Rates',
+      description: 'Find out how to check international calling rates on the PlanetTalk App',
+      fileSize: 0,
+      mimeType: 'video/youtube',
+      type: 'video',
+      category: 'training',
+      visibility: 'public',
+      isFeatured: false,
+      isExternal: true,
+      isEmbedded: true,
+      externalUrl: 'https://youtube.com/shorts/dNF2nidlSpk',
+      embedUrl: 'https://www.youtube.com/embed/dNF2nidlSpk',
+      viewCount: 0,
+      downloadCount: 0,
+      tags: ['tutorial', 'rates', 'calling', 'pricing'],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: 'video-marketing-messages',
+      title: 'Manage Marketing Messages',
+      description: 'Learn how to opt in and opt out of marketing messages on PlanetTalk app',
+      fileSize: 0,
+      mimeType: 'video/youtube',
+      type: 'video',
+      category: 'training',
+      visibility: 'public',
+      isFeatured: false,
+      isExternal: true,
+      isEmbedded: true,
+      externalUrl: 'https://youtube.com/shorts/rxz0xifMvjo',
+      embedUrl: 'https://www.youtube.com/embed/rxz0xifMvjo',
+      viewCount: 0,
+      downloadCount: 0,
+      tags: ['tutorial', 'marketing', 'settings', 'preferences'],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    }
+  ]
+
   useEffect(() => {
     loadMediaData()
   }, [])
@@ -79,6 +243,8 @@ export default function MediaPage() {
       if (data) {
         // Add static terms PDF to termsAndConditions
         data.termsAndConditions = [staticTermsPDF, ...(data.termsAndConditions || [])]
+        // Add YouTube training videos to trainingMaterials
+        data.trainingMaterials = [...trainingVideos, ...(data.trainingMaterials || [])]
         setMediaData(data)
       } else {
         setError('No media data available')
@@ -103,6 +269,16 @@ export default function MediaPage() {
       return
     }
 
+    // For YouTube videos (static training videos)
+    if (resource.mimeType === 'video/youtube' && resource.isEmbedded) {
+      setPreviewModal({
+        isOpen: true,
+        resource: resource,
+        type: 'video'
+      })
+      return
+    }
+
     // Track access
     try {
       await api.agent.trackResourceAccess(resource.id)
@@ -123,8 +299,8 @@ export default function MediaPage() {
       previewType = 'document'
     }
 
-    // Handle external resources
-    if (resource.isExternal) {
+    // Handle external resources (non-embedded)
+    if (resource.isExternal && !resource.isEmbedded) {
       window.open(resource.externalUrl, '_blank')
       return
     }
@@ -180,6 +356,12 @@ export default function MediaPage() {
       return
     }
 
+    // For YouTube videos, open in new tab
+    if (resource.mimeType === 'video/youtube' && resource.externalUrl) {
+      window.open(resource.externalUrl, '_blank')
+      return
+    }
+
     try {
       const content = await api.agent.getResourceContent(resource.id)
 
@@ -219,8 +401,6 @@ export default function MediaPage() {
     
     if (selectedCategory === 'all') {
       resources = getAllResources()
-    } else if (selectedCategory === 'featured') {
-      resources = getAllResources().filter(r => r.isFeatured)
     } else {
       switch (selectedCategory) {
         case 'training':
@@ -262,6 +442,10 @@ export default function MediaPage() {
     if (resource.id === 'static-terms-pdf') {
       return '/terms-and-conditions.pdf'
     }
+    // For YouTube videos, use embedUrl
+    if (resource.mimeType === 'video/youtube' && resource.embedUrl) {
+      return resource.embedUrl
+    }
     // For API resources, the URL is already fetched and stored in contentUrl
     return resource.contentUrl || null
   }
@@ -302,15 +486,28 @@ export default function MediaPage() {
               <p className="text-gray-600 mt-0.5 line-clamp-1 text-xs sm:text-sm">{resource.description}</p>
             </div>
             <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-              <button
-                onClick={() => handleDownload(resource)}
-                className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                title="Download"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
-              </button>
+              {resource.mimeType === 'video/youtube' ? (
+                <button
+                  onClick={() => handleDownload(resource)}
+                  className="flex items-center gap-2 px-3 py-2 text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors text-sm font-medium"
+                  title="Watch on YouTube"
+                >
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                  </svg>
+                  <span className="hidden sm:inline">YouTube</span>
+                </button>
+              ) : (
+                <button
+                  onClick={() => handleDownload(resource)}
+                  className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                  title="Download"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                </button>
+              )}
               <button
                 onClick={() => setPreviewModal({ isOpen: false, resource: null, type: null })}
                 className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
@@ -345,12 +542,28 @@ export default function MediaPage() {
                 <img src={resourceUrl} alt={resource.title} className="max-w-full max-h-full object-contain" />
               </div>
             ) : previewModal.type === 'video' ? (
-              <div className="flex items-center justify-center h-full p-4 bg-black">
-                <video controls className="max-w-full max-h-full" autoPlay>
-                  <source src={resourceUrl} type={resource.mimeType} />
-                  Your browser does not support the video tag.
-                </video>
-              </div>
+              resource.mimeType === 'video/youtube' ? (
+                // YouTube embed
+                <div className="h-full w-full flex items-center justify-center bg-black p-4">
+                  <div className="w-full max-w-4xl aspect-video">
+                    <iframe
+                      src={resourceUrl}
+                      className="w-full h-full border-0 rounded-lg"
+                      title={resource.title}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  </div>
+                </div>
+              ) : (
+                // Regular video file
+                <div className="flex items-center justify-center h-full p-4 bg-black">
+                  <video controls className="max-w-full max-h-full" autoPlay>
+                    <source src={resourceUrl} type={resource.mimeType} />
+                    Your browser does not support the video tag.
+                  </video>
+                </div>
+              )
             ) : null}
           </div>
         </div>
@@ -372,7 +585,6 @@ export default function MediaPage() {
   const displayResources = getFilteredResources()
   const categories = [
     { key: 'all', label: t('categories.all'), icon: '📁', count: getAllResources().length },
-    { key: 'featured', label: t('categories.featured'), icon: '⭐', count: mediaData?.summary.featuredCount || 0 },
     { key: 'training', label: t('categories.training'), icon: '📚', count: mediaData?.trainingMaterials.length || 0 },
     { key: 'terms_conditions', label: t('categories.termsConditions'), icon: '📋', count: mediaData?.termsAndConditions.length || 0 },
     { key: 'bank_forms', label: t('categories.bankForms'), icon: '🏦', count: mediaData?.bankForms.length || 0 },
@@ -383,11 +595,11 @@ export default function MediaPage() {
   ]
 
   return (
-    <div className="w-full overflow-x-hidden">
+    <div className="w-full max-w-full overflow-x-hidden">
       {/* Compact Header */}
-      <div className="mb-3 w-full overflow-x-hidden">
+      <div className="mb-3 w-full max-w-full">
         {/* Title Bar */}
-        <div className="flex items-center mb-4">
+        <div className="flex items-center mb-4 w-full">
           <div className="w-10 h-10 bg-gradient-to-r from-pt-turquoise to-pt-turquoise-600 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm">
             <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 9a2 2 0 00-2 2v2a2 2 0 002 2m0 0h14" />
@@ -400,9 +612,9 @@ export default function MediaPage() {
       </div>
 
         {/* Category Tabs */}
-        <div className="relative w-full mb-4">
+        <div className="relative w-full mb-4 overflow-x-hidden">
           <div className="overflow-x-auto scrollbar-thin pb-2">
-            <div className="flex gap-2 min-w-max pr-4">
+            <div className="flex gap-2 min-w-0">
               {categories.map((category) => (
                   <button
                     key={category.key}
@@ -431,12 +643,12 @@ export default function MediaPage() {
 
         {/* Error Message */}
         {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-lg mb-3 flex items-center text-sm">
-          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-lg mb-3 flex items-center text-sm w-full max-w-full">
+          <svg className="w-4 h-4 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-          <span className="flex-1 truncate">{error}</span>
-          <button onClick={() => setError(null)} className="ml-2 text-red-500 hover:text-red-700">
+          <span className="flex-1 truncate min-w-0">{error}</span>
+          <button onClick={() => setError(null)} className="ml-2 text-red-500 hover:text-red-700 flex-shrink-0">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
@@ -445,7 +657,7 @@ export default function MediaPage() {
         )}
 
       {/* Resources Grid */}
-      <div className="w-full overflow-x-hidden">
+      <div className="w-full max-w-full overflow-x-hidden">
         {displayResources.length === 0 ? (
           <div className="bg-white rounded-lg p-8 text-center">
             <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
@@ -457,9 +669,9 @@ export default function MediaPage() {
             <p className="text-sm text-gray-500">Try selecting a different category</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 pb-6 w-full">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 pb-6 w-full max-w-full">
             {displayResources.map((resource) => (
-              <div key={resource.id} className="bg-white rounded-xl border border-gray-200 hover:border-pt-turquoise shadow-sm hover:shadow-lg transition-all duration-200 min-w-0 overflow-hidden group">
+              <div key={resource.id} className="bg-white rounded-xl border border-gray-200 hover:border-pt-turquoise shadow-sm hover:shadow-lg transition-all duration-200 w-full min-w-0 overflow-hidden group">
                 {/* Thumbnail/Icon */}
                 <div className="h-32 bg-gradient-to-br from-pt-turquoise/10 via-pt-turquoise/5 to-transparent flex items-center justify-center relative overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-br from-transparent to-pt-turquoise/5 group-hover:to-pt-turquoise/10 transition-all duration-200"></div>
@@ -474,21 +686,14 @@ export default function MediaPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     )}
                   </svg>
-                  {resource.isFeatured && (
-                    <div className="absolute top-3 right-3 z-10">
-                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-gradient-to-r from-yellow-400 to-yellow-500 text-yellow-900 shadow-md">
-                        ⭐ Featured
-                      </span>
-                    </div>
-                  )}
                 </div>
 
                 {/* Content */}
-                <div className="p-4 min-w-0">
-                  <h3 className="font-bold text-base text-gray-900 mb-2 truncate group-hover:text-pt-turquoise transition-colors">
+                <div className="p-4 w-full min-w-0">
+                  <h3 className="font-bold text-base text-gray-900 mb-2 truncate group-hover:text-pt-turquoise transition-colors w-full">
                               {resource.title}
                             </h3>
-                  <p className="text-gray-600 text-sm mb-3 line-clamp-2 break-words leading-relaxed">
+                  <p className="text-gray-600 text-sm mb-3 line-clamp-2 break-words leading-relaxed w-full overflow-hidden">
                     {resource.description}
                   </p>
                             
@@ -516,22 +721,35 @@ export default function MediaPage() {
                       onClick={() => handlePreview(resource)}
                       className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-pt-turquoise text-white rounded-lg hover:bg-pt-turquoise-600 text-sm font-semibold transition-colors shadow-sm hover:shadow"
                     >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                      </svg>
-                      View
+                      {resource.mimeType === 'video/youtube' ? (
+                        <>
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M8 5v14l11-7z"/>
+                          </svg>
+                          Watch
+                        </>
+                      ) : (
+                        <>
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                          </svg>
+                          View
+                        </>
+                      )}
                     </button>
-                            <button
-                      onClick={() => handleDownload(resource)}
-                      className="p-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-                      title="Download"
-                            >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                      </svg>
-                            </button>
-                          </div>
+                    {resource.mimeType !== 'video/youtube' && (
+                      <button
+                        onClick={() => handleDownload(resource)}
+                        className="p-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                        title="Download"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
                         </div>
                   </div>
             ))}

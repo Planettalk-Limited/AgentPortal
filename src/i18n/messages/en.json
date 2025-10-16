@@ -185,7 +185,7 @@
   },
   "footer": {
     "agentPortal": "Agent Portal",
-    "description": "Empowering telecommunications agents worldwide with comprehensive management tools and real-time analytics to grow their business efficiently.",
+    "description": "helping you connect and support your loved ones!",
     "downloadApp": "Download PlanetTalk App",
     "sections": {
       "platform": "Platform",
@@ -723,7 +723,7 @@
     }
   },
   "dashboardFooter": {
-    "description": "Agent Portal - Empowering global telecommunications",
+    "description": "helping you connect and support your loved ones!",
     "support": "Support",
     "terms": "Terms",
     "privacy": "Privacy"
