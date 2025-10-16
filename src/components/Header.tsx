@@ -9,6 +9,13 @@ import PlanetTalkLogo from './PlanetTalkLogo'
 import LanguageSelector from './LanguageSelector'
 import LanguageSelectorMobile from './LanguageSelectorMobile'
 
+interface NavItem {
+  href: string;
+  label: string;
+  external: boolean;
+  isWhatsApp?: boolean;
+}
+
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const { user, loading, logout } = useAuth()
@@ -56,10 +63,10 @@ const Header = () => {
   }
 
   // Navigation items based on authentication status
-  const getNavItems = () => {
+  const getNavItems = (): NavItem[] => {
     if (user) {
       // Authenticated user navigation
-      const baseItems = [
+      const baseItems: NavItem[] = [
         { href: createLocalizedPath('/dashboard'), label: t('dashboard'), external: false },
       ]
 
@@ -80,10 +87,11 @@ const Header = () => {
       return baseItems
     } else {
       // Public navigation
-      return [
+      const publicItems: NavItem[] = [
         { href: 'https://planettalk.com', label: t('planettalkWebsite'), external: true },
         { href: 'https://www.whatsapp.com/channel/0029VbAgkQJJf05cXRvh8e3s', label: t('chatWithUs'), external: true, isWhatsApp: true }
       ]
+      return publicItems
     }
   }
 
