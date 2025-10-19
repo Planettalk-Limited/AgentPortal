@@ -579,7 +579,9 @@
     "minutesAgo": "minutos atrás",
     "hoursAgo": "horas atrás",
     "yesterday": "Ontem",
-    "daysAgo": "dias atrás"
+    "daysAgo": "dias atrás",
+    "showMore": "Mostrar {count} mais",
+    "showLess": "Mostrar menos"
   },
   "media": {
     "title": "Mídia e Recursos",
@@ -836,5 +838,16 @@
       "description": "Se você tiver alguma dúvida sobre estes termos e condições, não hesite em nos contatar.",
       "email": "agent@planettalk.com"
     }
+  },
+  "whatsappGroup": {
+    "title": "Junte-se ao nosso grupo WhatsApp",
+    "description": "Conecte-se com outros agentes, receba atualizações exclusivas e obtenha suporte instantâneo!",
+    "benefitsTitle": "O que você receberá:",
+    "benefit1": "Atualizações instantâneas sobre novos recursos e promoções",
+    "benefit2": "Suporte direto de nossa equipe",
+    "benefit3": "Dicas e melhores práticas dos melhores agentes",
+    "joinNow": "Entrar no grupo",
+    "cancel": "Talvez mais tarde",
+    "dontShowAgain": "Não mostrar isso novamente"
   }
 }

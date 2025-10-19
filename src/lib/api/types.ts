@@ -866,25 +866,27 @@ export interface BulkAgentDataUploadResponse {
   totalProcessed: number;
   successful: number;
   failed: number;
-  skipped: number;
-  updatedAgents: string[];
+  skipped?: number;
+  updatedAgents?: string[];
   details: Array<{
     agentCode: string;
     status: 'success' | 'failed' | 'skipped';
     message?: string;
     error?: string;
     updatedFields?: string[];
+    amount?: number;
+    earningId?: string;
   }>;
-  errorSummary: {
-    invalidAgentCodes: string[];
-    validationErrors: string[];
-    otherErrors: string[];
+  errorSummary?: {
+    duplicateReferences?: string[];
+    invalidAgentCodes?: string[];
+    validationErrors?: string[];
+    otherErrors?: string[];
   };
-  batchInfo: {
-    batchId: string;
-    processedAt: string;
-    processingTimeMs: number;
-    uploadedBy: string;
-    description?: string;
-  };
+  batchId: string;
+  uploadedAt: string;
+  totalAmount?: number;
+  processingTimeMs?: number;
+  uploadedBy?: string;
+  description?: string;
 }

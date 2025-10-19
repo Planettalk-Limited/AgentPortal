@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import DashboardSidebar from './DashboardSidebar'
 import DashboardHeader from './DashboardHeader'
 import DashboardFooter from './DashboardFooter'
+import WhatsAppGroupModal from './WhatsAppGroupModal'
 
 interface AuthenticatedLayoutProps {
   children: React.ReactNode
@@ -13,7 +14,39 @@ interface AuthenticatedLayoutProps {
 const AuthenticatedLayout = ({ children }: AuthenticatedLayoutProps) => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [showWhatsAppModal, setShowWhatsAppModal] = useState(false)
   const { user, loading } = useAuth()
+
+  // Check if we should show the WhatsApp modal on login
+  useEffect(() => {
+    if (user && !loading) {
+      const dontShowAgain = localStorage.getItem('whatsapp_modal_dont_show')
+      const shownThisSession = sessionStorage.getItem('whatsapp_modal_shown')
+      
+      // Only show if user hasn't permanently dismissed it AND hasn't seen it this session
+      if (!dontShowAgain && !shownThisSession) {
+        // Small delay to let the dashboard load first
+        const timer = setTimeout(() => {
+          setShowWhatsAppModal(true)
+          // Mark as shown for this session
+          sessionStorage.setItem('whatsapp_modal_shown', 'true')
+        }, 1500)
+        return () => clearTimeout(timer)
+      }
+    }
+  }, [user, loading])
+
+  // Handle "don't show again"
+  const handleDontShowAgain = () => {
+    localStorage.setItem('whatsapp_modal_dont_show', 'true')
+    setShowWhatsAppModal(false)
+  }
+
+  // Handle regular close (just for this session)
+  const handleClose = () => {
+    sessionStorage.setItem('whatsapp_modal_shown', 'true')
+    setShowWhatsAppModal(false)
+  }
 
   // Close mobile menu when resizing to desktop
   useEffect(() => {
@@ -113,6 +146,14 @@ const AuthenticatedLayout = ({ children }: AuthenticatedLayoutProps) => {
         {/* Footer */}
         <DashboardFooter />
       </div>
+
+      {/* WhatsApp Group Modal - Shows on login */}
+      <WhatsAppGroupModal 
+        isOpen={showWhatsAppModal} 
+        onClose={handleClose}
+        showDontShowAgain={true}
+        onDontShowAgain={handleDontShowAgain}
+      />
     </div>
   )
 }

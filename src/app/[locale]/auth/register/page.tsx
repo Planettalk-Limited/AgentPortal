@@ -66,6 +66,7 @@ export default function RegisterPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [success, setSuccess] = useState(false)
   const [successMessage, setSuccessMessage] = useState('')
+  const [showTermsModal, setShowTermsModal] = useState(false)
   
   const { register, loading, error, clearError } = useAuth()
   const router = useRouter()
@@ -391,14 +392,13 @@ export default function RegisterPage() {
                 <span className="text-red-200 ml-1 sm:ml-2">*</span>
                 <p className="text-white/90 mt-1 sm:mt-2 text-sm sm:text-base md:text-lg">
                   I agree to the{' '}
-                  <a 
-                    href="/terms-and-conditions.pdf"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
+                    type="button"
+                    onClick={() => setShowTermsModal(true)}
                     className="text-white underline hover:text-gray-100 font-semibold decoration-2 underline-offset-2"
                   >
                     Agent Program Terms & Conditions
-                  </a>
+                  </button>
                 </p>
               </label>
             </div>
@@ -441,6 +441,53 @@ export default function RegisterPage() {
           </p>
         </div>
       </form>
+
+      {/* Terms & Conditions Modal - Full Screen */}
+      {showTermsModal && (
+        <div className="fixed inset-0 z-[9999] bg-white flex flex-col">
+          {/* Modal Header */}
+          <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 bg-white flex-shrink-0">
+            <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">Agent Program Terms & Conditions</h2>
+            <button
+              onClick={() => setShowTermsModal(false)}
+              className="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-100 rounded-lg"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Modal Content - PDF Viewer */}
+          <div className="flex-1 overflow-hidden bg-gray-100">
+            <iframe
+              src="/terms-and-conditions.pdf"
+              className="w-full h-full border-0"
+              title="Terms and Conditions"
+            />
+          </div>
+
+          {/* Modal Footer */}
+          <div className="flex items-center justify-between p-4 sm:p-6 border-t border-gray-200 bg-white flex-shrink-0">
+            <button
+              onClick={() => setShowTermsModal(false)}
+              className="px-4 py-2.5 sm:px-6 sm:py-3 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors"
+            >
+              Close
+            </button>
+            <a
+              href="/terms-and-conditions.pdf"
+              download
+              className="px-4 py-2.5 sm:px-6 sm:py-3 bg-pt-turquoise text-white rounded-lg font-medium hover:bg-pt-turquoise-600 transition-colors flex items-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              Download PDF
+            </a>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

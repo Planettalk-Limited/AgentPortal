@@ -8,16 +8,20 @@ import { useAuth } from '@/contexts/AuthContext'
 import PlanetTalkLogo from './PlanetTalkLogo'
 import LanguageSelector from './LanguageSelector'
 import LanguageSelectorMobile from './LanguageSelectorMobile'
+import WhatsAppGroupModal from './WhatsAppGroupModal'
 
 interface NavItem {
-  href: string;
+  href?: string;
   label: string;
-  external: boolean;
+  external?: boolean;
   isWhatsApp?: boolean;
+  isButton?: boolean;
+  onClick?: () => void;
 }
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [whatsappModalOpen, setWhatsappModalOpen] = useState(false)
   const { user, loading, logout } = useAuth()
   const router = useRouter()
   const pathname = usePathname()
@@ -80,16 +84,14 @@ const Header = () => {
       }
 
       baseItems.push(
-        { href: createLocalizedPath('/profile'), label: t('profile'), external: false },
-        { href: 'https://www.whatsapp.com/channel/0029VbAgkQJJf05cXRvh8e3s', label: t('chatWithUs'), external: true, isWhatsApp: true }
+        { href: createLocalizedPath('/profile'), label: t('profile'), external: false }
       )
       
       return baseItems
     } else {
       // Public navigation
       const publicItems: NavItem[] = [
-        { href: 'https://planettalk.com', label: t('planettalkWebsite'), external: true },
-        { href: 'https://www.whatsapp.com/channel/0029VbAgkQJJf05cXRvh8e3s', label: t('chatWithUs'), external: true, isWhatsApp: true }
+        { href: 'https://planettalk.com', label: t('planettalkWebsite'), external: true }
       ]
       return publicItems
     }
@@ -156,9 +158,19 @@ const Header = () => {
               <div className="lg:hidden flex flex-col min-h-screen h-full pt-24 px-6 pb-8 overflow-y-auto bg-white">
                 <div className="flex-1">
                   <ul className="space-y-6 mb-8">
-                    {navItems.map((item) => (
-                      <li key={item.href}>
-                        {item.external ? (
+                    {navItems.map((item, index) => (
+                      <li key={item.href || index}>
+                        {item.isButton ? (
+                          <button
+                            onClick={() => {
+                              item.onClick?.()
+                              setMobileMenuOpen(false)
+                            }}
+                            className="text-xl font-medium text-pt-dark-gray hover:text-pt-turquoise transition-colors duration-150 flex items-center"
+                          >
+                            {item.label}
+                          </button>
+                        ) : item.external ? (
                           <a
                             href={item.href}
                             target="_blank"
@@ -173,7 +185,7 @@ const Header = () => {
                           </a>
                         ) : (
                           <Link 
-                            href={item.href}
+                            href={item.href!}
                             className="text-xl font-medium text-pt-dark-gray hover:text-pt-turquoise transition-colors duration-150 flex items-center"
                             onClick={() => setMobileMenuOpen(false)}
                           >
@@ -229,9 +241,16 @@ const Header = () => {
 
             {/* Desktop navigation */}
             <ul className="hidden lg:flex lg:items-center lg:space-x-8">
-              {navItems.map((item) => (
-                <li key={item.href}>
-                  {item.external ? (
+              {navItems.map((item, index) => (
+                <li key={item.href || index}>
+                  {item.isButton ? (
+                    <button
+                      onClick={item.onClick}
+                      className="text-pt-dark-gray hover:text-pt-turquoise transition-colors duration-150 font-medium"
+                    >
+                      {item.label}
+                    </button>
+                  ) : item.external ? (
                     <a
                       href={item.href}
                       target="_blank"
@@ -245,7 +264,7 @@ const Header = () => {
                     </a>
                   ) : (
                     <Link 
-                      href={item.href}
+                      href={item.href!}
                       className="text-pt-dark-gray hover:text-pt-turquoise transition-colors duration-150 font-medium"
                     >
                       {item.label}
@@ -292,6 +311,12 @@ const Header = () => {
           </nav>
         </div>
       </div>
+
+      {/* WhatsApp Group Modal */}
+      <WhatsAppGroupModal 
+        isOpen={whatsappModalOpen} 
+        onClose={() => setWhatsappModalOpen(false)} 
+      />
     </header>
   )
 }

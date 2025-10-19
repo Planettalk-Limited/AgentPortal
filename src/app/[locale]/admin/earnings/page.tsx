@@ -1,47 +1,17 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { api, Earning } from '@/lib/api'
+import { api, Earning, BulkAgentDataUploadResponse } from '@/lib/api'
 import { formatCurrencyWithSymbol } from '@/lib/utils/currency'
 
 interface BulkUploadData {
   agentCode: string
-  amount: number
-  type: 'referral_commission' | 'bonus' | 'penalty' | 'adjustment' | 'promotion_bonus'
-  description: string
-  referenceId?: string
-  commissionRate?: number
-  earnedAt?: string
-  currency?: string
-}
-
-interface BulkUploadResult {
-  totalProcessed: number
-  successful: number
-  failed: number
-  skipped: number
-  totalAmount: number
-  updatedAgents: string[]
-  details: Array<{
-    agentCode: string
-    status: 'success' | 'failed' | 'skipped'
-    earningId?: string
-    amount: number
-    message?: string
-    error?: string
-  }>
-  errorSummary: {
-    invalidAgentCodes: string[]
-    duplicateReferences: string[]
-    validationErrors: string[]
-    otherErrors: string[]
-  }
-  batchInfo: {
-    batchId: string
-    processedAt: string
-    processingTimeMs: number
-    uploadedBy: string
-  }
+  totalEarnings: number
+  earningsForCurrentMonth: number
+  totalReferrals: number
+  referralsForCurrentMonth: number
+  availableBalance: number
+  totalPayoutAmount: number
 }
 
 // Helper function to derive earning type from description or metadata
@@ -78,7 +48,7 @@ export default function EarningsPage() {
   const [autoConfirm, setAutoConfirm] = useState(true)
   const [isUploading, setIsUploading] = useState(false)
   const [isExporting, setIsExporting] = useState(false)
-  const [lastUploadResult, setLastUploadResult] = useState<BulkUploadResult | null>(null)
+  const [lastUploadResult, setLastUploadResult] = useState<BulkAgentDataUploadResponse | null>(null)
   const [showResultsModal, setShowResultsModal] = useState(false)
   const [selectedEarnings, setSelectedEarnings] = useState<string[]>([])
   const [showBulkApproveModal, setShowBulkApproveModal] = useState(false)
@@ -178,85 +148,55 @@ export default function EarningsPage() {
       
       const text = await csvFile.text()
       const lines = text.split('\n').filter(line => line.trim())
-      const headers = lines[0].toLowerCase().split(',').map(h => h.trim())
-      
-      // Expected headers mapping
-      const headerMapping = {
-        'agent_code': 'agentCode',
-        'agentcode': 'agentCode',
-        'agent': 'agentCode',
-        'amount': 'amount',
-        'type': 'type',
-        'description': 'description',
-        'reference_id': 'referenceId',
-        'referenceid': 'referenceId',
-        'reference': 'referenceId',
-        'commission_rate': 'commissionRate',
-        'commissionrate': 'commissionRate',
-        'earned_at': 'earnedAt',
-        'earnedat': 'earnedAt',
-        'date': 'earnedAt',
-        'currency': 'currency'
-      }
+      const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/ /g, '_'))
       
       // Find required columns
-      const agentCodeIndex = headers.findIndex(h => ['agent_code', 'agentcode', 'agent'].includes(h))
-      const amountIndex = headers.findIndex(h => h === 'amount')
-      const typeIndex = headers.findIndex(h => h === 'type')
-      const descriptionIndex = headers.findIndex(h => h === 'description')
+      const agentCodeIndex = headers.findIndex(h => h.includes('agent'))
+      const totalEarningsIndex = headers.findIndex(h => h.includes('total') && h.includes('earning'))
+      const currentMonthEarningsIndex = headers.findIndex(h => h.includes('current') && h.includes('month') && h.includes('earning'))
+      const totalReferralsIndex = headers.findIndex(h => h.includes('total') && h.includes('referral'))
+      const currentMonthReferralsIndex = headers.findIndex(h => h.includes('current') && h.includes('month') && h.includes('referral'))
+      const availableBalanceIndex = headers.findIndex(h => h.includes('available') || h.includes('balance'))
+      const totalPayoutIndex = headers.findIndex(h => h.includes('payout'))
       
-      if (agentCodeIndex === -1 || amountIndex === -1 || typeIndex === -1 || descriptionIndex === -1) {
-        setError('CSV must contain columns: agent_code, amount, type, description')
+      if (agentCodeIndex === -1 || totalEarningsIndex === -1 || currentMonthEarningsIndex === -1) {
+        setError('CSV must contain columns: Agent Code, Total Earnings, Earnings for Current Month')
         return
       }
       
       // Parse CSV data
-      const earningsData: BulkUploadData[] = []
+      const agentsData: BulkUploadData[] = []
       
       for (let i = 1; i < lines.length; i++) {
         const columns = lines[i].split(',').map(col => col.trim())
-        if (columns.length < 4) continue
+        if (columns.length < 3) continue
         
-        const earning: BulkUploadData = {
+        const agentData: BulkUploadData = {
           agentCode: columns[agentCodeIndex],
-          amount: parseFloat(columns[amountIndex]) || 0,
-          type: columns[typeIndex] as any,
-          description: columns[descriptionIndex] || '',
-          currency: 'USD'
+          totalEarnings: parseFloat(columns[totalEarningsIndex]) || 0,
+          earningsForCurrentMonth: parseFloat(columns[currentMonthEarningsIndex]) || 0,
+          totalReferrals: totalReferralsIndex !== -1 ? parseInt(columns[totalReferralsIndex]) || 0 : 0,
+          referralsForCurrentMonth: currentMonthReferralsIndex !== -1 ? parseInt(columns[currentMonthReferralsIndex]) || 0 : 0,
+          availableBalance: availableBalanceIndex !== -1 ? parseFloat(columns[availableBalanceIndex]) || 0 : 0,
+          totalPayoutAmount: totalPayoutIndex !== -1 ? parseFloat(columns[totalPayoutIndex]) || 0 : 0
         }
         
-        // Add optional fields if present
-        const referenceIndex = headers.findIndex(h => ['reference_id', 'referenceid', 'reference'].includes(h))
-        if (referenceIndex !== -1 && columns[referenceIndex]) {
-          earning.referenceId = columns[referenceIndex]
-        }
-        
-        const commissionIndex = headers.findIndex(h => ['commission_rate', 'commissionrate'].includes(h))
-        if (commissionIndex !== -1 && columns[commissionIndex]) {
-          earning.commissionRate = parseFloat(columns[commissionIndex]) || undefined
-        }
-        
-        const dateIndex = headers.findIndex(h => ['earned_at', 'earnedat', 'date'].includes(h))
-        if (dateIndex !== -1 && columns[dateIndex]) {
-          earning.earnedAt = columns[dateIndex]
-        }
-        
-        earningsData.push(earning)
+        agentsData.push(agentData)
       }
       
-      if (earningsData.length === 0) {
-        setError('No valid earnings data found in CSV file')
+      if (agentsData.length === 0) {
+        setError('No valid agent data found in CSV file')
         return
       }
       
-      // Upload via API
-      const response = await api.admin.bulkUploadEarnings({
-        earnings: earningsData,
+      // Upload via new API endpoint
+      const response = await api.admin.bulkUploadAgentData({
+        agentsData: agentsData,
         batchDescription: batchDescription || `CSV Upload - ${new Date().toLocaleString()}`,
-        autoConfirm: autoConfirm,
+        autoUpdate: autoConfirm,
         metadata: {
-          uploadSource: 'Admin Panel CSV',
-          filename: csvFile.name
+          filename: csvFile.name,
+          uploadSource: 'Admin Panel'
         }
       })
       
@@ -365,11 +305,11 @@ export default function EarningsPage() {
 
   const downloadSampleCsv = () => {
     const sampleData = [
-      ['agent_code', 'amount', 'type', 'description', 'reference_id', 'commission_rate', 'earned_at'],
-      ['AG123456', '25.50', 'referral_commission', 'Commission for customer referral', 'TXN-12345', '10.5', '2025-01-15T10:30:00Z'],
-      ['AG789012', '50.00', 'bonus', 'Monthly performance bonus', 'BONUS-JAN-2025', '', '2025-01-15T10:30:00Z'],
-      ['AG345678', '15.75', 'referral_commission', 'Commission for mobile top-up referral', 'TXN-67890', '12.0', '2025-01-15T10:30:00Z'],
-      ['AG111213', '-5.00', 'penalty', 'Late submission penalty', 'PEN-2025-001', '', '2025-01-15T10:30:00Z']
+      ['Agent Code', 'Total Earnings', 'Earnings for Current Month', 'Total Referrals', 'Referrals for Current Month', 'Available Balance', 'Total Payout Amount'],
+      ['AGT21618', '125.50', '25.50', '45', '5', '100.00', '25.50'],
+      ['AGT92654', '250.00', '50.00', '80', '10', '200.00', '50.00'],
+      ['AGT33421', '175.75', '35.75', '60', '8', '150.00', '25.75'],
+      ['AGT88012', '95.25', '20.25', '30', '4', '80.00', '15.25']
     ]
     
     const csvContent = sampleData.map(row => row.join(',')).join('\n')
@@ -378,7 +318,7 @@ export default function EarningsPage() {
     const a = document.createElement('a')
     a.style.display = 'none'
     a.href = url
-    a.download = 'earnings_import_sample.csv'
+    a.download = 'agent_earnings_upload_sample.csv'
     document.body.appendChild(a)
     a.click()
     window.URL.revokeObjectURL(url)
@@ -389,31 +329,31 @@ export default function EarningsPage() {
     if (!lastUploadResult) return
     
     const reportData = [
-      ['Bulk Earnings Upload Report'],
+      ['Agent Earnings Bulk Upload Report'],
       ['Generated:', new Date().toLocaleString()],
-      ['Batch ID:', lastUploadResult.batchInfo.batchId],
+      ['Batch ID:', lastUploadResult.batchId],
+      ['Description:', lastUploadResult.description || 'N/A'],
       ['Total Processed:', lastUploadResult.totalProcessed.toString()],
       ['Successful:', lastUploadResult.successful.toString()],
       ['Failed:', lastUploadResult.failed.toString()],
-      ['Skipped:', lastUploadResult.skipped.toString()],
-      ['Total Amount:', lastUploadResult.totalAmount.toString()],
-      ['Processing Time (ms):', lastUploadResult.batchInfo.processingTimeMs.toString()],
+      ['Skipped:', (lastUploadResult.skipped || 0).toString()],
+      ['Updated Agents:', (lastUploadResult.updatedAgents?.length || 0).toString()],
+      ['Processing Time (ms):', (lastUploadResult.processingTimeMs || 0).toString()],
       [''],
       ['DETAILED RESULTS'],
-      ['Agent Code', 'Status', 'Amount', 'Earning ID', 'Message/Error']
+      ['Agent Code', 'Status', 'Updated Fields', 'Message/Error']
     ]
     
     lastUploadResult.details.forEach(detail => {
       reportData.push([
         detail.agentCode,
         detail.status,
-        detail.amount.toString(),
-        detail.earningId || '',
+        detail.updatedFields?.join(', ') || '',
         detail.message || detail.error || ''
       ])
     })
     
-    if (lastUploadResult.errorSummary.invalidAgentCodes.length > 0) {
+    if (lastUploadResult.errorSummary?.invalidAgentCodes && lastUploadResult.errorSummary.invalidAgentCodes.length > 0) {
       reportData.push([''])
       reportData.push(['INVALID AGENT CODES'])
       lastUploadResult.errorSummary.invalidAgentCodes.forEach(code => {
@@ -430,7 +370,7 @@ export default function EarningsPage() {
     const a = document.createElement('a')
     a.style.display = 'none'
     a.href = url
-    a.download = `earnings-upload-report-${lastUploadResult.batchInfo.batchId}.csv`
+    a.download = `earnings-upload-report-${lastUploadResult.batchId}.csv`
     document.body.appendChild(a)
     a.click()
     window.URL.revokeObjectURL(url)
@@ -952,7 +892,7 @@ export default function EarningsPage() {
           <div className="bg-white rounded-xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-pt-dark-gray">Bulk Upload Earnings</h2>
+              <h2 className="text-xl font-semibold text-pt-dark-gray">Bulk Upload Agent Earnings Data</h2>
                 <button
                   onClick={() => {
                   setShowBulkUpload(false)
@@ -973,36 +913,73 @@ export default function EarningsPage() {
               {/* CSV Format Guide */}
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <div className="flex items-start space-x-3">
-                  <svg className="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  <div className="flex-1">
-                    <h4 className="font-medium text-blue-900 mb-2">CSV Format Requirements</h4>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-medium text-blue-900 mb-3">CSV Format Requirements</h4>
                     <div className="text-sm text-blue-800 space-y-2">
-                      <p><strong>Required columns:</strong> agent_code, amount, type, description</p>
-                      <p><strong>Optional columns:</strong> reference_id, commission_rate, earned_at</p>
-                      <p><strong>Types:</strong> referral_commission, bonus, penalty, adjustment, promotion_bonus</p>
-                      <div className="bg-white rounded p-2 mt-2 font-mono text-xs">
-                        <div className="text-gray-600">Example:</div>
-                        <div>agent_code,amount,type,description</div>
-                        <div>AG123456,25.50,referral_commission,Customer referral</div>
-                        <div>AG789012,50.00,bonus,Performance bonus</div>
+                      <div>
+                        <p className="font-semibold mb-1">Required Columns:</p>
+                        <ul className="list-disc list-inside space-y-0.5 ml-2">
+                          <li>Agent Code</li>
+                          <li>Total Earnings</li>
+                          <li>Earnings for Current Month</li>
+                        </ul>
+                      </div>
+                      <div>
+                        <p className="font-semibold mb-1">Optional Columns:</p>
+                        <ul className="list-disc list-inside space-y-0.5 ml-2">
+                          <li>Total Referrals</li>
+                          <li>Referrals for Current Month</li>
+                          <li>Available Balance</li>
+                          <li>Total Payout Amount</li>
+                        </ul>
+                      </div>
+                      <div className="bg-white rounded p-3 mt-3">
+                        <p className="font-semibold text-gray-700 mb-2">Example Format:</p>
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-xs font-mono">
+                            <thead>
+                              <tr className="border-b border-gray-300">
+                                <th className="text-left py-1 px-2 whitespace-nowrap">Agent Code</th>
+                                <th className="text-left py-1 px-2 whitespace-nowrap">Total Earnings</th>
+                                <th className="text-left py-1 px-2 whitespace-nowrap">Current Month</th>
+                                <th className="text-left py-1 px-2 whitespace-nowrap">Total Refs</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr className="text-gray-700">
+                                <td className="py-1 px-2">AGT21618</td>
+                                <td className="py-1 px-2">125.50</td>
+                                <td className="py-1 px-2">25.50</td>
+                                <td className="py-1 px-2">45</td>
+                              </tr>
+                              <tr className="text-gray-700">
+                                <td className="py-1 px-2">AGT92654</td>
+                                <td className="py-1 px-2">250.00</td>
+                                <td className="py-1 px-2">50.00</td>
+                                <td className="py-1 px-2">80</td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
                       </div>
                     </div>
                     <div className="mt-3">
-                <button
+                      <button
                         onClick={downloadSampleCsv}
-                        className="inline-flex items-center px-3 py-1 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700 transition-colors duration-200"
-                >
-                        <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200"
+                      >
+                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
                         Download Sample CSV
-                </button>
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-        </div>
 
               {/* File Upload */}
               <div>
@@ -1041,7 +1018,7 @@ export default function EarningsPage() {
                 />
               </div>
               
-              {/* Auto Confirm - Prominent Default */}
+              {/* Auto Update - Prominent Default */}
               <div className={`border-2 rounded-lg p-4 transition-all ${
                 autoConfirm 
                   ? 'bg-green-50 border-green-300' 
@@ -1050,17 +1027,17 @@ export default function EarningsPage() {
                 <div className="flex items-start space-x-3">
                   <input
                     type="checkbox"
-                    id="auto-confirm"
+                    id="auto-update"
                     checked={autoConfirm}
                     onChange={(e) => setAutoConfirm(e.target.checked)}
                     className="mt-1 w-5 h-5 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 focus:ring-2"
                   />
                   <div className="flex-1">
-                    <label htmlFor="auto-confirm" className="flex items-center text-sm font-semibold text-gray-900 mb-2 cursor-pointer">
+                    <label htmlFor="auto-update" className="flex items-center text-sm font-semibold text-gray-900 mb-2 cursor-pointer">
                       <svg className="w-5 h-5 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
-                      Auto-Confirm Earnings & Update Balances
+                      Auto-Update Agent Data
                       <span className="ml-2 px-2 py-0.5 bg-green-600 text-white text-xs rounded-full font-bold">RECOMMENDED</span>
                     </label>
                     <div className={`text-sm space-y-2 ${autoConfirm ? 'text-green-800' : 'text-gray-600'}`}>
@@ -1068,10 +1045,10 @@ export default function EarningsPage() {
                         ✓ When enabled (default):
                       </p>
                       <ul className="ml-4 space-y-1">
-                        <li>• Earnings are immediately confirmed</li>
-                        <li>• Agent balances are automatically updated</li>
-                        <li>• Payouts can be processed right away</li>
-                        <li>• No manual approval required</li>
+                        <li>• Agent earnings and referrals are updated immediately</li>
+                        <li>• Balances are automatically calculated</li>
+                        <li>• Data is synced across all dashboards</li>
+                        <li>• No manual updates required</li>
                       </ul>
                       {!autoConfirm && (
                         <>
@@ -1079,9 +1056,9 @@ export default function EarningsPage() {
                             ⚠ When disabled:
                           </p>
                           <ul className="ml-4 space-y-1 text-yellow-700">
-                            <li>• Earnings created as "pending"</li>
-                            <li>• Balances NOT updated automatically</li>
-                            <li>• Requires manual approval for each earning</li>
+                            <li>• Data uploaded but NOT applied</li>
+                            <li>• Manual review and approval needed</li>
+                            <li>• Balances will not update</li>
                           </ul>
                         </>
                       )}
@@ -1098,7 +1075,7 @@ export default function EarningsPage() {
                 <div>
                   <h4 className="font-medium text-yellow-900 mb-1">Upload Warning</h4>
                   <p className="text-sm text-yellow-800">
-                    This will process all earnings in the CSV file. Make sure you have verified the file contents and agent codes before uploading.
+                    This will update agent data for all rows in the CSV file. Make sure you have verified the file contents and agent codes before uploading.
                   </p>
                 </div>
               </div>
@@ -1134,7 +1111,7 @@ export default function EarningsPage() {
                       <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
                       </svg>
-                      Upload Earnings
+                      Upload Agent Data
                     </>
                   )}
                 </button>
@@ -1247,7 +1224,7 @@ export default function EarningsPage() {
             <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full my-8">
               {/* Modal Header */}
               <div className={`relative px-8 py-6 rounded-t-2xl ${
-                lastUploadResult.failed > 0 || lastUploadResult.skipped > 0
+                lastUploadResult.failed > 0 || (lastUploadResult.skipped || 0) > 0
                   ? 'bg-gradient-to-r from-yellow-500 to-orange-500'
                   : 'bg-gradient-to-r from-green-500 to-green-600'
               }`}>
@@ -1260,7 +1237,7 @@ export default function EarningsPage() {
                   </svg>
                 </button>
                 <h2 className="text-2xl font-bold text-white">Bulk Upload Results</h2>
-                <p className="text-white/90 text-sm mt-1">Batch ID: {lastUploadResult.batchInfo.batchId}</p>
+                <p className="text-white/90 text-sm mt-1">Batch ID: {lastUploadResult.batchId}</p>
               </div>
 
               {/* Summary Stats */}
@@ -1279,18 +1256,20 @@ export default function EarningsPage() {
                     <div className="text-sm text-red-700 font-medium mt-1">Failed</div>
                   </div>
                   <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 text-center">
-                    <div className="text-3xl font-bold text-yellow-600">{lastUploadResult.skipped}</div>
+                    <div className="text-3xl font-bold text-yellow-600">{lastUploadResult.skipped || 0}</div>
                     <div className="text-sm text-yellow-700 font-medium mt-1">Skipped</div>
                   </div>
                 </div>
 
                 {/* Total Amount */}
-                <div className="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-xl p-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-purple-700">Total Amount Processed:</span>
-                    <span className="text-2xl font-bold text-purple-900">{formatCurrencyWithSymbol(lastUploadResult.totalAmount)}</span>
+                {lastUploadResult.totalAmount !== undefined && (
+                  <div className="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-xl p-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-purple-700">Total Amount Processed:</span>
+                      <span className="text-2xl font-bold text-purple-900">{formatCurrencyWithSymbol(lastUploadResult.totalAmount)}</span>
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {/* Batch Information */}
                 <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
@@ -1303,28 +1282,34 @@ export default function EarningsPage() {
                   <div className="grid grid-cols-2 gap-3 text-sm">
                     <div>
                       <span className="text-gray-500">Batch ID:</span>
-                      <p className="font-mono text-gray-900">{lastUploadResult.batchInfo.batchId}</p>
+                      <p className="font-mono text-gray-900">{lastUploadResult.batchId}</p>
                     </div>
                     <div>
-                      <span className="text-gray-500">Processed At:</span>
-                      <p className="text-gray-900">{new Date(lastUploadResult.batchInfo.processedAt).toLocaleString()}</p>
+                      <span className="text-gray-500">Uploaded At:</span>
+                      <p className="text-gray-900">{new Date(lastUploadResult.uploadedAt).toLocaleString()}</p>
                     </div>
-                    <div>
-                      <span className="text-gray-500">Processing Time:</span>
-                      <p className="text-gray-900">{lastUploadResult.batchInfo.processingTimeMs}ms</p>
-                    </div>
-                    <div>
-                      <span className="text-gray-500">Uploaded By:</span>
-                      <p className="text-gray-900">{lastUploadResult.batchInfo.uploadedBy}</p>
-                    </div>
+                    {lastUploadResult.processingTimeMs !== undefined && (
+                      <div>
+                        <span className="text-gray-500">Processing Time:</span>
+                        <p className="text-gray-900">{lastUploadResult.processingTimeMs}ms</p>
+                      </div>
+                    )}
+                    {lastUploadResult.uploadedBy && (
+                      <div>
+                        <span className="text-gray-500">Uploaded By:</span>
+                        <p className="text-gray-900">{lastUploadResult.uploadedBy}</p>
+                      </div>
+                    )}
                   </div>
                 </div>
 
                 {/* Error Summary */}
-                {(lastUploadResult.errorSummary.duplicateReferences.length > 0 || 
-                  lastUploadResult.errorSummary.invalidAgentCodes.length > 0 ||
-                  lastUploadResult.errorSummary.validationErrors.length > 0 ||
-                  lastUploadResult.errorSummary.otherErrors.length > 0) && (
+                {lastUploadResult.errorSummary && (
+                  (lastUploadResult.errorSummary.duplicateReferences?.length || 0) > 0 || 
+                  (lastUploadResult.errorSummary.invalidAgentCodes?.length || 0) > 0 ||
+                  (lastUploadResult.errorSummary.validationErrors?.length || 0) > 0 ||
+                  (lastUploadResult.errorSummary.otherErrors?.length || 0) > 0
+                ) && (
                   <div className="bg-red-50 border border-red-200 rounded-xl p-4">
                     <h3 className="font-semibold text-red-900 mb-3 flex items-center">
                       <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1333,7 +1318,7 @@ export default function EarningsPage() {
                       Error Summary
                     </h3>
                     <div className="space-y-3 text-sm">
-                      {lastUploadResult.errorSummary.duplicateReferences.length > 0 && (
+                      {lastUploadResult.errorSummary?.duplicateReferences && lastUploadResult.errorSummary.duplicateReferences.length > 0 && (
                         <div>
                           <p className="font-medium text-red-900 mb-1">Duplicate Reference IDs ({lastUploadResult.errorSummary.duplicateReferences.length}):</p>
                           <div className="bg-white rounded p-2 max-h-24 overflow-y-auto">
@@ -1347,7 +1332,7 @@ export default function EarningsPage() {
                           </div>
                         </div>
                       )}
-                      {lastUploadResult.errorSummary.invalidAgentCodes.length > 0 && (
+                      {lastUploadResult.errorSummary?.invalidAgentCodes && lastUploadResult.errorSummary.invalidAgentCodes.length > 0 && (
                         <div>
                           <p className="font-medium text-red-900 mb-1">Invalid Agent Codes ({lastUploadResult.errorSummary.invalidAgentCodes.length}):</p>
                           <div className="bg-white rounded p-2 max-h-24 overflow-y-auto">
@@ -1361,7 +1346,7 @@ export default function EarningsPage() {
                           </div>
                         </div>
                       )}
-                      {lastUploadResult.errorSummary.validationErrors.length > 0 && (
+                      {lastUploadResult.errorSummary?.validationErrors && lastUploadResult.errorSummary.validationErrors.length > 0 && (
                         <div>
                           <p className="font-medium text-red-900 mb-1">Validation Errors:</p>
                           <ul className="bg-white rounded p-2 space-y-1 text-red-700">
@@ -1371,7 +1356,7 @@ export default function EarningsPage() {
                           </ul>
                         </div>
                       )}
-                      {lastUploadResult.errorSummary.otherErrors.length > 0 && (
+                      {lastUploadResult.errorSummary?.otherErrors && lastUploadResult.errorSummary.otherErrors.length > 0 && (
                         <div>
                           <p className="font-medium text-red-900 mb-1">Other Errors:</p>
                           <ul className="bg-white rounded p-2 space-y-1 text-red-700">
@@ -1400,8 +1385,8 @@ export default function EarningsPage() {
                       <thead className="bg-gray-50 sticky top-0">
                         <tr className="border-b border-gray-200">
                           <th className="px-4 py-3 text-left font-semibold text-gray-700">Agent Code</th>
-                          <th className="px-4 py-3 text-left font-semibold text-gray-700">Amount</th>
                           <th className="px-4 py-3 text-left font-semibold text-gray-700">Status</th>
+                          <th className="px-4 py-3 text-left font-semibold text-gray-700">Updated Fields</th>
                           <th className="px-4 py-3 text-left font-semibold text-gray-700">Details</th>
                         </tr>
                       </thead>
@@ -1409,7 +1394,6 @@ export default function EarningsPage() {
                         {lastUploadResult.details.map((detail, idx) => (
                           <tr key={idx} className="border-b border-gray-100 hover:bg-gray-50">
                             <td className="px-4 py-3 font-mono text-gray-900">{detail.agentCode}</td>
-                            <td className="px-4 py-3 font-semibold">{formatCurrencyWithSymbol(detail.amount)}</td>
                             <td className="px-4 py-3">
                               <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${
                                 detail.status === 'success' 
@@ -1421,6 +1405,19 @@ export default function EarningsPage() {
                                 {detail.status === 'success' ? '✓ Success' : detail.status === 'failed' ? '✗ Failed' : '⊘ Skipped'}
                               </span>
                             </td>
+                            <td className="px-4 py-3 text-sm text-gray-600">
+                              {detail.updatedFields && detail.updatedFields.length > 0 ? (
+                                <div className="flex flex-wrap gap-1">
+                                  {detail.updatedFields.map((field, fieldIdx) => (
+                                    <span key={fieldIdx} className="inline-block px-2 py-0.5 bg-blue-100 text-blue-800 rounded text-xs">
+                                      {field}
+                                    </span>
+                                  ))}
+                                </div>
+                              ) : (
+                                <span className="text-gray-400">—</span>
+                              )}
+                            </td>
                             <td className="px-4 py-3 text-gray-600">
                               {detail.error && (
                                 <span className="text-red-600">{detail.error}</span>
@@ -1429,7 +1426,7 @@ export default function EarningsPage() {
                                 <span className="text-gray-600">{detail.message}</span>
                               )}
                               {detail.earningId && (
-                                <span className="text-green-600 text-xs">ID: {detail.earningId}</span>
+                                <div className="text-green-600 text-xs mt-1">ID: {detail.earningId}</div>
                               )}
                             </td>
                           </tr>

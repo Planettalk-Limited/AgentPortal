@@ -421,9 +421,6 @@ export default function MediaPage() {
         case 'announcements':
           resources = mediaData.announcements || []
           break
-        case 'media':
-          resources = mediaData.media || []
-          break
       }
     }
 
@@ -590,8 +587,7 @@ export default function MediaPage() {
     { key: 'bank_forms', label: t('categories.bankForms'), icon: '🏦', count: mediaData?.bankForms.length || 0 },
     { key: 'announcements', label: t('categories.announcements'), icon: '📢', count: mediaData?.announcements.length || 0 },
     { key: 'marketing', label: t('categories.marketing'), icon: '📈', count: mediaData?.marketing.length || 0 },
-    { key: 'compliance', label: t('categories.compliance'), icon: '✅', count: mediaData?.compliance.length || 0 },
-    { key: 'media', label: t('categories.media'), icon: '🎬', count: mediaData?.media.length || 0 }
+    { key: 'compliance', label: t('categories.compliance'), icon: '✅', count: mediaData?.compliance.length || 0 }
   ]
 
   return (
@@ -699,21 +695,24 @@ export default function MediaPage() {
                             
                   {/* Meta Info */}
                   <div className="flex items-center gap-3 text-xs text-gray-500 mb-4 pb-3 border-b border-gray-100">
-                              <span className="flex items-center gap-1">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
-                      <span className="font-medium">{resource.viewCount || 0}</span>
-                              </span>
+                    {/* Only show view count for non-YouTube videos */}
+                    {resource.mimeType !== 'video/youtube' && (
+                      <span className="flex items-center gap-1">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        <span className="font-medium">{resource.viewCount || 0}</span>
+                      </span>
+                    )}
                     {resource.fileSize > 0 && (
-                                <span className="flex items-center gap-1">
+                      <span className="flex items-center gap-1">
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                                  </svg>
-                                  <span className="font-medium">{formatFileSize(resource.fileSize)}</span>
-                                </span>
-                              )}
-                            </div>
+                        </svg>
+                        <span className="font-medium">{formatFileSize(resource.fileSize)}</span>
+                      </span>
+                    )}
+                  </div>
 
                   {/* Actions */}
                   <div className="flex gap-2">
