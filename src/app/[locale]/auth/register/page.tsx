@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useTranslations, useLocale } from 'next-intl'
@@ -68,12 +68,20 @@ export default function RegisterPage() {
   const [successMessage, setSuccessMessage] = useState('')
   const [showTermsModal, setShowTermsModal] = useState(false)
   const [downloadStatus, setDownloadStatus] = useState<'idle' | 'downloading' | 'downloaded'>('idle')
+  const [isIOS, setIsIOS] = useState(false)
   
   const { register, loading, error, clearError } = useAuth()
   const router = useRouter()
   const locale = useLocale()
   const t = useTranslations('auth.register')
   const tTerms = useTranslations('termsPage')
+  
+  // Detect iOS
+  useEffect(() => {
+    const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+    setIsIOS(iOS)
+  }, [])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -460,15 +468,87 @@ export default function RegisterPage() {
             </button>
           </div>
 
-          {/* Modal Content - PDF Viewer - Scrollable */}
-          <div className="flex-1 overflow-auto bg-gray-100 p-2 sm:p-4" style={{ WebkitOverflowScrolling: 'touch' }}>
-            <div className="min-h-full max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
-              <iframe
-                src="/terms-and-conditions.pdf#view=FitH"
-                className="w-full min-h-[800px] sm:min-h-[1000px] lg:min-h-[1200px] border-0"
-                title="Terms and Conditions"
-              />
-            </div>
+          {/* Modal Content - PDF Viewer - iOS Safari Compatible */}
+          <div className="flex-1 overflow-auto bg-gray-100 flex items-center justify-center p-4 sm:p-6" style={{ WebkitOverflowScrolling: 'touch' }}>
+            {isIOS ? (
+              /* iOS Safari - Show instructions to open PDF */
+              <div className="max-w-md mx-auto bg-white shadow-xl rounded-2xl p-6 sm:p-8 text-center">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 bg-pt-turquoise-100 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
+                  <svg className="w-8 h-8 sm:w-10 sm:h-10 text-pt-turquoise" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3">{tTerms('viewTitle')}</h3>
+                <p className="text-gray-600 mb-6">{tTerms('viewMessage')}</p>
+                
+                <div className="space-y-3">
+                  {/* Open in Safari */}
+                  <a
+                    href="/terms-and-conditions.pdf"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-pt-turquoise text-white rounded-lg font-medium hover:bg-pt-turquoise-600 transition-colors"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                    {tTerms('openInSafari')}
+                  </a>
+                  
+                  {/* Download Button */}
+                  <a
+                    href="/terms-and-conditions.pdf"
+                    download
+                    onClick={() => {
+                      setDownloadStatus('downloading')
+                      setTimeout(() => {
+                        setDownloadStatus('downloaded')
+                        setTimeout(() => setDownloadStatus('idle'), 2000)
+                      }, 500)
+                    }}
+                    className={`w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-medium transition-all ${
+                      downloadStatus === 'downloaded' 
+                        ? 'bg-green-500 text-white hover:bg-green-600' 
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    {downloadStatus === 'downloading' ? (
+                      <>
+                        <svg className="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                        {tTerms('downloading')}
+                      </>
+                    ) : downloadStatus === 'downloaded' ? (
+                      <>
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        {tTerms('downloaded')}
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                        {tTerms('download')}
+                      </>
+                    )}
+                  </a>
+                </div>
+              </div>
+            ) : (
+              /* Desktop - Use iframe */
+              <div className="w-full h-full p-2 sm:p-4">
+                <div className="max-w-4xl mx-auto h-full bg-white shadow-lg rounded-lg overflow-hidden">
+                  <iframe
+                    src="/terms-and-conditions.pdf#view=FitH"
+                    className="w-full h-full min-h-[800px]"
+                    title="Terms and Conditions"
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Modal Footer */}

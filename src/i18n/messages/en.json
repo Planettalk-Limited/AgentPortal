@@ -894,6 +894,9 @@
     "downloading": "Downloading...",
     "downloaded": "Downloaded!",
     "close": "Close",
+    "openInSafari": "Open PDF in Safari",
+    "viewTitle": "View Terms & Conditions",
+    "viewMessage": "To read the full Terms & Conditions on your iPhone, please open or download the PDF.",
     "fallback": {
       "noSupport": "Your browser does not support viewing PDFs inline.",
       "pleaseDownload": "Please download the PDF to view it."

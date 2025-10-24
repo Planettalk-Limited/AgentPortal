@@ -840,6 +840,9 @@
     "downloading": "Téléchargement...",
     "downloaded": "Téléchargé !",
     "close": "Fermer",
+    "openInSafari": "Ouvrir le PDF dans Safari",
+    "viewTitle": "Voir les Conditions Générales",
+    "viewMessage": "Pour lire les Conditions Générales complètes sur votre iPhone, veuillez ouvrir ou télécharger le PDF.",
     "fallback": {
       "noSupport": "Votre navigateur ne prend pas en charge l'affichage des PDF en ligne.",
       "pleaseDownload": "Veuillez télécharger le PDF pour le consulter."
