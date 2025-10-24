@@ -460,12 +460,12 @@ export default function RegisterPage() {
             </button>
           </div>
 
-          {/* Modal Content - PDF Viewer - Centered on Mobile */}
-          <div className="flex-1 overflow-auto bg-gray-100 flex items-center justify-center p-2 sm:p-4">
-            <div className="w-full h-full max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
+          {/* Modal Content - PDF Viewer - Scrollable */}
+          <div className="flex-1 overflow-auto bg-gray-100 p-2 sm:p-4" style={{ WebkitOverflowScrolling: 'touch' }}>
+            <div className="min-h-full max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
               <iframe
                 src="/terms-and-conditions.pdf#view=FitH"
-                className="w-full h-full border-0"
+                className="w-full min-h-[800px] sm:min-h-[1000px] lg:min-h-[1200px] border-0"
                 title="Terms and Conditions"
               />
             </div>
