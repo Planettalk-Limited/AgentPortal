@@ -267,14 +267,14 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="bg-gradient-to-br from-gray-50 via-white to-gray-50 -m-4 sm:-m-6">
+    <div className="bg-gray-50 pb-4 sm:pb-6">
       {/* Hero Header - Clean with rounded edges */}
-      <div className="px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6">
+      <div className="px-4 sm:px-6 lg:px-8 pt-3 sm:pt-4">
         <div className="relative bg-gradient-to-r from-pt-turquoise to-pt-turquoise-600 rounded-2xl sm:rounded-3xl overflow-hidden max-w-7xl mx-auto">
           <div className="absolute inset-0 bg-black opacity-5"></div>
           <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent"></div>
           
-          <div className="relative px-4 sm:px-6 lg:px-8 py-5 sm:py-6 lg:py-8 pb-16 sm:pb-20 lg:pb-24">
+          <div className="relative px-4 sm:px-6 lg:px-8 py-4 sm:py-5 lg:py-6 pb-8 sm:pb-10 lg:pb-12">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 sm:gap-6">
               {/* Left side - User info */}
               <div className="flex items-center gap-3 sm:gap-4">
@@ -284,41 +284,17 @@ export default function DashboardPage() {
                   </span>
                 </div>
                 <div className="min-w-0">
-                  <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-1.5 sm:mb-2">
+                  <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white">
                     {t('welcomeBack', { name: user?.firstName || 'Agent' })}
                   </h1>
-                  {/* Agent Code */}
-                  <div className="flex items-center gap-2">
-                    <span className="text-pt-turquoise-100 text-xs sm:text-sm">Code:</span>
-                    <div className="flex items-center gap-1.5 bg-white/15 backdrop-blur-sm px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-lg border border-white/20">
-                      <span className="font-mono font-bold text-white text-sm sm:text-base tracking-wider">{agent.agentCode}</span>
-                      <button
-                        onClick={async () => {
-                          try {
-                            await navigator.clipboard.writeText(agent.agentCode)
-                            setSuccessMessage('Agent code copied!')
-                            setTimeout(() => setSuccessMessage(null), 2000)
-                          } catch (err) {
-                            setError('Failed to copy code')
-                          }
-                        }}
-                        className="text-white hover:text-pt-turquoise-100 transition-colors p-1 hover:bg-white/20 rounded"
-                        title="Copy"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
                 </div>
               </div>
 
               {/* Right side - Stats */}
               <div className="flex items-center gap-4 sm:gap-6 lg:gap-8">
                 <div className="text-center">
-                  <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">{parseFloat(String(agent.commissionRate || '0'))}%</div>
-                  <div className="text-pt-turquoise-100 text-xs sm:text-sm whitespace-nowrap mt-1">Commission</div>
+                  <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">{parseFloat(String(agent.commissionRate || '10'))}%</div>
+                  <div className="text-pt-turquoise-100 text-xs sm:text-sm whitespace-nowrap mt-1">{t('commissionRate')}</div>
                 </div>
                 <div className="w-px h-12 sm:h-14 lg:h-16 bg-white/30"></div>
                 <div className="text-center">
@@ -332,72 +308,64 @@ export default function DashboardPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Key Metrics - Clean horizontal cards on mobile */}
-        <div className="space-y-3 sm:space-y-4 lg:grid lg:grid-cols-4 lg:gap-6 lg:space-y-0 mb-8 sm:mb-10 lg:mb-12 -mt-12 sm:-mt-16 lg:-mt-20 relative z-10">
+        {/* Key Metrics - 2-column grid on mobile, 4 columns on desktop */}
+        <div className="grid grid-cols-2 gap-2.5 sm:gap-3 lg:grid-cols-4 lg:gap-4 transform -translate-y-6 sm:-translate-y-8 lg:-translate-y-10 relative z-10">
           {/* Total Earnings */}
-          <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-5 lg:p-6 shadow-lg border border-gray-100">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3 sm:gap-4">
-                <div className="p-2.5 sm:p-3 bg-gradient-to-br from-green-400 to-green-600 rounded-xl">
-                  <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <div>
-                  <div className="text-xs sm:text-sm text-gray-500 mb-0.5">{t('totalEarnings')}</div>
-                  <div className="text-xl sm:text-2xl font-bold text-gray-900">{formatCurrencyWithSymbol(agent.totalEarnings)}</div>
-                </div>
+          <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 lg:p-6 shadow-lg border border-gray-100">
+            <div className="flex flex-col lg:flex-row lg:items-center gap-2 lg:gap-4">
+              <div className="p-2 sm:p-2.5 lg:p-3 bg-gradient-to-br from-green-400 to-green-600 rounded-lg lg:rounded-xl w-fit">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <div className="text-xs text-gray-500 mb-0.5">{t('totalEarnings')}</div>
+                <div className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">{formatCurrencyWithSymbol(agent.totalEarnings)}</div>
               </div>
             </div>
           </div>
 
           {/* This Month Earnings */}
-          <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-5 lg:p-6 shadow-lg border border-gray-100">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3 sm:gap-4">
-                <div className="p-2.5 sm:p-3 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl">
-                  <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                </div>
-                <div>
-                  <div className="text-xs sm:text-sm text-gray-500 mb-0.5">{t('thisMonth')}</div>
-                  <div className="text-xl sm:text-2xl font-bold text-gray-900">{formatCurrencyWithSymbol(agent.earningsThisMonth || 0)}</div>
-                </div>
+          <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 lg:p-6 shadow-lg border border-gray-100">
+            <div className="flex flex-col lg:flex-row lg:items-center gap-2 lg:gap-4">
+              <div className="p-2 sm:p-2.5 lg:p-3 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg lg:rounded-xl w-fit">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <div className="text-xs text-gray-500 mb-0.5">{t('thisMonth')}</div>
+                <div className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">{formatCurrencyWithSymbol(agent.earningsThisMonth || 0)}</div>
               </div>
             </div>
           </div>
           
           {/* Total Referrals */}
-          <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-5 lg:p-6 shadow-lg border border-gray-100">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3 sm:gap-4">
-                <div className="p-2.5 sm:p-3 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl">
-                  <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                  </svg>
-                </div>
-                <div>
-                  <div className="text-xs sm:text-sm text-gray-500 mb-0.5">{t('referrals')}</div>
-                  <div className="text-xl sm:text-2xl font-bold text-gray-900">{agent.totalReferrals || 0}</div>
-                </div>
+          <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 lg:p-6 shadow-lg border border-gray-100">
+            <div className="flex flex-col lg:flex-row lg:items-center gap-2 lg:gap-4">
+              <div className="p-2 sm:p-2.5 lg:p-3 bg-gradient-to-br from-orange-400 to-orange-600 rounded-lg lg:rounded-xl w-fit">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <div className="text-xs text-gray-500 mb-0.5">{t('referrals')}</div>
+                <div className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">{agent.totalReferrals || 0}</div>
               </div>
             </div>
           </div>
 
           {/* Referrals This Month */}
-          <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-5 lg:p-6 shadow-lg border border-gray-100">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3 sm:gap-4">
-                <div className="p-2.5 sm:p-3 bg-gradient-to-br from-purple-400 to-purple-600 rounded-xl">
-                  <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
-                  </svg>
-                </div>
-                <div>
-                  <div className="text-xs sm:text-sm text-gray-500 mb-0.5">{t('thisMonth')}</div>
-                  <div className="text-xl sm:text-2xl font-bold text-gray-900">{agent.referralsThisMonth || 0}</div>
-                </div>
+          <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 lg:p-6 shadow-lg border border-gray-100">
+            <div className="flex flex-col lg:flex-row lg:items-center gap-2 lg:gap-4">
+              <div className="p-2 sm:p-2.5 lg:p-3 bg-gradient-to-br from-purple-400 to-purple-600 rounded-lg lg:rounded-xl w-fit">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <div className="text-xs text-gray-500 mb-0.5">{t('thisMonth')}</div>
+                <div className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">{agent.referralsThisMonth || 0}</div>
               </div>
             </div>
           </div>
@@ -405,16 +373,51 @@ export default function DashboardPage() {
         </div>
         
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-5">
           {/* Share & Earn Section */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg sm:shadow-xl border border-gray-100 overflow-hidden">
-              <div className="bg-gradient-to-r from-pt-turquoise to-pt-turquoise-600 px-4 py-4 sm:px-6 sm:py-5 lg:px-8 lg:py-6">
+              <div className="bg-gradient-to-r from-pt-turquoise to-pt-turquoise-600 px-4 py-3 sm:px-5 sm:py-4 lg:px-6 lg:py-5">
                 <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-white mb-1 sm:mb-2">{t('shareAndEarnHeader')}</h2>
                 <p className="text-pt-turquoise-100 text-sm sm:text-base">{t('shareAgentCodeEarn')}</p>
               </div>
 
-              <div className="p-4 sm:p-6 lg:p-8">
+              <div className="p-3 sm:p-4 lg:p-5">
+                {/* Agent Code Display - Prominent */}
+                <div className="mb-4">
+                  <label className="block text-xs sm:text-sm font-semibold text-gray-600 mb-2 uppercase tracking-wide">
+                    {t('yourAgentCode')}
+                  </label>
+                  <div className="flex items-center gap-3 bg-gradient-to-r from-gray-50 to-gray-100 p-3 sm:p-4 rounded-xl border-2 border-gray-200">
+                    <div className="flex-1">
+                      <span className="font-mono font-bold text-gray-900 text-xl sm:text-2xl lg:text-3xl tracking-wider block">
+                        {agent.agentCode}
+                      </span>
+                      <span className="text-xs sm:text-sm text-gray-500 mt-1 block">
+                        {t('earnCommission', { rate: parseFloat(String(agent.commissionRate || '10')) })}
+                      </span>
+                    </div>
+                    <button
+                      onClick={async () => {
+                        try {
+                          await navigator.clipboard.writeText(agent.agentCode)
+                          setSuccessMessage(t('agentCodeCopied'))
+                          setTimeout(() => setSuccessMessage(null), 2000)
+                        } catch (err) {
+                          setError(t('failedToCopyCode'))
+                        }
+                      }}
+                      className="flex-shrink-0 bg-pt-turquoise hover:bg-pt-turquoise-600 text-white px-4 sm:px-6 py-3 sm:py-4 rounded-lg transition-colors font-semibold shadow-lg hover:shadow-xl flex items-center gap-2"
+                      title={t('copyCode')}
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
+                      <span className="hidden sm:inline">{t('copyCode')}</span>
+                    </button>
+                  </div>
+                </div>
+
                 {/* Social Media Sharing */}
                 <SocialShareButton 
                   code={agent.agentCode}
@@ -426,15 +429,15 @@ export default function DashboardPage() {
           </div>
           
           {/* Payout Section */}
-          <div className="space-y-4 sm:space-y-6 lg:space-y-8">
+          <div className="space-y-3 sm:space-y-4 lg:space-y-5">
             {/* Payout Card */}
             <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg sm:shadow-xl border border-gray-100 overflow-hidden">
               <div className="bg-gradient-to-r from-green-500 to-green-600 px-4 py-3 sm:px-6 sm:py-4">
                 <h3 className="text-base sm:text-lg lg:text-xl font-bold text-white">{t('requestPayout')}</h3>
               </div>
               
-              <div className="p-4 sm:p-5 lg:p-6">
-                <div className="text-center mb-4 sm:mb-6">
+              <div className="p-3 sm:p-4 lg:p-5">
+                <div className="text-center mb-3 sm:mb-4">
                   <div className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">
                     {formatCurrencyWithSymbol(agent.availableBalance)}
                   </div>
@@ -573,10 +576,10 @@ export default function DashboardPage() {
         </div>
         
         {/* Recent Activity */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 mt-6 sm:mt-8 lg:mt-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 lg:gap-5 mt-3 sm:mt-4 lg:mt-5">
           {/* Recent Earnings */}
           <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg sm:shadow-xl border border-gray-100 overflow-hidden">
-            <div className="bg-gradient-to-r from-green-50 to-green-100 px-4 py-3 sm:px-6 sm:py-4 border-b">
+            <div className="bg-gradient-to-r from-green-50 to-green-100 px-3 py-2.5 sm:px-4 sm:py-3 border-b">
               <h3 className="text-base sm:text-lg font-semibold text-green-800 flex items-center">
                 <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -585,27 +588,42 @@ export default function DashboardPage() {
               </h3>
             </div>
             
-            <div className="p-4 sm:p-5 lg:p-6">
+            <div className="p-3 sm:p-4 lg:p-5">
               {earnings.length > 0 ? (
-                <div className="space-y-2.5 sm:space-y-3">
-                  {earnings.slice(0, 5).map((earning, index) => (
-                    <div key={index} className="flex justify-between items-center p-3 sm:p-4 bg-gray-50 rounded-lg sm:rounded-xl hover:bg-gray-100 transition-colors">
-                      <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
-                        <div className="w-9 h-9 sm:w-10 sm:h-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                          <svg className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
+                <div className="grid grid-cols-2 gap-2 sm:gap-2.5 md:flex md:flex-col">
+                  {earnings.slice(0, 6).map((earning, index) => (
+                    <div key={index} className="flex flex-col md:flex-row md:justify-between md:items-center p-3 sm:p-4 bg-gray-50 rounded-lg sm:rounded-xl hover:bg-gray-100 transition-colors">
+                      {/* Mobile: Vertical Card Layout */}
+                      <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-3 md:min-w-0 md:flex-1">
+                        <div className="flex items-center gap-2 md:gap-3">
+                          <div className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                            <svg className="w-4 h-4 sm:w-4 sm:h-4 md:w-5 md:h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                          </div>
+                          {/* Amount on mobile - top right */}
+                          <p className="text-sm sm:text-base md:text-lg font-bold text-green-600 md:hidden ml-auto">
+                            {formatCurrencyWithSymbol(earning.amount)}
+                          </p>
                         </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="font-medium text-gray-900 text-sm sm:text-base truncate">
+                        <div className="min-w-0 flex-1 mt-1 md:mt-0">
+                          <p className="font-medium text-gray-900 text-xs sm:text-sm md:text-base truncate leading-tight">
                             {earning.description || t('commissionEarned')}
                           </p>
-                          <p className="text-xs sm:text-sm text-gray-500">
+                          <p className="text-xs text-gray-500 mt-0.5">
                             {formatHumanDate(earning.createdAt || new Date().toISOString())}
                           </p>
+                          <span className={`inline-flex px-1.5 py-0.5 text-xs font-semibold rounded-full mt-1 ${
+                            earning.status === 'confirmed' 
+                              ? 'bg-green-100 text-green-800' 
+                              : 'bg-yellow-100 text-yellow-800'
+                          }`}>
+                            {earning.status === 'confirmed' ? t('confirmed') : t('pending')}
+                          </span>
                         </div>
                       </div>
-                      <div className="text-right flex-shrink-0 ml-2">
+                      {/* Desktop: Amount & Status on Right */}
+                      <div className="hidden md:block text-right flex-shrink-0 ml-2">
                         <p className="text-base sm:text-lg font-bold text-green-600">
                           {formatCurrencyWithSymbol(earning.amount)}
                         </p>
@@ -636,7 +654,7 @@ export default function DashboardPage() {
           
           {/* Recent Payouts */}
           <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg sm:shadow-xl border border-gray-100 overflow-hidden">
-            <div className="bg-gradient-to-r from-blue-50 to-blue-100 px-4 py-3 sm:px-6 sm:py-4 border-b">
+            <div className="bg-gradient-to-r from-blue-50 to-blue-100 px-3 py-2.5 sm:px-4 sm:py-3 border-b">
               <h3 className="text-base sm:text-lg font-semibold text-blue-800 flex items-center">
                 <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
@@ -645,31 +663,42 @@ export default function DashboardPage() {
               </h3>
             </div>
             
-            <div className="p-4 sm:p-5 lg:p-6">
+            <div className="p-3 sm:p-4 lg:p-5">
               {payouts.length > 0 ? (
-                <div className="space-y-2.5 sm:space-y-3">
-                  {payouts.slice(0, 5).map((payout, index) => {
+                <div className="grid grid-cols-2 gap-2 sm:gap-2.5 md:flex md:flex-col">
+                  {payouts.slice(0, 6).map((payout, index) => {
                     const statusInfo = getPayoutStatusInfo(payout.status || 'pending')
                     return (
-                      <div key={index} className="flex justify-between items-center p-3 sm:p-4 bg-gray-50 rounded-lg sm:rounded-xl hover:bg-gray-100 transition-colors">
-                        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
-                          <div className="w-9 h-9 sm:w-10 sm:h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                            <svg className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                            </svg>
+                      <div key={index} className="flex flex-col md:flex-row md:justify-between md:items-center p-3 sm:p-4 bg-gray-50 rounded-lg sm:rounded-xl hover:bg-gray-100 transition-colors">
+                        {/* Mobile: Vertical Card Layout */}
+                        <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-3 md:min-w-0 md:flex-1">
+                          <div className="flex items-center gap-2 md:gap-3">
+                            <div className="w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                              <svg className="w-4 h-4 sm:w-4 sm:h-4 md:w-5 md:h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                              </svg>
+                            </div>
+                            {/* Amount on mobile - top right */}
+                            <p className="text-sm sm:text-base md:text-lg font-bold text-blue-600 md:hidden ml-auto">
+                              {formatCurrencyWithSymbol(payout.amount)}
+                            </p>
                           </div>
-                          <div className="min-w-0 flex-1">
-                            <p className="font-medium text-gray-900 text-sm sm:text-base truncate">
+                          <div className="min-w-0 flex-1 mt-1 md:mt-0">
+                            <p className="font-medium text-gray-900 text-xs sm:text-sm md:text-base truncate leading-tight">
                               {payout.method === 'bank_transfer' ? t('bankTransfer') : 
                                payout.method === 'planettalk_credit' ? t('planettalkCredit') || 'PlanetTalk Credit' :
                                payout.method || t('bankTransfer')}
                             </p>
-                            <p className="text-xs sm:text-sm text-gray-500">
+                            <p className="text-xs text-gray-500 mt-0.5">
                               {formatHumanDate(payout.createdAt || new Date().toISOString())}
                             </p>
+                            <span className={`inline-flex px-1.5 py-0.5 text-xs font-semibold rounded-full mt-1 ${statusInfo.bgColor} ${statusInfo.textColor}`}>
+                              {statusInfo.label}
+                            </span>
                           </div>
                         </div>
-                        <div className="text-right flex-shrink-0 ml-2">
+                        {/* Desktop: Amount & Status on Right */}
+                        <div className="hidden md:block text-right flex-shrink-0 ml-2">
                           <p className="text-base sm:text-lg font-bold text-blue-600">
                             {formatCurrencyWithSymbol(payout.amount)}
                           </p>
@@ -706,9 +735,9 @@ export default function DashboardPage() {
         isLoading={payoutLoading}
       />
       
-      {/* Success/Error Messages - Mobile Optimized */}
+      {/* Success/Error Messages - Mobile Optimized - iOS Safe */}
       {successMessage && (
-        <div className="fixed top-4 left-4 right-4 sm:left-auto sm:right-4 bg-green-500 text-white px-4 py-3 sm:px-6 sm:py-4 rounded-xl shadow-2xl z-[9999] sm:max-w-md">
+        <div className="fixed top-4 left-4 right-4 sm:left-auto sm:right-4 bg-green-500 text-white px-4 py-3 sm:px-6 sm:py-4 rounded-xl shadow-2xl z-[9999] sm:max-w-md will-change-transform transform translate-z-0">
           <div className="flex items-center">
             <div className="w-5 h-5 sm:w-6 sm:h-6 bg-white/20 rounded-full flex items-center justify-center mr-2 sm:mr-3 flex-shrink-0">
               <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -729,7 +758,7 @@ export default function DashboardPage() {
       )}
       
       {error && (
-        <div className="fixed top-4 left-4 right-4 sm:left-auto sm:right-4 bg-red-500 text-white px-4 py-3 sm:px-6 sm:py-4 rounded-xl shadow-2xl z-[9999] sm:max-w-md">
+        <div className="fixed top-4 left-4 right-4 sm:left-auto sm:right-4 bg-red-500 text-white px-4 py-3 sm:px-6 sm:py-4 rounded-xl shadow-2xl z-[9999] sm:max-w-md will-change-transform transform translate-z-0">
           <div className="flex items-center">
             <div className="w-5 h-5 sm:w-6 sm:h-6 bg-white/20 rounded-full flex items-center justify-center mr-2 sm:mr-3 flex-shrink-0">
               <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

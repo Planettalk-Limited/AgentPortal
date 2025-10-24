@@ -4,7 +4,7 @@
  */
 
 export const PAYOUT_CONSTANTS = {
-  MINIMUM_AMOUNT: 3,
+  MINIMUM_AMOUNT: 20,
   CURRENCY: 'USD'
 } as const
 

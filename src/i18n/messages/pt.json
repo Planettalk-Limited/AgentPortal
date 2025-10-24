@@ -564,6 +564,7 @@
     "shareAndEarnHeader": "Compartilhe e Ganhe Comissões",
     "shareAgentCodeEarn": "Compartilhe seu código de agente e ganhe em cada recarga de cliente",
     "agentCodeCopied": "Código de agente copiado para a área de transferência!",
+    "failedToCopyCode": "Falha ao copiar código",
     "allTime": "Todo o tempo",
     "loadingDashboard": "Carregando seu painel...",
     "unableToLoad": "Não é Possível Carregar o Painel",
@@ -829,6 +830,9 @@
       "format": "Formato PDF"
     },
     "download": "Baixar PDF",
+    "downloading": "Baixando...",
+    "downloaded": "Baixado!",
+    "close": "Fechar",
     "fallback": {
       "noSupport": "Seu navegador não suporta visualização de PDF inline.",
       "pleaseDownload": "Por favor, baixe o PDF para visualizá-lo."

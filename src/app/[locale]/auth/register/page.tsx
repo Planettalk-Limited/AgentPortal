@@ -67,11 +67,13 @@ export default function RegisterPage() {
   const [success, setSuccess] = useState(false)
   const [successMessage, setSuccessMessage] = useState('')
   const [showTermsModal, setShowTermsModal] = useState(false)
+  const [downloadStatus, setDownloadStatus] = useState<'idle' | 'downloading' | 'downloaded'>('idle')
   
   const { register, loading, error, clearError } = useAuth()
   const router = useRouter()
   const locale = useLocale()
   const t = useTranslations('auth.register')
+  const tTerms = useTranslations('termsPage')
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -444,46 +446,77 @@ export default function RegisterPage() {
 
       {/* Terms & Conditions Modal - Full Screen */}
       {showTermsModal && (
-        <div className="fixed inset-0 z-[9999] bg-white flex flex-col">
+        <div className="fixed inset-0 z-[9999] bg-white flex flex-col safe-area-inset">
           {/* Modal Header */}
-          <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 bg-white flex-shrink-0">
-            <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">Agent Program Terms & Conditions</h2>
+          <div className="flex items-center justify-between p-3 sm:p-4 lg:p-6 border-b border-gray-200 bg-white flex-shrink-0">
+            <h2 className="text-sm sm:text-base lg:text-lg font-bold text-gray-900 pr-2 leading-tight">Agent Program Terms & Conditions</h2>
             <button
               onClick={() => setShowTermsModal(false)}
-              className="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-100 rounded-lg"
+              className="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-100 rounded-lg flex-shrink-0"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           </div>
 
-          {/* Modal Content - PDF Viewer */}
-          <div className="flex-1 overflow-hidden bg-gray-100">
-            <iframe
-              src="/terms-and-conditions.pdf"
-              className="w-full h-full border-0"
-              title="Terms and Conditions"
-            />
+          {/* Modal Content - PDF Viewer - Centered on Mobile */}
+          <div className="flex-1 overflow-auto bg-gray-100 flex items-center justify-center p-2 sm:p-4">
+            <div className="w-full h-full max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
+              <iframe
+                src="/terms-and-conditions.pdf#view=FitH"
+                className="w-full h-full border-0"
+                title="Terms and Conditions"
+              />
+            </div>
           </div>
 
           {/* Modal Footer */}
-          <div className="flex items-center justify-between p-4 sm:p-6 border-t border-gray-200 bg-white flex-shrink-0">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 sm:gap-4 p-3 sm:p-4 lg:p-6 border-t border-gray-200 bg-white flex-shrink-0">
             <button
               onClick={() => setShowTermsModal(false)}
-              className="px-4 py-2.5 sm:px-6 sm:py-3 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors"
+              className="w-full sm:w-auto px-4 py-2.5 sm:px-6 sm:py-3 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors text-center"
             >
-              Close
+              {tTerms('close')}
             </button>
             <a
               href="/terms-and-conditions.pdf"
               download
-              className="px-4 py-2.5 sm:px-6 sm:py-3 bg-pt-turquoise text-white rounded-lg font-medium hover:bg-pt-turquoise-600 transition-colors flex items-center gap-2"
+              onClick={() => {
+                setDownloadStatus('downloading')
+                setTimeout(() => {
+                  setDownloadStatus('downloaded')
+                  setTimeout(() => setDownloadStatus('idle'), 2000)
+                }, 500)
+              }}
+              className={`w-full sm:w-auto px-4 py-2.5 sm:px-6 sm:py-3 rounded-lg font-medium transition-all flex items-center justify-center gap-2 ${
+                downloadStatus === 'downloaded' 
+                  ? 'bg-green-500 text-white hover:bg-green-600' 
+                  : 'bg-pt-turquoise text-white hover:bg-pt-turquoise-600'
+              }`}
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-              </svg>
-              Download PDF
+              {downloadStatus === 'downloading' ? (
+                <>
+                  <svg className="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  {tTerms('downloading')}
+                </>
+              ) : downloadStatus === 'downloaded' ? (
+                <>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  {tTerms('downloaded')}
+                </>
+              ) : (
+                <>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                  {tTerms('download')}
+                </>
+              )}
             </a>
           </div>
         </div>

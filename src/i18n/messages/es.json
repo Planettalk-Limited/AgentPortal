@@ -567,6 +567,7 @@
     "shareAndEarnHeader": "Comparte y Gana Comisiones",
     "shareAgentCodeEarn": "Comparte tu código de agente y gana en cada recarga de cliente",
     "agentCodeCopied": "¡Código de agente copiado al portapapeles!",
+    "failedToCopyCode": "Error al copiar código",
     "allTime": "Todo el tiempo",
     "loadingDashboard": "Cargando tu panel...",
     "unableToLoad": "No se Puede Cargar el Panel",
@@ -791,6 +792,9 @@
       "format": "Formato PDF"
     },
     "download": "Descargar PDF",
+    "downloading": "Descargando...",
+    "downloaded": "¡Descargado!",
+    "close": "Cerrar",
     "fallback": {
       "noSupport": "Su navegador no admite la visualización de PDF en línea.",
       "pleaseDownload": "Por favor descargue el PDF para verlo."

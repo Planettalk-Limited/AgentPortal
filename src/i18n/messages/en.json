@@ -667,6 +667,7 @@
     "shareAndEarnHeader": "Share & Earn Commissions",
     "shareAgentCodeEarn": "Share your agent code and earn on every customer top-up",
     "agentCodeCopied": "Agent code copied to clipboard!",
+    "failedToCopyCode": "Failed to copy code",
     "allTime": "All time",
     "loadingDashboard": "Loading your dashboard...",
     "unableToLoad": "Unable to Load Dashboard",
@@ -890,6 +891,9 @@
       "format": "PDF Format"
     },
     "download": "Download PDF",
+    "downloading": "Downloading...",
+    "downloaded": "Downloaded!",
+    "close": "Close",
     "fallback": {
       "noSupport": "Your browser does not support viewing PDFs inline.",
       "pleaseDownload": "Please download the PDF to view it."

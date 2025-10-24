@@ -565,6 +565,7 @@
     "shareAndEarnHeader": "Partagez et Gagnez des Commissions",
     "shareAgentCodeEarn": "Partagez votre code d'agent et gagnez sur chaque recharge client",
     "agentCodeCopied": "Code d'agent copié dans le presse-papiers !",
+    "failedToCopyCode": "Échec de la copie du code",
     "allTime": "Tout le temps",
     "loadingDashboard": "Chargement de votre tableau de bord...",
     "unableToLoad": "Impossible de Charger le Tableau de Bord",
@@ -836,6 +837,9 @@
       "format": "Format PDF"
     },
     "download": "Télécharger le PDF",
+    "downloading": "Téléchargement...",
+    "downloaded": "Téléchargé !",
+    "close": "Fermer",
     "fallback": {
       "noSupport": "Votre navigateur ne prend pas en charge l'affichage des PDF en ligne.",
       "pleaseDownload": "Veuillez télécharger le PDF pour le consulter."
