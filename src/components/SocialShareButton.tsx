@@ -131,16 +131,6 @@ export default function SocialShareButton({
       iconSize: 'w-4 h-4'
     },
     {
-      onClick: copyToClipboard,
-      bgColor: 'bg-indigo-50 hover:bg-indigo-100',
-      borderColor: 'border-indigo-100',
-      iconBg: 'bg-indigo-600 hover:bg-indigo-700',
-      textColor: 'text-indigo-700',
-      label: 'Copy',
-      icon: <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>,
-      iconSize: 'w-4 h-4'
-    },
-    {
       onClick: shareOnTwitter,
       bgColor: 'bg-gray-50 hover:bg-gray-100',
       borderColor: 'border-gray-100',

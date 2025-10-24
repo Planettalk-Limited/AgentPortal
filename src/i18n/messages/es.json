@@ -22,7 +22,8 @@
     "administration": "Administración",
     "chatWithUs": "Chatea con Nosotros",
     "support": "Soporte",
-    "media": "Medios y Recursos"
+    "media": "Medios y Recursos",
+    "joinOurChannel": "Únete a Nuestro Canal"
   },
   "hero": {
     "badge": "Portal de Agentes En Vivo",
@@ -512,6 +513,8 @@
     "getSupportDescription": "Asistencia 24/7 para todas tus preguntas",
     "commissionRate": "Tasa de Comisión",
     "currentMonth": "Este Mes",
+    "earningsThisMonth": "Ganancias Este Mes",
+    "referralsThisMonth": "Referencias Este Mes",
     "totalReferrals": "Referencias Totales",
     "shareAndEarn": "Comparte y Gana Comisiones",
     "shareDescription": "Comparte la app PlanetTalk con tu código de agente para ganar comisiones cuando los clientes lo usen al registrarse",

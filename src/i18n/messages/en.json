@@ -22,7 +22,8 @@
     "administration": "Administration",
     "chatWithUs": "Chat with Us",
     "support": "Support",
-    "media": "Media & Resources"
+    "media": "Media & Resources",
+    "joinOurChannel": "Join Our Channel"
   },
   "hero": {
     "badge": "Agent Portal Live",
@@ -614,6 +615,8 @@
     "getSupportDescription": "24/7 assistance for all your questions",
     "commissionRate": "Commission Rate",
     "currentMonth": "This Month",
+    "earningsThisMonth": "Earnings This Month",
+    "referralsThisMonth": "Referrals This Month",
     "shareAndEarn": "Share & Earn Commissions", 
     "shareDescription": "Share the PlanetTalk app with your agent code to earn commissions when customers use it during signup",
     "yourAgentCode": "YOUR AGENT CODE",

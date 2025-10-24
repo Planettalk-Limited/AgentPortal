@@ -22,7 +22,8 @@
     "administration": "Administration",
     "chatWithUs": "Chattez avec Nous",
     "support": "Support",
-    "media": "Médias et Ressources"
+    "media": "Médias et Ressources",
+    "joinOurChannel": "Rejoignez Notre Canal"
   },
   "hero": {
     "badge": "Portail Agent En Direct",
@@ -510,6 +511,8 @@
     "getSupportDescription": "Assistance 24/7 pour toutes vos questions",
     "commissionRate": "Taux de Commission",
     "currentMonth": "Ce Mois",
+    "earningsThisMonth": "Gains Ce Mois",
+    "referralsThisMonth": "Parrainages Ce Mois",
     "totalReferrals": "Parrainages Totaux",
     "shareAndEarn": "Partagez et Gagnez des Commissions",
     "shareDescription": "Partagez l'app PlanetTalk avec votre code d'agent pour gagner des commissions quand les clients l'utilisent lors de l'inscription",

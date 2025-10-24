@@ -107,7 +107,7 @@ const AuthenticatedLayout = ({ children }: AuthenticatedLayoutProps) => {
         />
       )}
       
-      {/* Desktop Sidebar */}
+      {/* Desktop Sidebar - Stretches full page height */}
       <div className="hidden lg:block">
         <DashboardSidebar 
           collapsed={sidebarCollapsed} 
@@ -130,7 +130,9 @@ const AuthenticatedLayout = ({ children }: AuthenticatedLayoutProps) => {
       </div>
       
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-h-screen w-full max-w-full overflow-x-hidden">
+      <div className={`flex-1 flex flex-col min-h-screen w-full max-w-full overflow-x-hidden ${
+        sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-64'
+      } transition-all duration-300`}>
         {/* Header */}
         <DashboardHeader 
           onToggleMobileMenu={toggleMobileMenu}

@@ -334,7 +334,7 @@ export default function DashboardPage() {
                 </svg>
               </div>
               <div className="flex-1">
-                <div className="text-xs text-gray-500 mb-0.5">{t('thisMonth')}</div>
+                <div className="text-xs text-gray-500 mb-0.5">{t('earningsThisMonth')}</div>
                 <div className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">{formatCurrencyWithSymbol(agent.earningsThisMonth || 0)}</div>
               </div>
             </div>
@@ -349,7 +349,7 @@ export default function DashboardPage() {
                 </svg>
               </div>
               <div className="flex-1">
-                <div className="text-xs text-gray-500 mb-0.5">{t('referrals')}</div>
+                <div className="text-xs text-gray-500 mb-0.5">{t('totalReferrals')}</div>
                 <div className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">{agent.totalReferrals || 0}</div>
               </div>
             </div>
@@ -364,7 +364,7 @@ export default function DashboardPage() {
                 </svg>
               </div>
               <div className="flex-1">
-                <div className="text-xs text-gray-500 mb-0.5">{t('thisMonth')}</div>
+                <div className="text-xs text-gray-500 mb-0.5">{t('referralsThisMonth')}</div>
                 <div className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">{agent.referralsThisMonth || 0}</div>
               </div>
             </div>
