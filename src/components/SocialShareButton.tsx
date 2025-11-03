@@ -174,27 +174,27 @@ export default function SocialShareButton({
       iconBg: 'bg-purple-600 hover:bg-purple-700',
       textColor: 'text-purple-700',
       label: 'Share',
-      icon: <path d="M15 8a3 3 0 11-6 0 3 3 0 016 0zM6 21V10.5a1.5 1.5 0 011.5-1.5h9a1.5 1.5 0 011.5 1.5V21m-12 0h12m-12 0a1.5 1.5 0 01-1.5-1.5V15m13.5 6a1.5 1.5 0 001.5-1.5V15M12 3v6m-3-2l3-3 3 3" />,
+      icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />,
       iconSize: 'w-5 h-5'
     }
   ]
 
   return (
     <div className={`${className}`}>
-      {/* Social Media Grid - 2 columns, 3 rows */}
-      <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
+      {/* Social Media Grid - 3 columns on mobile (2 rows), 2 columns on tablet+ */}
+      <div className="grid grid-cols-3 sm:grid-cols-2 gap-2 sm:gap-2.5 lg:gap-3">
         {socialButtons.map((button, index) => (
         <button
             key={index}
             onClick={button.onClick}
-            className={`flex flex-col items-center justify-center p-3 sm:p-3.5 lg:p-4 ${button.bgColor} rounded-xl transition-all duration-200 group border ${button.borderColor}`}
+            className={`flex flex-col items-center justify-center p-2 sm:p-3 lg:p-4 ${button.bgColor} rounded-lg sm:rounded-xl transition-all duration-200 group border ${button.borderColor}`}
           >
-            <div className={`w-10 h-10 sm:w-11 sm:h-11 ${button.iconBg} text-white rounded-full flex items-center justify-center mb-1.5 sm:mb-2 group-hover:scale-110 transition-transform shadow-lg`}>
-              <svg className={button.iconSize} viewBox="0 0 24 24" fill="currentColor">
+            <div className={`w-9 h-9 sm:w-10 sm:h-10 lg:w-11 lg:h-11 ${button.iconBg} text-white rounded-full flex items-center justify-center mb-1 sm:mb-1.5 lg:mb-2 group-hover:scale-110 transition-transform shadow-lg`}>
+              <svg className={button.iconSize} viewBox="0 0 24 24" fill={button.label === 'Share' ? 'none' : 'currentColor'} stroke={button.label === 'Share' ? 'currentColor' : 'none'}>
                 {button.icon}
             </svg>
           </div>
-            <span className={`text-xs font-medium ${button.textColor}`}>{button.label}</span>
+            <span className={`text-xs font-medium ${button.textColor} text-center leading-tight`}>{button.label}</span>
         </button>
         ))}
           </div>
