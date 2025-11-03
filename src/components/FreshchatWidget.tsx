@@ -21,11 +21,11 @@ export default function FreshchatWidget() {
       
       // Initialize the FreshworksWidget function if it doesn't exist
       if (typeof window.FreshworksWidget !== 'function') {
-        const n = function() {
-          // @ts-ignore
-          n.q.push(arguments)
+        const n = function(...args: any[]) {
+          // @ts-expect-error - Freshworks queue initialization
+          n.q.push(args)
         }
-        // @ts-ignore
+        // @ts-expect-error - Freshworks queue property
         n.q = []
         window.FreshworksWidget = n
       }
@@ -37,14 +37,14 @@ export default function FreshchatWidget() {
       {/* Freshchat initialization script */}
       <Script
         id="freshchat-settings"
-        strategy="beforeInteractive"
+        strategy="afterInteractive"
         dangerouslySetInnerHTML={{
           __html: `
             window.fwSettings = {
               'widget_id': 36000001447
             };
             if (typeof window.FreshworksWidget !== 'function') {
-              var n = function() { n.q.push(arguments) };
+              var n = function() { n.q.push(Array.prototype.slice.call(arguments)) };
               n.q = [];
               window.FreshworksWidget = n;
             }

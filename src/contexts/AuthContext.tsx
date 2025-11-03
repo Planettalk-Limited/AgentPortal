@@ -242,13 +242,24 @@ export function AuthProvider({ children }: AuthProviderProps) {
       return { requires2FA: false, requiresEmailVerification: false }
     } catch (error) {
       const apiError = error as ApiError
+      
       // Provide user-friendly error message for 401 (invalid credentials)
       if (apiError.statusCode === 401) {
         setError('Invalid email or password. Please check your credentials and try again.')
+      } else if (apiError.statusCode === 404) {
+        setError('Login service not available. Please try again later.')
+      } else if (apiError.error) {
+        setError(apiError.error)
+      } else if (apiError.details?.message) {
+        setError(Array.isArray(apiError.details.message) 
+          ? apiError.details.message.join(', ') 
+          : apiError.details.message)
       } else {
-        setError(apiError.error || 'Login failed')
+        setError('Login failed. Please try again.')
       }
-      throw error
+      
+      // Don't throw - just return failure state
+      return { requires2FA: false, requiresEmailVerification: false }
     } finally {
       setLoading(false)
     }

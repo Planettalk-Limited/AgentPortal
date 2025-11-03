@@ -356,7 +356,9 @@ export class AuthService extends BaseService {
    * Change password
    */
   async changePassword(data: ChangePasswordRequest): Promise<void> {
-    await this.action('auth/change-password', data);
+    await this.execute(() => 
+      this.client.patch('auth/change-password', data)
+    );
   }
 
   /**

@@ -23,8 +23,8 @@ const Features = () => {
             <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-white/5 rounded-full blur-2xl"></div>
             
             {/* Quote icons */}
-            <div className="absolute top-4 left-4 text-white/20 text-4xl">"</div>
-            <div className="absolute bottom-4 right-4 text-white/20 text-4xl rotate-180">"</div>
+            <div className="absolute top-4 left-4 text-white/20 text-4xl">&quot;</div>
+            <div className="absolute bottom-4 right-4 text-white/20 text-4xl rotate-180">&quot;</div>
             
             <div className="relative z-10 text-center">
               <p className="text-white text-lg md:text-xl leading-relaxed mb-4">

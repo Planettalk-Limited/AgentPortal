@@ -291,7 +291,7 @@
       "alreadyHaveAccount": "Vous avez déjà un compte ?"
     },
     "register": {
-      "title": "Créez Votre Compte Agent",
+      "title": "Créez Votre Compte",
       "subtitle": "Rejoignez le réseau d'agents PlanetTalk et commencez à gagner dès aujourd'hui",
       "fields": {
         "firstName": "Prénom",
@@ -329,7 +329,7 @@
         "privacyLink": "Politique de Confidentialité",
         "newsletter": "J'accepte de recevoir les newsletters et j'accepte la déclaration de confidentialité des données."
       },
-      "submit": "Créer le Compte Agent",
+      "submit": "Créer le Compte",
       "submitting": "Création du Compte...",
       "success": {
         "title": "Inscription Réussie !",

@@ -166,12 +166,11 @@ export default function ProfilePage() {
       setSaving(true)
       setError(null)
 
-      // Update profile info
+      // Update profile info (country is not updatable per backend validation)
       const updateData: UpdateProfileRequest = {
         firstName: formData.firstName,
         lastName: formData.lastName,
-        phoneNumber: formData.phoneNumber,
-        country: formData.country
+        phoneNumber: formData.phoneNumber
       }
 
       await api.auth.updateProfile(updateData)
@@ -186,9 +185,23 @@ export default function ProfilePage() {
       setSuccess(t('profileUpdated'))
       setTimeout(() => setSuccess(null), 3000)
 
-    } catch (error) {
-      const apiError = error as ApiError
-      setError(apiError.error || t('failedToUpdateProfile'))
+    } catch (error: any) {
+      // Display only the message from API
+      let errorMessage = 'Failed to update profile'
+      
+      if (error.details?.message) {
+        errorMessage = Array.isArray(error.details.message) 
+          ? error.details.message.join('\n') 
+          : error.details.message
+      } else if (error.message) {
+        errorMessage = Array.isArray(error.message) 
+          ? error.message.join('\n') 
+          : error.message
+      } else if (error.error) {
+        errorMessage = error.error
+      }
+      
+      setError(errorMessage)
     } finally {
       setSaving(false)
     }
@@ -225,9 +238,23 @@ export default function ProfilePage() {
       setSuccess(t('passwordChanged'))
       setTimeout(() => setSuccess(null), 3000)
 
-    } catch (error) {
-      const apiError = error as ApiError
-      setError(apiError.error || t('failedToChangePassword'))
+    } catch (error: any) {
+      // Display only the message from API
+      let errorMessage = 'Failed to change password'
+      
+      if (error.details?.message) {
+        errorMessage = Array.isArray(error.details.message) 
+          ? error.details.message.join('\n') 
+          : error.details.message
+      } else if (error.message) {
+        errorMessage = Array.isArray(error.message) 
+          ? error.message.join('\n') 
+          : error.message
+      } else if (error.error) {
+        errorMessage = error.error
+      }
+      
+      setError(errorMessage)
     } finally {
       setSaving(false)
     }

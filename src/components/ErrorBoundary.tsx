@@ -98,7 +98,7 @@ export function ErrorAlert({
         </div>
         <div className="ml-3 flex-1">
           <h3 className="text-sm font-medium text-red-800">Error</h3>
-          <p className="text-sm text-red-700 mt-1">{error}</p>
+          <div className="text-sm text-red-700 mt-1 whitespace-pre-line">{error}</div>
         </div>
         {onClose && (
           <div className="ml-auto pl-3">

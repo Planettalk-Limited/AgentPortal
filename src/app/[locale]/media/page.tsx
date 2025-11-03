@@ -447,23 +447,25 @@ export default function MediaPage() {
     return resource.contentUrl || null
   }
 
+  // Close modal on ESC key - at top level
+  useEffect(() => {
+    if (!previewModal.isOpen) return
+
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setPreviewModal({ isOpen: false, resource: null, type: null })
+      }
+    }
+    
+    document.addEventListener('keydown', handleEscape)
+    return () => document.removeEventListener('keydown', handleEscape)
+  }, [previewModal.isOpen])
+
   const PreviewModalComponent = () => {
     if (!previewModal.isOpen || !previewModal.resource) return null
 
     const resource = previewModal.resource
     const resourceUrl = getResourceUrl(resource)
-
-    // Close modal on ESC key
-    useEffect(() => {
-      const handleEscape = (e: KeyboardEvent) => {
-        if (e.key === 'Escape') {
-          setPreviewModal({ isOpen: false, resource: null, type: null })
-        }
-      }
-      
-      document.addEventListener('keydown', handleEscape)
-      return () => document.removeEventListener('keydown', handleEscape)
-    }, [])
 
     return (
       <div 

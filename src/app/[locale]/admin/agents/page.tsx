@@ -1118,7 +1118,7 @@ export default function AgentsPage() {
                 </div>
                 <div>
                   <h2 className="text-2xl font-bold text-white">Agent Created Successfully!</h2>
-                  <p className="text-green-100 text-sm mt-1">Save these credentials - they won't be shown again</p>
+                  <p className="text-green-100 text-sm mt-1">Save these credentials - they won&apos;t be shown again</p>
                 </div>
               </div>
             </div>
@@ -1149,7 +1149,7 @@ export default function AgentsPage() {
                     <div>
                       <h4 className="font-bold text-blue-900 mb-1">ℹ️ Agent Created</h4>
                       <p className="text-sm text-blue-800">
-                        The agent has been created successfully. Login credentials will be sent to the agent's email address.
+                        The agent has been created successfully. Login credentials will be sent to the agent&apos;s email address.
                       </p>
                     </div>
                   </div>

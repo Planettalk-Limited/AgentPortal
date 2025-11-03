@@ -1432,7 +1432,7 @@ export default function PayoutsPage() {
                     <h4 className="font-medium text-blue-900 mb-2">CSV Format Requirements</h4>
                     <div className="text-sm text-blue-800 space-y-2">
                       <p><strong>Required:</strong> One column containing payout IDs</p>
-                      <p><strong>Accepted column names:</strong> "id", "payout_id", "reference", or any column containing these words</p>
+                      <p><strong>Accepted column names:</strong> &quot;id&quot;, &quot;payout_id&quot;, &quot;reference&quot;, or any column containing these words</p>
                       <p><strong>Format:</strong> Standard CSV with comma separators and headers in the first row</p>
                       <div className="bg-white rounded p-2 mt-2 font-mono text-xs">
                         <div className="text-gray-600">Example:</div>

@@ -418,12 +418,14 @@ export default function DashboardPage() {
                   </div>
                 </div>
 
-                {/* Social Media Sharing */}
-                <SocialShareButton 
-                  code={agent.agentCode}
-                  agentName={`${user?.firstName} ${user?.lastName}`}
-                  className="w-full"
-                />
+                {/* Social Media Sharing - 2 Column Grid */}
+                <div className="grid grid-cols-2 gap-3">
+                  <SocialShareButton 
+                    code={agent.agentCode}
+                    agentName={`${user?.firstName} ${user?.lastName}`}
+                    className="col-span-2"
+                  />
+                </div>
               </div>
             </div>
           </div>

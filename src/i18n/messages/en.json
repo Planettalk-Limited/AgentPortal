@@ -393,7 +393,7 @@
       "alreadyHaveAccount": "Already have an account?"
     },
     "register": {
-      "title": "Create Your Agent Account",
+      "title": "Create Your Account",
       "subtitle": "Join the PlanetTalk agent network and start earning today",
       "fields": {
         "firstName": "First Name",
@@ -434,7 +434,7 @@
         "newsletter": "I agree to receive newsletters and accept the data privacy statement."
       },
       "passwordRequirement": "Must be at least 8 characters long",
-      "submit": "Create Agent Account",
+      "submit": "Create Account",
       "submitting": "Creating Account...",
       "success": {
         "title": "Registration Successful!",

@@ -428,12 +428,7 @@ export default function RegisterPage() {
                 <span className="text-lg sm:text-xl font-bold">{t('submitting')}</span>
               </div>
             ) : (
-              <div className="flex items-center justify-center">
-                <svg className="w-6 h-6 sm:w-7 sm:h-7 mr-3 sm:mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="3">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-                {t('submit')}
-              </div>
+              <span className="text-lg sm:text-xl font-bold">{t('submit')}</span>
             )}
           </button>
         </div>
