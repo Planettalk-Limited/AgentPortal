@@ -22,10 +22,8 @@ export default function FreshchatWidget() {
       // Initialize the FreshworksWidget function if it doesn't exist
       if (typeof window.FreshworksWidget !== 'function') {
         const n = function(...args: any[]) {
-          // @ts-expect-error - Freshworks queue initialization
           n.q.push(args)
-        }
-        // @ts-expect-error - Freshworks queue property
+        } as any
         n.q = []
         window.FreshworksWidget = n
       }
