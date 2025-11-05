@@ -386,10 +386,7 @@ export default function AgentsPage() {
             onClick={() => setShowCreateModal(true)}
             className="px-6 py-3 bg-pt-turquoise text-white rounded-lg hover:bg-pt-turquoise-600 transition-colors font-semibold shadow-lg flex items-center"
           >
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-            </svg>
-            Create New Agent
+            Create New
           </button>
         </div>
       </div>
@@ -939,8 +936,8 @@ export default function AgentsPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
-              <h2 className="text-2xl font-bold text-white">Create New Agent</h2>
-              <p className="text-pt-turquoise-100 text-sm mt-1">Add a new agent to the platform</p>
+              <h2 className="text-2xl font-bold text-white">Create New</h2>
+              <p className="text-pt-turquoise-100 text-sm mt-1">Add a new user to the platform</p>
             </div>
 
             {/* Modal Content */}
@@ -1090,10 +1087,7 @@ export default function AgentsPage() {
                   </>
                 ) : (
                   <>
-                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-                    </svg>
-                    Create Agent
+                    Create
                   </>
                 )}
               </button>

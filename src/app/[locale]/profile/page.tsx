@@ -73,6 +73,7 @@ export default function ProfilePage() {
   const [success, setSuccess] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState('profile')
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
 
   // Profile Data (includes personal info, currency, and notifications)
   const [formData, setFormData] = useState({
@@ -160,11 +161,38 @@ export default function ProfilePage() {
     }
   }
 
+  const validateProfileForm = () => {
+    const errors: Record<string, string> = {}
+    
+    if (!formData.firstName.trim()) {
+      errors.firstName = 'First name is required'
+    }
+    
+    if (!formData.lastName.trim()) {
+      errors.lastName = 'Last name is required'
+    }
+    
+    if (formData.phoneNumber && !/^[+\d\s()-]+$/.test(formData.phoneNumber)) {
+      errors.phoneNumber = 'Please enter a valid phone number'
+    }
+    
+    setFieldErrors(errors)
+    return Object.keys(errors).length === 0
+  }
+
   const handleProfileSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    // Validate form
+    if (!validateProfileForm()) {
+      setError('Please fix the errors in the form')
+      return
+    }
+    
     try {
       setSaving(true)
       setError(null)
+      setFieldErrors({})
 
       // Update profile info (country is not updatable per backend validation)
       const updateData: UpdateProfileRequest = {
@@ -183,7 +211,7 @@ export default function ProfilePage() {
 
       await refreshUser()
       setSuccess(t('profileUpdated'))
-      setTimeout(() => setSuccess(null), 3000)
+      setTimeout(() => setSuccess(null), 5000)
 
     } catch (error: any) {
       // Display only the message from API
@@ -202,27 +230,49 @@ export default function ProfilePage() {
       }
       
       setError(errorMessage)
+      setTimeout(() => setError(null), 5000)
     } finally {
       setSaving(false)
     }
   }
 
+  const validatePasswordForm = () => {
+    const errors: Record<string, string> = {}
+    
+    if (!passwordData.currentPassword) {
+      errors.currentPassword = 'Current password is required'
+    }
+    
+    if (!passwordData.newPassword) {
+      errors.newPassword = 'New password is required'
+    } else if (passwordData.newPassword.length < 8) {
+      errors.newPassword = 'Password must be at least 8 characters long'
+    }
+    
+    if (!passwordData.confirmPassword) {
+      errors.confirmPassword = 'Please confirm your password'
+    } else if (passwordData.newPassword !== passwordData.confirmPassword) {
+      errors.confirmPassword = 'Passwords do not match'
+    }
+    
+    setFieldErrors(errors)
+    return Object.keys(errors).length === 0
+  }
+
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
-      setError(t('passwordsDoNotMatch'))
-      return
-    }
-
-    if (passwordData.newPassword.length < 8) {
-      setError(t('passwordTooShort'))
+    // Validate form
+    if (!validatePasswordForm()) {
+      setError('Please fix the errors in the form')
+      setTimeout(() => setError(null), 5000)
       return
     }
 
     try {
       setSaving(true)
       setError(null)
+      setFieldErrors({})
 
       await api.auth.changePassword({
         currentPassword: passwordData.currentPassword,
@@ -236,7 +286,7 @@ export default function ProfilePage() {
       })
 
       setSuccess(t('passwordChanged'))
-      setTimeout(() => setSuccess(null), 3000)
+      setTimeout(() => setSuccess(null), 5000)
 
     } catch (error: any) {
       // Display only the message from API
@@ -255,6 +305,7 @@ export default function ProfilePage() {
       }
       
       setError(errorMessage)
+      setTimeout(() => setError(null), 5000)
     } finally {
       setSaving(false)
     }
@@ -330,9 +381,62 @@ export default function ProfilePage() {
           )}
         </div>
 
-        {/* Success/Error Messages */}
-        <SuccessAlert message={success} onClose={() => setSuccess(null)} />
-        <ErrorAlert error={error} onClose={() => setError(null)} />
+        {/* Enhanced Success/Error Popup Notifications */}
+        {success && (
+          <div className="fixed top-4 right-4 z-50 animate-slide-in">
+            <div className="bg-white rounded-2xl shadow-2xl border-l-4 border-green-500 p-4 sm:p-6 max-w-md">
+              <div className="flex items-start">
+                <div className="flex-shrink-0">
+                  <div className="flex items-center justify-center w-12 h-12 rounded-full bg-green-100">
+                    <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                </div>
+                <div className="ml-4 flex-1">
+                  <h3 className="text-lg font-semibold text-gray-900">Success!</h3>
+                  <p className="mt-1 text-sm text-gray-600">{success}</p>
+                </div>
+                <button
+                  onClick={() => setSuccess(null)}
+                  className="ml-4 flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {error && (
+          <div className="fixed top-4 right-4 z-50 animate-slide-in">
+            <div className="bg-white rounded-2xl shadow-2xl border-l-4 border-red-500 p-4 sm:p-6 max-w-md">
+              <div className="flex items-start">
+                <div className="flex-shrink-0">
+                  <div className="flex items-center justify-center w-12 h-12 rounded-full bg-red-100">
+                    <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </div>
+                </div>
+                <div className="ml-4 flex-1">
+                  <h3 className="text-lg font-semibold text-gray-900">Error</h3>
+                  <p className="mt-1 text-sm text-gray-600 whitespace-pre-line">{error}</p>
+                </div>
+                <button
+                  onClick={() => setError(null)}
+                  className="ml-4 flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Simplified Tab Navigation - Only Profile and Password */}
         <div className="bg-white rounded-2xl shadow-lg mb-6 overflow-hidden">
@@ -341,7 +445,11 @@ export default function ProfilePage() {
             <div className="sm:hidden">
               <select
                 value={activeTab}
-                onChange={(e) => setActiveTab(e.target.value as any)}
+                onChange={(e) => {
+                  setActiveTab(e.target.value as any)
+                  setFieldErrors({})
+                  setError(null)
+                }}
                 className="block w-full border-0 py-4 px-4 text-sm font-medium text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 {tabs.map((tab) => (
@@ -357,7 +465,11 @@ export default function ProfilePage() {
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
+                  onClick={() => {
+                    setActiveTab(tab.id)
+                    setFieldErrors({})
+                    setError(null)
+                  }}
                   className={`flex-1 px-6 py-4 border-b-2 font-medium text-sm transition-all duration-200 ${
                     activeTab === tab.id
                       ? 'border-blue-500 text-blue-600 bg-blue-50'
@@ -395,26 +507,74 @@ export default function ProfilePage() {
                       <label className="block text-sm font-medium text-gray-700">
                         {t('personalInfo.firstName')}
                       </label>
-                      <input
-                        type="text"
-                        value={formData.firstName}
-                        onChange={(e) => setFormData(prev => ({ ...prev, firstName: e.target.value }))}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                        required
-                      />
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={formData.firstName}
+                          onChange={(e) => {
+                            setFormData(prev => ({ ...prev, firstName: e.target.value }))
+                            setFieldErrors(prev => ({ ...prev, firstName: '' }))
+                          }}
+                          className={`w-full px-4 py-3 border rounded-xl focus:ring-2 transition-colors ${
+                            fieldErrors.firstName 
+                              ? 'border-red-500 focus:ring-red-500 focus:border-red-500 bg-red-50' 
+                              : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                          }`}
+                          required
+                        />
+                        {fieldErrors.firstName && (
+                          <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                            <svg className="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                        )}
+                      </div>
+                      {fieldErrors.firstName && (
+                        <p className="text-sm text-red-600 flex items-center mt-1">
+                          <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                          </svg>
+                          {fieldErrors.firstName}
+                        </p>
+                      )}
                     </div>
 
                     <div className="space-y-2">
                       <label className="block text-sm font-medium text-gray-700">
                         {t('personalInfo.lastName')}
                       </label>
-                      <input
-                        type="text"
-                        value={formData.lastName}
-                        onChange={(e) => setFormData(prev => ({ ...prev, lastName: e.target.value }))}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                        required
-                      />
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={formData.lastName}
+                          onChange={(e) => {
+                            setFormData(prev => ({ ...prev, lastName: e.target.value }))
+                            setFieldErrors(prev => ({ ...prev, lastName: '' }))
+                          }}
+                          className={`w-full px-4 py-3 border rounded-xl focus:ring-2 transition-colors ${
+                            fieldErrors.lastName 
+                              ? 'border-red-500 focus:ring-red-500 focus:border-red-500 bg-red-50' 
+                              : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                          }`}
+                          required
+                        />
+                        {fieldErrors.lastName && (
+                          <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                            <svg className="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                        )}
+                      </div>
+                      {fieldErrors.lastName && (
+                        <p className="text-sm text-red-600 flex items-center mt-1">
+                          <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                          </svg>
+                          {fieldErrors.lastName}
+                        </p>
+                      )}
                     </div>
 
                     <div className="space-y-2">
@@ -434,13 +594,37 @@ export default function ProfilePage() {
                       <label className="block text-sm font-medium text-gray-700">
                         {t('personalInfo.phoneNumber')}
                       </label>
-                      <input
-                        type="tel"
-                        value={formData.phoneNumber}
-                        onChange={(e) => setFormData(prev => ({ ...prev, phoneNumber: e.target.value }))}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                        placeholder="+1 (555) 123-4567"
-                      />
+                      <div className="relative">
+                        <input
+                          type="tel"
+                          value={formData.phoneNumber}
+                          onChange={(e) => {
+                            setFormData(prev => ({ ...prev, phoneNumber: e.target.value }))
+                            setFieldErrors(prev => ({ ...prev, phoneNumber: '' }))
+                          }}
+                          className={`w-full px-4 py-3 border rounded-xl focus:ring-2 transition-colors ${
+                            fieldErrors.phoneNumber 
+                              ? 'border-red-500 focus:ring-red-500 focus:border-red-500 bg-red-50' 
+                              : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                          }`}
+                          placeholder="+27673900200"
+                        />
+                        {fieldErrors.phoneNumber && (
+                          <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                            <svg className="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                        )}
+                      </div>
+                      {fieldErrors.phoneNumber && (
+                        <p className="text-sm text-red-600 flex items-center mt-1">
+                          <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                          </svg>
+                          {fieldErrors.phoneNumber}
+                        </p>
+                      )}
                     </div>
 
                     <div className="space-y-2">
@@ -587,41 +771,114 @@ export default function ProfilePage() {
                     <label className="block text-sm font-medium text-gray-700">
                       {t('password.currentPassword')}
                     </label>
-                    <input
-                      type="password"
-                      value={passwordData.currentPassword}
-                      onChange={(e) => setPasswordData(prev => ({ ...prev, currentPassword: e.target.value }))}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                      required
-                    />
+                    <div className="relative">
+                      <input
+                        type="password"
+                        value={passwordData.currentPassword}
+                        onChange={(e) => {
+                          setPasswordData(prev => ({ ...prev, currentPassword: e.target.value }))
+                          setFieldErrors(prev => ({ ...prev, currentPassword: '' }))
+                        }}
+                        className={`w-full px-4 py-3 border rounded-xl focus:ring-2 transition-colors ${
+                          fieldErrors.currentPassword 
+                            ? 'border-red-500 focus:ring-red-500 focus:border-red-500 bg-red-50' 
+                            : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                        }`}
+                        required
+                      />
+                      {fieldErrors.currentPassword && (
+                        <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                          <svg className="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                      )}
+                    </div>
+                    {fieldErrors.currentPassword && (
+                      <p className="text-sm text-red-600 flex items-center mt-1">
+                        <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                        </svg>
+                        {fieldErrors.currentPassword}
+                      </p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
                     <label className="block text-sm font-medium text-gray-700">
                       {t('password.newPassword')}
                     </label>
-                    <input
-                      type="password"
-                      value={passwordData.newPassword}
-                      onChange={(e) => setPasswordData(prev => ({ ...prev, newPassword: e.target.value }))}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                      required
-                      minLength={8}
-                    />
-                    <p className="text-xs text-gray-500">{t('password.requirements')}</p>
+                    <div className="relative">
+                      <input
+                        type="password"
+                        value={passwordData.newPassword}
+                        onChange={(e) => {
+                          setPasswordData(prev => ({ ...prev, newPassword: e.target.value }))
+                          setFieldErrors(prev => ({ ...prev, newPassword: '' }))
+                        }}
+                        className={`w-full px-4 py-3 border rounded-xl focus:ring-2 transition-colors ${
+                          fieldErrors.newPassword 
+                            ? 'border-red-500 focus:ring-red-500 focus:border-red-500 bg-red-50' 
+                            : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                        }`}
+                        required
+                        minLength={8}
+                      />
+                      {fieldErrors.newPassword && (
+                        <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                          <svg className="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                      )}
+                    </div>
+                    {fieldErrors.newPassword ? (
+                      <p className="text-sm text-red-600 flex items-center mt-1">
+                        <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                        </svg>
+                        {fieldErrors.newPassword}
+                      </p>
+                    ) : (
+                      <p className="text-xs text-gray-500">{t('password.requirements')}</p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
                     <label className="block text-sm font-medium text-gray-700">
                       {t('password.confirmPassword')}
                     </label>
-                    <input
-                      type="password"
-                      value={passwordData.confirmPassword}
-                      onChange={(e) => setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                      required
-                    />
+                    <div className="relative">
+                      <input
+                        type="password"
+                        value={passwordData.confirmPassword}
+                        onChange={(e) => {
+                          setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))
+                          setFieldErrors(prev => ({ ...prev, confirmPassword: '' }))
+                        }}
+                        className={`w-full px-4 py-3 border rounded-xl focus:ring-2 transition-colors ${
+                          fieldErrors.confirmPassword 
+                            ? 'border-red-500 focus:ring-red-500 focus:border-red-500 bg-red-50' 
+                            : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                        }`}
+                        required
+                      />
+                      {fieldErrors.confirmPassword && (
+                        <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                          <svg className="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                      )}
+                    </div>
+                    {fieldErrors.confirmPassword && (
+                      <p className="text-sm text-red-600 flex items-center mt-1">
+                        <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                        </svg>
+                        {fieldErrors.confirmPassword}
+                      </p>
+                    )}
                   </div>
 
                   <div className="bg-gradient-to-r from-yellow-50 to-amber-50 border border-yellow-200 rounded-xl p-6">
@@ -662,6 +919,23 @@ export default function ProfilePage() {
           )}
         </div>
       </div>
+      
+      <style jsx>{`
+        @keyframes slide-in {
+          from {
+            transform: translateX(100%);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0);
+            opacity: 1;
+          }
+        }
+        
+        .animate-slide-in {
+          animation: slide-in 0.3s ease-out;
+        }
+      `}</style>
     </div>
   )
 }

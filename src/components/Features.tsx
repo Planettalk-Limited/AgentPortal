@@ -36,7 +36,7 @@ const Features = () => {
               
               <div className="flex justify-center">
                 <Link 
-                  href={createLocalizedPath('/auth/apply')}
+                  href={createLocalizedPath('/auth/register')}
                   className="bg-white text-pt-turquoise px-8 py-3 rounded-xl font-semibold hover:bg-gray-50 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
                 >
                   {t('ctaSecondary')}
@@ -120,7 +120,7 @@ const Features = () => {
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
             <Link 
-              href={createLocalizedPath('/auth/apply')}
+              href={createLocalizedPath('/auth/register')}
               className="group relative overflow-hidden rounded-lg inline-flex items-center justify-center px-6 md:px-8 py-3 md:py-4 text-lg md:text-xl font-semibold text-pt-turquoise transition-all duration-300 sm:w-auto w-full max-w-sm sm:max-w-none"
             >
               <span className="absolute inset-0 bg-white"></span>

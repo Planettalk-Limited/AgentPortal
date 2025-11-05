@@ -129,11 +129,13 @@ const Hero = () => {
                   <div className="absolute bottom-1/3 right-1/4 w-4 h-4 md:w-5 md:h-5 bg-white rounded-full animate-ping hidden md:block"></div>
                   
                   {/* Enhanced Commission badge with more eye-catching design - responsive positioning */}
-                  <div className="absolute -bottom-2 -right-2 md:-bottom-4 md:-right-4 w-20 h-20 md:w-28 md:h-28 lg:w-36 lg:h-36 bg-gradient-to-br from-[#FF6B6B]/80 to-[#FF9E53]/80 rounded-full flex items-center justify-center shadow-xl animate-bounce-slow overflow-hidden transform rotate-3 border-2 md:border-4 border-white">
-                    <div className="text-center relative z-10 bg-white w-16 h-16 md:w-24 md:h-24 lg:w-32 lg:h-32 rounded-full flex flex-col items-center justify-center">
-                      <span className="text-[#FF6B6B] text-lg md:text-2xl lg:text-3xl font-extrabold">{t('commissionBadge.months') || '24'}</span>
-                      <span className="text-[#FF6B6B] text-xs md:text-xs lg:text-sm block">{t('commissionBadge.period') || 'months'}</span>
-                      <span className="text-[#FF6B6B] text-xs md:text-sm lg:text-base block font-bold">{t('commissionBadge.label') || 'commission'}</span>
+                  <div className="absolute -bottom-4 -right-4 md:-bottom-4 md:-right-4 w-32 h-32 md:w-28 md:h-28 lg:w-36 lg:h-36 bg-gradient-to-br from-[#FF6B6B]/80 to-[#FF9E53]/80 rounded-full flex items-center justify-center shadow-xl animate-bounce-slow overflow-hidden transform rotate-3 border-2 md:border-4 border-white">
+                    <div className="text-center relative z-10 bg-white w-28 h-28 md:w-24 md:h-24 lg:w-32 lg:h-32 rounded-full flex flex-col items-center justify-center px-2 py-3 md:p-2">
+                      <div className="flex flex-col items-center justify-center h-full w-full">
+                        <span className="text-[#FF6B6B] text-2xl md:text-2xl lg:text-3xl font-extrabold leading-none">{t('commissionBadge.months') || '24'}</span>
+                        <span className="text-[#FF6B6B] text-[0.65rem] md:text-xs lg:text-sm block leading-tight mt-1">{t('commissionBadge.period') || 'months'}</span>
+                        <span className="text-[#FF6B6B] text-[0.65rem] md:text-sm lg:text-base block font-bold leading-tight mt-0.5 md:mt-1">{t('commissionBadge.label') || 'commission'}</span>
+                      </div>
                       <div className="absolute inset-0 border-2 md:border-4 border-dashed border-[#FF6B6B]/30 rounded-full animate-spin-slow"></div>
                     </div>
                   </div>
