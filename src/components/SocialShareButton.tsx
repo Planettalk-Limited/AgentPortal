@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useLocale, useTranslations } from 'next-intl'
+import { useLocale } from 'next-intl'
 
 interface SocialShareButtonProps {
   code: string
@@ -11,11 +11,11 @@ interface SocialShareButtonProps {
 
 export default function SocialShareButton({ 
   code, 
-  agentName = 'Agent',
+  agentName: _agentName = 'Agent',
   className = ''
 }: SocialShareButtonProps) {
   const locale = useLocale()
-  const t = useTranslations('dashboard')
+
   const [copySuccess, setCopySuccess] = useState(false)
   const [showAll, setShowAll] = useState(false)
 
@@ -23,17 +23,56 @@ export default function SocialShareButton({
   const referralUrl = 'https://planettalk.com'
 
   // Localized share messages
-  const getShareMessage = () => {
-    const messages = {
-      en: `🌟 Check out PlanetTalk for affordable international calls & top-ups! Use my agent code: ${code} when you sign up. ${referralUrl}`,
-      es: `🌟 ¡Mira PlanetTalk para llamadas internacionales y recargas económicas! Usa mi código de agente: ${code} al registrarte. ${referralUrl}`,
-      fr: `🌟 Découvrez PlanetTalk pour des appels internationaux et recharges abordables ! Utilisez mon code d'agent : ${code} lors de votre inscription. ${referralUrl}`,
-      pt: `🌟 Confira o PlanetTalk para chamadas internacionais e recargas acessíveis! Use meu código de agente: ${code} ao se cadastrar. ${referralUrl}`
-    }
-    return messages[locale as keyof typeof messages] || messages.en
+  const shareMessages: Record<'en' | 'es' | 'fr', string> = {
+    en: [
+      'Download PlanetTalk to support and connect with your loved ones.',
+      '',
+      '- Cheap international calls',
+      '',
+      '- Send airtime and data',
+      '',
+      '- Buy gift vouchers',
+      '',
+      '- Pay utility bills for family abroad.(Water, Electricity, etc.)',
+      '',
+      `Use my Code ${code} to enjoy 100% bonus on your first top-up.`,
+      '',
+      'Visit planettalk.com to learn more.'
+    ].join('\n'),
+    es: [
+      'Descarga PlanetTalk para apoyar y mantenerte en contacto con tus seres queridos.',
+      '',
+      '- Llamadas internacionales económicas',
+      '',
+      '- Envía tiempo aire y datos',
+      '',
+      '- Compra tarjetas de regalo',
+      '',
+      '- Paga servicios para tu familia en el extranjero (agua, luz, etc.)',
+      '',
+      `Usa mi código ${code} y recibe un bono del 100% en tu primera recarga.`,
+      '',
+      'Visita planettalk.com para saber más.'
+    ].join('\n'),
+    fr: [
+      'Telechargez PlanetTalk pour soutenir et rester en contact avec vos proches.',
+      '',
+      '- Appels internationaux a petit prix',
+      '',
+      '- Envoyez du temps d\'antenne et des donnees',
+      '',
+      '- Achetez des cartes cadeaux',
+      '',
+      '- Reglez les factures de services publics pour votre famille a l\'etranger (eau, electricite, etc.)',
+      '',
+      `Utilisez mon code ${code} pour profiter d'un bonus de 100 % sur votre premiere recharge.`,
+      '',
+      'Visitez planettalk.com pour en savoir plus.'
+    ].join('\n')
   }
 
-  const shareMessage = getShareMessage()
+  const shareMessage = shareMessages[(locale as 'en' | 'es' | 'fr')] || shareMessages.en
+  const emailSubject = shareMessage.split('\n')[0]
   const encodedMessage = encodeURIComponent(shareMessage)
 
   // Copy to clipboard function
@@ -76,19 +115,10 @@ export default function SocialShareButton({
     window.open(`https://t.me/share/url?url=${encodeURIComponent(referralUrl)}&text=${encodedMessage}`, '_blank')
   }
 
-  const shareOnInstagram = () => {
-    // Instagram doesn't support direct link sharing, so we copy to clipboard
-    copyToClipboard()
-  }
-
-  const shareOnTikTok = () => {
-    // TikTok doesn't support direct link sharing, so we copy to clipboard
-    copyToClipboard()
-  }
 
   const shareViaEmail = () => {
-    const subject = encodeURIComponent(`Check out PlanetTalk - Agent Code: ${code}`)
-    const emailBody = encodeURIComponent(`Hi,\n\nMy name is ${agentName}.\n\nI'd like to invite you to check out PlanetTalk for great rates on international calls and mobile top-ups.\n\nPlease use my agent code: ${code} when you sign up - this helps support my business.\n\nVisit PlanetTalk here: ${referralUrl}\n\nThanks!\n${agentName.split(' ')[0]}\n\n--\nFor questions, contact: agent@planettalk.com`)
+    const subject = encodeURIComponent(emailSubject)
+    const emailBody = encodeURIComponent(shareMessage)
     window.open(`mailto:?subject=${subject}&body=${emailBody}`, '_blank')
   }
 
