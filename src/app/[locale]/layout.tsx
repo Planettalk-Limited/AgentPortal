@@ -34,7 +34,7 @@ export default async function LocaleLayout({
   }
 
   return (
-    <NextIntlClientProvider messages={messages}>
+    <NextIntlClientProvider messages={messages} locale={locale}>
       <AuthProvider>
         {children}
         <FreshchatWidget />

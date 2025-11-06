@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useLocale } from 'next-intl'
 
 interface SocialShareButtonProps {
@@ -14,16 +14,27 @@ export default function SocialShareButton({
   agentName: _agentName = 'Agent',
   className = ''
 }: SocialShareButtonProps) {
-  const locale = useLocale()
+  const rawLocale = useLocale()
+  const locale = rawLocale ? rawLocale.toLowerCase() : 'en'
+
+  const normalizedLocale: 'en' | 'es' | 'fr' | 'pt' = locale.startsWith('es')
+    ? 'es'
+    : locale.startsWith('fr')
+    ? 'fr'
+    : locale.startsWith('pt')
+    ? 'pt'
+    : 'en'
 
   const [copySuccess, setCopySuccess] = useState(false)
-  const [showAll, setShowAll] = useState(false)
+
+  // Debug: Log locale changes
+  console.log('SocialShareButton - Current locale:', rawLocale, '-> Normalized:', normalizedLocale)
 
   // Generate the PlanetTalk URL
   const referralUrl = 'https://planettalk.com'
 
-  // Localized share messages
-  const shareMessages: Record<'en' | 'es' | 'fr', string> = {
+  // Localized share messages - wrapped in useMemo to ensure reactivity
+  const shareMessages = useMemo(() => ({
     en: [
       'Download PlanetTalk to support and connect with your loved ones.',
       '',
@@ -68,12 +79,30 @@ export default function SocialShareButton({
       `Utilisez mon code ${code} pour profiter d'un bonus de 100 % sur votre premiere recharge.`,
       '',
       'Visitez planettalk.com pour en savoir plus.'
+    ].join('\n'),
+    pt: [
+      'Baixe PlanetTalk para apoiar e se conectar com quem voce ama.',
+      '',
+      '- Chamadas internacionais economicas',
+      '',
+      '- Envie recargas e dados',
+      '',
+      '- Compre vales-presente',
+      '',
+      '- Pague contas de servicos para a familia no exterior (agua, energia, etc.)',
+      '',
+      `Use meu codigo ${code} para ganhar 100% de bonus na sua primeira recarga.`,
+      '',
+      'Visite planettalk.com para saber mais.'
     ].join('\n')
-  }
+  }), [code])
 
-  const shareMessage = shareMessages[(locale as 'en' | 'es' | 'fr')] || shareMessages.en
+  const shareMessage = shareMessages[normalizedLocale]
   const emailSubject = shareMessage.split('\n')[0]
   const encodedMessage = encodeURIComponent(shareMessage)
+
+  // Debug: Log the selected message
+  console.log('Selected message for locale', normalizedLocale, ':', shareMessage.substring(0, 50) + '...')
 
   // Copy to clipboard function
   const copyToClipboard = async () => {
@@ -130,7 +159,7 @@ export default function SocialShareButton({
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `Check out PlanetTalk - Agent Code: ${code}`,
+          title: emailSubject,
           text: shareMessage,
           url: referralUrl
         })
