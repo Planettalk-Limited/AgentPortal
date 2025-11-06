@@ -19,17 +19,16 @@ export default function SocialShareButton({
   const [copySuccess, setCopySuccess] = useState(false)
   const [showAll, setShowAll] = useState(false)
 
-  // Generate the referral URL
-  const baseUrl = typeof window !== 'undefined' ? window.location.origin : ''
-  const referralUrl = `${baseUrl}/${locale}/referral/${code}`
+  // Generate the PlanetTalk URL
+  const referralUrl = 'https://planettalk.com'
 
   // Localized share messages
   const getShareMessage = () => {
     const messages = {
-      en: `🌟 Join PlanetTalk for affordable international calls & top-ups! Use my agent code: ${code} when you sign up. ${referralUrl}`,
-      es: `🌟 ¡Únete a PlanetTalk para llamadas internacionales y recargas económicas! Usa mi código de agente: ${code} al registrarte. ${referralUrl}`,
-      fr: `🌟 Rejoignez PlanetTalk pour des appels internationaux et recharges abordables ! Utilisez mon code d'agent : ${code} lors de votre inscription. ${referralUrl}`,
-      pt: `🌟 Junte-se ao PlanetTalk para chamadas internacionais e recargas acessíveis! Use meu código de agente: ${code} ao se cadastrar. ${referralUrl}`
+      en: `🌟 Check out PlanetTalk for affordable international calls & top-ups! Use my agent code: ${code} when you sign up. ${referralUrl}`,
+      es: `🌟 ¡Mira PlanetTalk para llamadas internacionales y recargas económicas! Usa mi código de agente: ${code} al registrarte. ${referralUrl}`,
+      fr: `🌟 Découvrez PlanetTalk pour des appels internationaux et recharges abordables ! Utilisez mon code d'agent : ${code} lors de votre inscription. ${referralUrl}`,
+      pt: `🌟 Confira o PlanetTalk para chamadas internacionais e recargas acessíveis! Use meu código de agente: ${code} ao se cadastrar. ${referralUrl}`
     }
     return messages[locale as keyof typeof messages] || messages.en
   }
@@ -88,8 +87,8 @@ export default function SocialShareButton({
   }
 
   const shareViaEmail = () => {
-    const subject = encodeURIComponent(`Join PlanetTalk - Agent Code: ${code}`)
-    const emailBody = encodeURIComponent(`Hi,\n\nMy name is ${agentName}.\n\nI'd like to invite you to download the PlanetTalk app for great rates on international calls and mobile top-ups.\n\nPlease use my agent code: ${code} when you sign up - this helps support my business.\n\nDownload the app here: ${referralUrl}\n\nThanks!\n${agentName.split(' ')[0]}\n\n--\nFor questions, contact: agent@planettalk.com`)
+    const subject = encodeURIComponent(`Check out PlanetTalk - Agent Code: ${code}`)
+    const emailBody = encodeURIComponent(`Hi,\n\nMy name is ${agentName}.\n\nI'd like to invite you to check out PlanetTalk for great rates on international calls and mobile top-ups.\n\nPlease use my agent code: ${code} when you sign up - this helps support my business.\n\nVisit PlanetTalk here: ${referralUrl}\n\nThanks!\n${agentName.split(' ')[0]}\n\n--\nFor questions, contact: agent@planettalk.com`)
     window.open(`mailto:?subject=${subject}&body=${emailBody}`, '_blank')
   }
 
@@ -101,7 +100,7 @@ export default function SocialShareButton({
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `Join PlanetTalk - Agent Code: ${code}`,
+          title: `Check out PlanetTalk - Agent Code: ${code}`,
           text: shareMessage,
           url: referralUrl
         })
