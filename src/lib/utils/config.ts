@@ -71,19 +71,55 @@ export async function shareReferralLink(
   const messages = {
     en: {
       title: `Download PlanetTalk - Agent Code: ${code}`,
-      text: `Hi! Download the PlanetTalk app for great international calls & top-ups. Use my agent code: ${code} when you sign up!`
+      text: `Download PlanetTalk to support and connect with your loved ones.
+
+Use my Code ${code} to enjoy a 100% bonus on your first top-up.
+
+• Cheap international calls
+• Send airtime and data
+• Buy gift vouchers
+• Pay utility bills for family abroad (Water, Electricity, etc.)
+
+Visit ${url} to download PlanetTalk today!`
     },
     es: {
       title: `Descarga PlanetTalk - Código de Agente: ${code}`,
-      text: `¡Hola! Descarga la app PlanetTalk para llamadas internacionales y recargas económicas. ¡Usa mi código de agente: ${code} al registrarte!`
+      text: `Descarga PlanetTalk para apoyar y conectarte con tus seres queridos.
+
+Usa mi Código ${code} para disfrutar de un bono del 100% en tu primera recarga.
+
+• Llamadas internacionales económicas
+• Envía tiempo aire y datos
+• Compra cupones de regalo
+• Paga facturas de servicios para familiares en el extranjero (Agua, Electricidad, etc.)
+
+¡Visita ${url} para descargar PlanetTalk hoy!`
     },
     fr: {
       title: `Téléchargez PlanetTalk - Code d'Agent: ${code}`,
-      text: `Salut! Téléchargez l'app PlanetTalk pour des appels internationaux et recharges pas chers. Utilisez mon code d'agent: ${code} lors de votre inscription!`
+      text: `Téléchargez PlanetTalk pour soutenir et rester connecté avec vos proches.
+
+Utilisez mon Code ${code} pour bénéficier d'un bonus de 100% sur votre première recharge.
+
+• Appels internationaux bon marché
+• Envoyez du crédit et des données
+• Achetez des bons cadeaux
+• Payez les factures de services pour votre famille à l'étranger (Eau, Électricité, etc.)
+
+Visitez ${url} pour télécharger PlanetTalk dès aujourd'hui !`
     },
     pt: {
       title: `Baixe o PlanetTalk - Código de Agente: ${code}`,
-      text: `Oi! Baixe o app PlanetTalk para chamadas internacionais e recargas baratas. Use meu código de agente: ${code} ao se cadastrar!`
+      text: `Baixe o PlanetTalk para apoiar e se conectar com seus entes queridos.
+
+Use meu Código ${code} para aproveitar um bônus de 100% na sua primeira recarga.
+
+• Chamadas internacionais baratas
+• Envie crédito e dados
+• Compre vales-presente
+• Pague contas de serviços para familiares no exterior (Água, Eletricidade, etc.)
+
+Visite ${url} para baixar o PlanetTalk hoje!`
     }
   }
   
@@ -94,14 +130,12 @@ export async function shareReferralLink(
     if (navigator.share && /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
       await navigator.share({
         title: message.title,
-        text: message.text,
-        url
+        text: message.text
       })
       return { success: true, method: 'share' }
     } else {
-      // Fallback to clipboard - copy the full message with URL
-      const fullMessage = `${message.text}\\n\\n${url}`
-      await copyToClipboard(fullMessage)
+      // Fallback to clipboard - copy the full message (URL already included)
+      await copyToClipboard(message.text)
       return { success: true, method: 'clipboard' }
     }
   } catch (error) {

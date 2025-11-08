@@ -27,11 +27,11 @@
   },
   "hero": {
     "badge": "Portal do Agente Ao Vivo",
-    "title": "Tornar-se Agente",
-    "middle": "com",
-    "subtitle": "PlanetTalk",
-    "subtitle2": "Ganhe dinheiro com PlanetTalk!",
-    "description": "Comece a ganhar comissões trazendo novos clientes para o PlanetTalk.",
+    "title": "Torne-se um Agente PlanetTalk",
+    "middle": "",
+    "subtitle": "",
+    "subtitle2": "Ganhe Quando Ajuda Famílias a Permanecerem Conectadas Através de Fronteiras",
+    "description": "Junte-se a uma rede de agentes em rápido crescimento que ajuda amigos e famílias no exterior a permanecerem próximos, enquanto ganha cada vez que recarregam no PlanetTalk.",
     "info": "Milhares de pessoas no Reino Unido, França e Canadá estão usando o aplicativo PlanetTalk para conectar e apoiar seus entes queridos através de chamadas internacionais baratas, recargas fáceis de crédito de dados e tempo de antena, e-vouchers, cartões-presente e pagamentos de contas de serviços públicos com tarifas imbatíveis.",
     "helpThemStay": "Você pode ajudá-los a permanecer conectados com seus entes queridos e ganhar dinheiro no processo!",
     "ctaPrimary": "Login do Agente",
@@ -241,7 +241,7 @@
       "subtitle": "Digite sua nova senha abaixo",
       "newPassword": "Nova Senha",
       "confirmPassword": "Confirmar Nova Senha",
-      "passwordRequirement": "A senha deve ter pelo menos 8 caracteres",
+      "passwordRequirement": "A senha deve ter pelo menos 8 caracteres, uma letra maiúscula e um caractere especial",
       "resetPassword": "Redefinir Senha",
       "resetting": "Redefinindo Senha...",
       "backToSignIn": "Voltar ao Login",
@@ -319,6 +319,9 @@
         "emailInvalid": "Por favor, digite um endereço de e-mail válido",
         "passwordRequired": "A senha é obrigatória",
         "passwordMinLength": "A senha deve ter pelo menos 8 caracteres",
+        "passwordUppercase": "A senha deve conter pelo menos uma letra maiúscula",
+        "passwordSpecialChar": "A senha deve conter pelo menos um caractere especial",
+        "passwordRequirements": "A senha deve ter pelo menos 8 caracteres, uma letra maiúscula e um caractere especial",
         "passwordMismatch": "As senhas não coincidem",
         "termsRequired": "Você deve aceitar os termos e condições"
       },
@@ -339,7 +342,7 @@
       },
       "alreadyHaveAccount": "Já tem uma conta?",
       "signInLink": "Faça login aqui",
-      "passwordRequirement": "Deve ter pelo menos 8 caracteres"
+      "passwordRequirement": "Deve ter pelo menos 8 caracteres, uma letra maiúscula e um caractere especial"
     },
     "verifyEmail": {
       "title": "Verifique seu Email",
@@ -808,7 +811,7 @@
     "newPassword": "Nova Senha",
     "confirmNewPassword": "Confirmar Nova Senha",
     "passwordHint": "Escolha uma senha forte com uma mistura de letras, números e símbolos.",
-    "passwordMinLength": "Deve ter pelo menos 8 caracteres",
+    "passwordMinLength": "Deve ter pelo menos 8 caracteres, uma letra maiúscula e um caractere especial",
     "activeAgent": "Agente Ativo",
     "updateProfile": "Atualizar Perfil",
     "updatePassword": "Atualizar Senha",

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, Suspense } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { useTranslations, useLocale } from 'next-intl'
 import { api } from '@/lib/api'
 import Link from 'next/link'
@@ -15,7 +15,6 @@ function VerifyEmailContent() {
   const [resendLoading, setResendLoading] = useState(false)
   const [resendMessage, setResendMessage] = useState<string | null>(null)
 
-  const router = useRouter()
   const searchParams = useSearchParams()
   const locale = useLocale()
   const t = useTranslations('auth.verifyEmail')
@@ -52,10 +51,6 @@ function VerifyEmailContent() {
 
       if (response.success) {
         setSuccess(true)
-        // Redirect to dashboard after successful verification
-        setTimeout(() => {
-          router.push(`/${locale}/dashboard`)
-        }, 2000)
       } else {
         setError(response.message || t('verificationFailed'))
       }
@@ -100,16 +95,19 @@ function VerifyEmailContent() {
   if (success) {
     return (
       <div className="text-center">
-        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+        <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
           <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
           </svg>
         </div>
         <h1 className="text-2xl font-bold text-pt-dark-gray mb-4">{t('success.title')}</h1>
-        <p className="text-pt-light-gray mb-6">{t('success.message')}</p>
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-          <p className="text-green-800 text-sm">{t('success.redirecting')}</p>
-        </div>
+        <p className="text-pt-light-gray mb-8">{t('success.message')}</p>
+        <Link
+          href={createLocalizedPath('/dashboard')}
+          className="inline-block w-full bg-pt-turquoise text-white py-4 px-6 rounded-2xl font-semibold text-lg hover:bg-pt-turquoise-600 hover:shadow-lg focus:ring-2 focus:ring-pt-turquoise focus:ring-offset-2 transition-all duration-200 transform hover:scale-[1.02] text-center"
+        >
+          Go to Dashboard
+        </Link>
       </div>
     )
   }

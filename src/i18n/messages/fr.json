@@ -27,11 +27,11 @@
   },
   "hero": {
     "badge": "Portail Agent En Direct",
-    "title": "Devenir Agent",
-    "middle": "avec",
-    "subtitle": "PlanetTalk",
-    "subtitle2": "Gagnez de l'argent avec PlanetTalk !",
-    "description": "Commencez à gagner des commissions en amenant de nouveaux clients à PlanetTalk.",
+    "title": "Devenez Agent PlanetTalk",
+    "middle": "",
+    "subtitle": "",
+    "subtitle2": "Gagnez en Aidant les Familles à Rester Connectées au-delà des Frontières",
+    "description": "Rejoignez un réseau d'agents en pleine croissance qui aident les amis et les familles à l'étranger à rester proches, tout en gagnant chaque fois qu'ils rechargent sur PlanetTalk.",
     "info": "Des milliers de personnes au Royaume-Uni, en France et au Canada utilisent l'application PlanetTalk pour se connecter et soutenir leurs proches via des appels internationaux bon marché, des recharges de crédit de données et d'airtime faciles, des e-vouchers, des cartes cadeaux et des paiements de factures de services publics à des tarifs imbattables.",
     "helpThemStay": "Vous pouvez les aider à rester connectés avec leurs proches et gagner de l'argent en même temps !",
     "ctaPrimary": "Connexion Agent",
@@ -241,7 +241,7 @@
       "subtitle": "Entrez votre nouveau mot de passe ci-dessous",
       "newPassword": "Nouveau Mot de Passe",
       "confirmPassword": "Confirmer le Nouveau Mot de Passe",
-      "passwordRequirement": "Le mot de passe doit contenir au moins 8 caractères",
+      "passwordRequirement": "Le mot de passe doit contenir au moins 8 caractères, une lettre majuscule et un caractère spécial",
       "resetPassword": "Réinitialiser le Mot de Passe",
       "resetting": "Réinitialisation du Mot de Passe...",
       "backToSignIn": "Retour à la Connexion",
@@ -319,6 +319,9 @@
         "emailInvalid": "Veuillez entrer une adresse e-mail valide",
         "passwordRequired": "Le mot de passe est requis",
         "passwordMinLength": "Le mot de passe doit contenir au moins 8 caractères",
+        "passwordUppercase": "Le mot de passe doit contenir au moins une lettre majuscule",
+        "passwordSpecialChar": "Le mot de passe doit contenir au moins un caractère spécial",
+        "passwordRequirements": "Le mot de passe doit contenir au moins 8 caractères, une lettre majuscule et un caractère spécial",
         "passwordMismatch": "Les mots de passe ne correspondent pas",
         "termsRequired": "Vous devez accepter les termes et conditions"
       },
@@ -339,7 +342,7 @@
       },
       "alreadyHaveAccount": "Vous avez déjà un compte ?",
       "signInLink": "Connectez-vous ici",
-      "passwordRequirement": "Doit contenir au moins 8 caractères"
+      "passwordRequirement": "Doit contenir au moins 8 caractères, une lettre majuscule et un caractère spécial"
     },
     "verifyEmail": {
       "title": "Vérifiez votre Email",
@@ -810,7 +813,7 @@
     "newPassword": "Nouveau Mot de Passe",
     "confirmNewPassword": "Confirmer le Nouveau Mot de Passe",
     "passwordHint": "Choisissez un mot de passe fort avec un mélange de lettres, chiffres et symboles.",
-    "passwordMinLength": "Doit contenir au moins 8 caractères",
+    "passwordMinLength": "Doit contenir au moins 8 caractères, une lettre majuscule et un caractère spécial",
     "activeAgent": "Agent Actif",
     "updateProfile": "Mettre à Jour le Profil",
     "changePassword": "Changer le Mot de Passe",

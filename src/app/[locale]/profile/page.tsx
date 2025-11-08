@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useLocale, useTranslations } from 'next-intl'
 import { useAuth } from '@/contexts/AuthContext'
 import { api, User, UpdateProfileRequest, ApiError } from '@/lib/api'
+import { validatePassword } from '@/lib/passwordValidation'
 import { ErrorAlert, SuccessAlert, LoadingSpinner } from '@/components/ErrorBoundary'
 import CountryPicker from '@/components/CountryPicker'
 
@@ -245,8 +246,11 @@ export default function ProfilePage() {
     
     if (!passwordData.newPassword) {
       errors.newPassword = 'New password is required'
-    } else if (passwordData.newPassword.length < 8) {
-      errors.newPassword = 'Password must be at least 8 characters long'
+    } else {
+      const passwordValidation = validatePassword(passwordData.newPassword)
+      if (!passwordValidation.isValid) {
+        errors.newPassword = passwordValidation.errors.join(', ')
+      }
     }
     
     if (!passwordData.confirmPassword) {

@@ -6,6 +6,7 @@ import DashboardSidebar from './DashboardSidebar'
 import DashboardHeader from './DashboardHeader'
 import DashboardFooter from './DashboardFooter'
 import WhatsAppGroupModal from './WhatsAppGroupModal'
+import WelcomeMessageModal from './WelcomeMessageModal'
 
 interface AuthenticatedLayoutProps {
   children: React.ReactNode
@@ -14,18 +15,30 @@ interface AuthenticatedLayoutProps {
 const AuthenticatedLayout = ({ children }: AuthenticatedLayoutProps) => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false)
   const [showWhatsAppModal, setShowWhatsAppModal] = useState(false)
-  const { user, loading } = useAuth()
+  const { user, loading, isFirstSignIn } = useAuth()
 
-  // Check if we should show the WhatsApp modal on login
+  // Check if we should show the welcome message for new users based on API flag
   useEffect(() => {
-    if (user && !loading) {
+    if (user && !loading && isFirstSignIn) {
+      // Show welcome message for first-time sign in
+      const timer = setTimeout(() => {
+        setShowWelcomeModal(true)
+      }, 1000)
+      return () => clearTimeout(timer)
+    }
+  }, [user, loading, isFirstSignIn])
+
+  // Check if we should show the WhatsApp modal after welcome message
+  useEffect(() => {
+    if (user && !loading && !showWelcomeModal) {
       const dontShowAgain = localStorage.getItem('whatsapp_modal_dont_show')
       const shownThisSession = sessionStorage.getItem('whatsapp_modal_shown')
       
       // Only show if user hasn't permanently dismissed it AND hasn't seen it this session
       if (!dontShowAgain && !shownThisSession) {
-        // Small delay to let the dashboard load first
+        // Small delay to let the dashboard load first (or after welcome closes)
         const timer = setTimeout(() => {
           setShowWhatsAppModal(true)
           // Mark as shown for this session
@@ -34,16 +47,21 @@ const AuthenticatedLayout = ({ children }: AuthenticatedLayoutProps) => {
         return () => clearTimeout(timer)
       }
     }
-  }, [user, loading])
+  }, [user, loading, showWelcomeModal])
 
-  // Handle "don't show again"
+  // Handle welcome modal close
+  const handleWelcomeClose = () => {
+    setShowWelcomeModal(false)
+  }
+
+  // Handle "don't show again" for WhatsApp modal
   const handleDontShowAgain = () => {
     localStorage.setItem('whatsapp_modal_dont_show', 'true')
     setShowWhatsAppModal(false)
   }
 
-  // Handle regular close (just for this session)
-  const handleClose = () => {
+  // Handle regular close for WhatsApp modal (just for this session)
+  const handleWhatsAppClose = () => {
     sessionStorage.setItem('whatsapp_modal_shown', 'true')
     setShowWhatsAppModal(false)
   }
@@ -149,10 +167,17 @@ const AuthenticatedLayout = ({ children }: AuthenticatedLayoutProps) => {
         <DashboardFooter />
       </div>
 
+      {/* Welcome Message Modal - Shows for new users */}
+      <WelcomeMessageModal 
+        isOpen={showWelcomeModal}
+        onClose={handleWelcomeClose}
+        userName={user?.firstName || 'Agent'}
+      />
+
       {/* WhatsApp Group Modal - Shows on login */}
       <WhatsAppGroupModal 
         isOpen={showWhatsAppModal} 
-        onClose={handleClose}
+        onClose={handleWhatsAppClose}
         showDontShowAgain={true}
         onDontShowAgain={handleDontShowAgain}
       />

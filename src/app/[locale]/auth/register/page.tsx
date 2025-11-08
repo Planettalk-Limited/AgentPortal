@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useTranslations, useLocale } from 'next-intl'
 import { useAuth } from '@/contexts/AuthContext'
+import { validatePassword } from '@/lib/passwordValidation'
 import CountryPicker from '@/components/CountryPicker'
 import PhoneNumberInput from '@/components/PhoneNumberInput'
 import { createLocalizedPath } from '@/lib/utils/navigation'
@@ -132,8 +133,9 @@ export default function RegisterPage() {
     if (!formData.password) {
       return t('validation.passwordRequired')
     }
-    if (formData.password.length < 8) {
-      return t('validation.passwordMinLength')
+    const passwordValidation = validatePassword(formData.password)
+    if (!passwordValidation.isValid) {
+      return t('validation.passwordRequirements')
     }
     if (formData.password !== formData.confirmPassword) {
       return t('validation.passwordMismatch')

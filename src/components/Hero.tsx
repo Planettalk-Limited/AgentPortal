@@ -49,16 +49,18 @@ const Hero = () => {
                       {t('title')}
                     </span>
                   </div>
-                  <span className="block text-white/90 mt-1 md:mt-2">{t('middle') || 'Agent'}</span>
-                  <div className="relative mt-1 md:mt-2">
-                    <span className="text-white font-extrabold relative z-10 inline-block">
-                      {t('subtitle')}
-                      <svg className="absolute -top-6 -right-8 w-6 h-6 text-white/60 animate-spin-slow" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path d="M12 2L14.5 9H22L16 13.5L18.5 20.5L12 16L5.5 20.5L8 13.5L2 9H9.5L12 2Z" strokeWidth="1.5"/>
-                      </svg>
-                    </span>
-                    <span className="absolute -bottom-2 left-0 w-full h-1 bg-white rounded animate-width"></span>
-                  </div>
+                  {t('middle') && <span className="block text-white/90 mt-1 md:mt-2">{t('middle')}</span>}
+                  {t('subtitle') && (
+                    <div className="relative mt-1 md:mt-2">
+                      <span className="text-white font-extrabold relative z-10 inline-block">
+                        {t('subtitle')}
+                        <svg className="absolute -top-6 -right-8 w-6 h-6 text-white/60 animate-spin-slow" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                          <path d="M12 2L14.5 9H22L16 13.5L18.5 20.5L12 16L5.5 20.5L8 13.5L2 9H9.5L12 2Z" strokeWidth="1.5"/>
+                        </svg>
+                      </span>
+                      <span className="absolute -bottom-2 left-0 w-full h-1 bg-white rounded animate-width"></span>
+                    </div>
+                  )}
                 </h1>
                 
                 {/* Subtitle with glowing effect */}

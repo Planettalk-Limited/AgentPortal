@@ -83,6 +83,7 @@ export interface LoginResponse {
   // Email verification fields
   requiresEmailVerification?: boolean;
   emailVerified?: boolean;
+  isFirstSignIn?: boolean; // Flag to show welcome modal for new users
   email?: string;
   otpSent?: boolean;
   otpMessage?: string;

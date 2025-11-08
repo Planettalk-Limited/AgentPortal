@@ -27,11 +27,11 @@
   },
   "hero": {
     "badge": "Agent Portal Live",
-    "title": "Become an Agent",
-    "middle": "with",
-    "subtitle": "PlanetTalk",
-    "subtitle2": "Make some cash with PlanetTalk!",
-    "description": "Start earning commissions by bringing in new customers to PlanetTalk.",
+    "title": "Become a PlanetTalk Agent",
+    "middle": "",
+    "subtitle": "",
+    "subtitle2": "Earn When You Help Families Stay Connected Across Borders",
+    "description": "Join a fast-growing network of Agents helping friends and families abroad stay close, while earning every time they top up on PlanetTalk.",
     "info": "Thousands of people in the UK, France and Canada are using the PlanetTalk app to connect and support their loved ones via cheap international calls, easy airtime and data credit recharges and top-ups, e-vouchers, gift cards, and utility bill payments at unbeatable rates.",
     "helpThemStay": "You can help them stay connected with loved ones and make some money in the process!",
     "ctaPrimary": "Agent Sign In",
@@ -343,7 +343,7 @@
       "subtitle": "Enter your new password below",
       "newPassword": "New Password",
       "confirmPassword": "Confirm New Password",
-      "passwordRequirement": "Password must be at least 8 characters long",
+      "passwordRequirement": "Password must be at least 8 characters, contain one uppercase letter and one special character",
       "resetPassword": "Reset Password",
       "resetting": "Resetting Password...",
       "backToSignIn": "Back to Sign In",
@@ -423,6 +423,9 @@
         "emailInvalid": "Please enter a valid email address",
         "passwordRequired": "Password is required",
         "passwordMinLength": "Password must be at least 8 characters long",
+        "passwordUppercase": "Password must contain at least one uppercase letter",
+        "passwordSpecialChar": "Password must contain at least one special character",
+        "passwordRequirements": "Password must be at least 8 characters, contain one uppercase letter and one special character",
         "passwordMismatch": "Passwords do not match",
         "agentProgramRequired": "You must accept the Agent Program Terms & Conditions"
       },
@@ -433,7 +436,7 @@
         "privacyLink": "Privacy Policy",
         "newsletter": "I agree to receive newsletters and accept the data privacy statement."
       },
-      "passwordRequirement": "Must be at least 8 characters long",
+      "passwordRequirement": "Must be at least 8 characters, contain one uppercase letter and one special character",
       "submit": "Create Account",
       "submitting": "Creating Account...",
       "success": {
@@ -860,7 +863,7 @@
       "currentPassword": "Current Password",
       "newPassword": "New Password",
       "confirmPassword": "Confirm New Password",
-      "requirements": "Must be at least 8 characters long",
+      "requirements": "Must be at least 8 characters, contain one uppercase letter and one special character",
       "securityTips": {
         "title": "Password Security Tips",
         "length": "Use at least 8 characters",

@@ -31,70 +31,50 @@ export default function SocialShareButton({
   console.log('SocialShareButton - Current locale:', rawLocale, '-> Normalized:', normalizedLocale)
 
   // Generate the PlanetTalk URL
-  const referralUrl = 'https://planettalk.com'
+  const referralUrl = 'https://app.planettalk.com/Jxk8/shareapp'
 
   // Localized share messages - wrapped in useMemo to ensure reactivity
   const shareMessages = useMemo(() => ({
-    en: [
-      'Download PlanetTalk to support and connect with your loved ones.',
-      '',
-      '- Cheap international calls',
-      '',
-      '- Send airtime and data',
-      '',
-      '- Buy gift vouchers',
-      '',
-      '- Pay utility bills for family abroad.(Water, Electricity, etc.)',
-      '',
-      `Use my Code ${code} to enjoy 100% bonus on your first top-up.`,
-      '',
-      'Visit planettalk.com to learn more.'
-    ].join('\n'),
-    es: [
-      'Descarga PlanetTalk para apoyar y mantenerte en contacto con tus seres queridos.',
-      '',
-      '- Llamadas internacionales económicas',
-      '',
-      '- Envía tiempo aire y datos',
-      '',
-      '- Compra tarjetas de regalo',
-      '',
-      '- Paga servicios para tu familia en el extranjero (agua, luz, etc.)',
-      '',
-      `Usa mi código ${code} y recibe un bono del 100% en tu primera recarga.`,
-      '',
-      'Visita planettalk.com para saber más.'
-    ].join('\n'),
-    fr: [
-      'Telechargez PlanetTalk pour soutenir et rester en contact avec vos proches.',
-      '',
-      '- Appels internationaux a petit prix',
-      '',
-      '- Envoyez du temps d\'antenne et des donnees',
-      '',
-      '- Achetez des cartes cadeaux',
-      '',
-      '- Reglez les factures de services publics pour votre famille a l\'etranger (eau, electricite, etc.)',
-      '',
-      `Utilisez mon code ${code} pour profiter d'un bonus de 100 % sur votre premiere recharge.`,
-      '',
-      'Visitez planettalk.com pour en savoir plus.'
-    ].join('\n'),
-    pt: [
-      'Baixe PlanetTalk para apoiar e se conectar com quem voce ama.',
-      '',
-      '- Chamadas internacionais economicas',
-      '',
-      '- Envie recargas e dados',
-      '',
-      '- Compre vales-presente',
-      '',
-      '- Pague contas de servicos para a familia no exterior (agua, energia, etc.)',
-      '',
-      `Use meu codigo ${code} para ganhar 100% de bonus na sua primeira recarga.`,
-      '',
-      'Visite planettalk.com para saber mais.'
-    ].join('\n')
+    en: `Download PlanetTalk to support and connect with your loved ones.
+
+Use my Code ${code} to enjoy a 100% bonus on your first top-up.
+
+• Cheap international calls
+• Send airtime and data
+• Buy gift vouchers
+• Pay utility bills for family abroad (Water, Electricity, etc.)
+
+Visit ${referralUrl} to download PlanetTalk today!`,
+    es: `Descarga PlanetTalk para apoyar y conectarte con tus seres queridos.
+
+Usa mi Código ${code} para disfrutar de un bono del 100% en tu primera recarga.
+
+• Llamadas internacionales económicas
+• Envía tiempo aire y datos
+• Compra cupones de regalo
+• Paga facturas de servicios para familiares en el extranjero (Agua, Electricidad, etc.)
+
+¡Visita ${referralUrl} para descargar PlanetTalk hoy!`,
+    fr: `Téléchargez PlanetTalk pour soutenir et rester connecté avec vos proches.
+
+Utilisez mon Code ${code} pour bénéficier d'un bonus de 100% sur votre première recharge.
+
+• Appels internationaux bon marché
+• Envoyez du crédit et des données
+• Achetez des bons cadeaux
+• Payez les factures de services pour votre famille à l'étranger (Eau, Électricité, etc.)
+
+Visitez ${referralUrl} pour télécharger PlanetTalk dès aujourd'hui !`,
+    pt: `Baixe o PlanetTalk para apoiar e se conectar com seus entes queridos.
+
+Use meu Código ${code} para aproveitar um bônus de 100% na sua primeira recarga.
+
+• Chamadas internacionais baratas
+• Envie crédito e dados
+• Compre vales-presente
+• Pague contas de serviços para familiares no exterior (Água, Eletricidade, etc.)
+
+Visite ${referralUrl} para baixar o PlanetTalk hoje!`
   }), [code])
 
   const shareMessage = shareMessages[normalizedLocale]

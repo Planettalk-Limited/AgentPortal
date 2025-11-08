@@ -11,6 +11,7 @@ interface AuthContextType {
   loading: boolean
   error: string | null
   isAuthenticated: boolean
+  isFirstSignIn: boolean
   login: (email: string, password: string) => Promise<{ requires2FA: boolean; requiresEmailVerification?: boolean; email?: string }>
   register: (data: RegisterRequest) => Promise<{ success: boolean; message: string }>
   verify2FA: (email: string, code: string) => Promise<void>
@@ -58,6 +59,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [isFirstSignIn, setIsFirstSignIn] = useState(false)
   const router = useRouter()
   const pathname = usePathname()
   const localeFromHook = useLocale()
@@ -224,6 +226,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
       if (response.success && response.user) {
         const user = response.user
         setUser(user)
+        
+        // Set isFirstSignIn flag from response
+        if (response.isFirstSignIn) {
+          setIsFirstSignIn(true)
+        }
 
         // Redirect based on user role
         switch (user.role) {
@@ -277,6 +284,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
         const user = response.user
         setUser(user)
         
+        // Set isFirstSignIn flag from response
+        if (response.isFirstSignIn) {
+          setIsFirstSignIn(true)
+        }
+        
         // Redirect based on user role after successful 2FA
         switch (user.role) {
           case 'admin':
@@ -319,6 +331,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const clearAuth = async () => {
     setUser(null)
     setError(null)
+    setIsFirstSignIn(false)
     api.auth.clearAuth()
     setLoading(false)
   }
@@ -390,6 +403,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     loading,
     error,
     isAuthenticated: !!user,
+    isFirstSignIn,
     login,
     register,
     verify2FA,
