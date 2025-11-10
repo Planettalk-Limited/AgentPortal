@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useTranslations, useLocale } from 'next-intl'
 import { api, ApiError } from '@/lib/api'
+import { validatePassword } from '@/lib/passwordValidation'
 
 function ResetPasswordForm() {
   const [formData, setFormData] = useState({
@@ -45,8 +46,9 @@ function ResetPasswordForm() {
       return
     }
 
-    if (formData.newPassword.length < 8) {
-      setError('Password must be at least 8 characters long')
+    const passwordValidation = validatePassword(formData.newPassword)
+    if (!passwordValidation.isValid) {
+      setError(passwordValidation.errors.join(', '))
       return
     }
 
@@ -163,7 +165,7 @@ function ResetPasswordForm() {
             </button>
           </div>
           <p className="text-xs text-pt-light-gray mt-1">
-            Password must be at least 8 characters long
+            {t('passwordRequirement')}
           </p>
         </div>
 

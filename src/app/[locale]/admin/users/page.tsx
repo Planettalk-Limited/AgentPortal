@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { api, User, UserQueryParams, ApiError } from '@/lib/api'
+import { validatePassword } from '@/lib/passwordValidation'
 import CountryPicker from '@/components/CountryPicker'
 
 // Helper function to get country display info
@@ -246,8 +247,9 @@ export default function UsersPage() {
       errors.email = 'Email must be 255 characters or less'
     }
     
-    if (newUserData.password.length < 8) {
-      errors.password = 'Password must be at least 8 characters'
+    const passwordValidation = validatePassword(newUserData.password)
+    if (!passwordValidation.isValid) {
+      errors.password = passwordValidation.errors.join(', ')
     }
     
     setFormErrors(errors)
