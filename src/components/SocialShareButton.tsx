@@ -31,7 +31,7 @@ export default function SocialShareButton({
   console.log('SocialShareButton - Current locale:', rawLocale, '-> Normalized:', normalizedLocale)
 
   // Generate the PlanetTalk URL
-  const referralUrl = 'https://app.planettalk.com/Jxk8/shareapp'
+  const referralUrl = 'https://onelink.to/getplanettalk'
 
   // Localized share messages - wrapped in useMemo to ensure reactivity
   const shareMessages = useMemo(() => ({

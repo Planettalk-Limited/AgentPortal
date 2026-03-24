@@ -214,7 +214,7 @@ const Footer = () => {
                   />
                 </a>
                 <a 
-                  href="https://app.planettalk.com/Jxk8/web" 
+                  href="https://onelink.to/getplanettalk" 
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:opacity-80 transition-opacity duration-200"

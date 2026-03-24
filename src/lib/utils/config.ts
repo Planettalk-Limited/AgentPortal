@@ -25,7 +25,7 @@ export function getBaseUrl(): string {
  */
 export function generateReferralUrl(code: string, locale: string = 'en'): string {
   // Use the official PlanetTalk app share link
-  return 'https://app.planettalk.com/Jxk8/shareapp'
+  return 'https://onelink.to/getplanettalk'
 }
 
 /**
