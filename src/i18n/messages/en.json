@@ -913,6 +913,18 @@
       "email": "agent@planettalk.com"
     }
   },
+  "welcomeMessage": {
+    "title": "Welcome to the PlanetTalk Agent Network!",
+    "greeting": "Congratulations {userName},",
+    "intro": "You're now part of a global community helping families stay connected across borders.",
+    "earnStart": "Start earning",
+    "earnHighlight": "unlimited commission",
+    "earnEnd": "every time someone you invite tops up on PlanetTalk.",
+    "shareMessage": "Just share your code and watch your rewards grow!",
+    "whatsappPrompt": "Join our WhatsApp Channel for exclusive updates, tips, and support.",
+    "joinChannel": "Join Channel",
+    "joinLater": "I'll Join Later"
+  },
   "whatsappGroup": {
     "title": "Join Our WhatsApp Group",
     "description": "Connect with fellow agents, get exclusive updates, and receive instant support!",

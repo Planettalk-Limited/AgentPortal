@@ -852,6 +852,18 @@
       "email": "agent@planettalk.com"
     }
   },
+  "welcomeMessage": {
+    "title": "Bem-vindo à Rede de Agentes PlanetTalk!",
+    "greeting": "Parabéns {userName},",
+    "intro": "Agora você faz parte de uma comunidade global que ajuda famílias a permanecerem conectadas através de fronteiras.",
+    "earnStart": "Comece a ganhar",
+    "earnHighlight": "comissão ilimitada",
+    "earnEnd": "sempre que alguém que você convidar fizer uma recarga no PlanetTalk.",
+    "shareMessage": "Basta compartilhar seu código e ver suas recompensas crescerem!",
+    "whatsappPrompt": "Junte-se ao nosso canal no WhatsApp para atualizações exclusivas, dicas e suporte.",
+    "joinChannel": "Entrar no canal",
+    "joinLater": "Entro depois"
+  },
   "whatsappGroup": {
     "title": "Junte-se ao nosso grupo WhatsApp",
     "description": "Conecte-se com outros agentes, receba atualizações exclusivas e obtenha suporte instantâneo!",
