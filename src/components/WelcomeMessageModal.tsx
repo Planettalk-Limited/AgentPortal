@@ -59,7 +59,7 @@ const WelcomeMessageModal = ({ isOpen, onClose, userName = 'Agent' }: WelcomeMes
           {/* Message Content */}
           <div className="space-y-4 mb-8">
             <p className="text-center text-gray-700 leading-relaxed">
-              You're now part of a global community helping families stay connected across borders.
+              You&apos;re now part of a global community helping families stay connected across borders.
             </p>
             
             <div className="bg-white rounded-lg p-6 shadow-sm border-2 border-pt-turquoise/20">
@@ -102,7 +102,7 @@ const WelcomeMessageModal = ({ isOpen, onClose, userName = 'Agent' }: WelcomeMes
               onClick={onClose}
               className="w-full px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors"
             >
-              I'll Join Later
+              I&apos;ll Join Later
             </button>
           </div>
         </div>
