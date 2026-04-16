@@ -108,7 +108,7 @@ const Hero = () => {
                   <div className="relative rounded-2xl overflow-hidden border-0 md:border md:border-white/20 shadow-lg transform hover:scale-[1.02] transition-transform duration-500">
                     <img 
                       src="/images/agent-signup.jpg" 
-                      alt="Become a PlanetTalk Agent" 
+                      alt="Become a PlanetTalk Partner" 
                       className="relative w-full h-full object-cover md:object-contain max-w-xl mx-auto lg:max-w-none"
                       style={{minHeight: '250px', maxHeight: '60vh', objectPosition: 'center'}}
                       onError={(e) => {
@@ -191,8 +191,8 @@ const Hero = () => {
                     <h4 className="text-sm font-semibold text-gray-700 mb-2">Terms and Conditions</h4>
                     <p className="text-sm text-gray-600">
                       Please read this before filling out the form. By submitting this form, you agree to our 
-                      <a href="/terms-and-conditions.pdf" target="_blank" className="text-pt-turquoise underline hover:no-underline"> Agent Program Terms and Conditions</a>. 
-                      You consent to receive communications about the PlanetTalk Agent Program and understand that your data will be processed in accordance with our Privacy Policy.
+                      <a href="/terms-and-conditions.pdf" target="_blank" className="text-pt-turquoise underline hover:no-underline"> Partner Program Terms and Conditions</a>.
+                      You consent to receive communications about the PlanetTalk Partner Program and understand that your data will be processed in accordance with our Privacy Policy.
                     </p>
                   </div>
                 </div>

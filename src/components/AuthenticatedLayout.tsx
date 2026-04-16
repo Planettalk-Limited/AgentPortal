@@ -171,7 +171,7 @@ const AuthenticatedLayout = ({ children }: AuthenticatedLayoutProps) => {
       <WelcomeMessageModal 
         isOpen={showWelcomeModal}
         onClose={handleWelcomeClose}
-        userName={user?.firstName || 'Agent'}
+        userName={user?.firstName || 'Partner'}
       />
 
       {/* WhatsApp Group Modal - Shows on login */}

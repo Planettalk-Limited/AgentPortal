@@ -53,7 +53,7 @@ const StatItem = ({ end, suffix, label, duration = 2000, prefix = '' }: StatItem
 const AnimatedStats = () => {
   return (
     <div className="flex items-center justify-center space-x-8 text-white/80">
-      <StatItem end={2500} suffix="+" label="Active Agents" />
+      <StatItem end={2500} suffix="+" label="Active Partners" />
       <StatItem end={45} suffix="+" label="Countries" />
       <StatItem end={2.5} suffix="M+" label="Earnings Paid" prefix="$" />
     </div>

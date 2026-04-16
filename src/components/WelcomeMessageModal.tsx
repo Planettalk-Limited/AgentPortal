@@ -8,7 +8,7 @@ interface WelcomeMessageModalProps {
   userName?: string
 }
 
-const WelcomeMessageModal = ({ isOpen, onClose, userName = 'Agent' }: WelcomeMessageModalProps) => {
+const WelcomeMessageModal = ({ isOpen, onClose, userName = 'Partner' }: WelcomeMessageModalProps) => {
   const t = useTranslations('welcomeMessage')
 
   if (!isOpen) return null

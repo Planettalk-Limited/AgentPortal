@@ -86,7 +86,7 @@ export class ApiClient {
       // Handle different error formats
       const error: ApiError = {
         success: false,
-        error: data.error || data.message || `HTTP ${response.status}`,
+        error: data.message || (data.error !== 'Bad Request' && data.error !== 'Unauthorized' && data.error !== 'Forbidden' && data.error !== 'Not Found' ? data.error : null) || `HTTP ${response.status}`,
         statusCode: response.status,
         timestamp: new Date().toISOString(),
         path: response.url,

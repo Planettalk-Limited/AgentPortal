@@ -103,6 +103,35 @@ export class AdminService extends BaseService {
     return this.actionWithResult(`admin/users/bulk-actions`, data);
   }
 
+  // ===== Business Partner Applications =====
+
+  /**
+   * List all pending business partner applications
+   */
+  async getPendingBusinessPartners(): Promise<User[]> {
+    return this.execute(() =>
+      this.client.get<User[]>('admin/users/pending-business-partners')
+    );
+  }
+
+  /**
+   * Approve a business partner and assign a custom partner code
+   */
+  async approveBusinessPartner(id: string, partnerCode: string): Promise<{ success: boolean; user: Partial<User>; agent: { id: string; agentCode: string; status: string } }> {
+    return this.execute(() =>
+      this.client.post(`admin/users/${id}/approve-business-partner`, { partnerCode })
+    );
+  }
+
+  /**
+   * Reject a business partner application
+   */
+  async rejectBusinessPartner(id: string, reason?: string): Promise<{ success: boolean; user: Partial<User>; message: string }> {
+    return this.execute(() =>
+      this.client.post(`admin/users/${id}/reject-business-partner`, reason ? { reason } : {})
+    );
+  }
+
   // ===== Payout Management =====
 
   /**

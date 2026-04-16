@@ -15,7 +15,7 @@ export default function LoginPage() {
   })
   const [twoFactorCode, setTwoFactorCode] = useState('')
   const [showPassword, setShowPassword] = useState(false)
-  const [loginStep, setLoginStep] = useState<'password' | '2fa'>('password')
+  const [loginStep, setLoginStep] = useState<'password' | '2fa' | 'partner_approval' | 'rejected'>('password')
   const [userEmail, setUserEmail] = useState('')
   const { login, verify2FA, loading, error, clearError, isAuthenticated } = useAuth()
   const router = useRouter()
@@ -48,24 +48,28 @@ export default function LoginPage() {
     try {
       const result = await login(formData.email, formData.password)
       
-      // Check if email verification is required
       if (result.requiresEmailVerification) {
-        // Redirect to email verification page with email pre-filled
         router.push(`/${locale}/auth/verify-email?email=${encodeURIComponent(formData.email)}`)
         return
       }
+
+      if (result.requiresPartnerApproval) {
+        setLoginStep('partner_approval')
+        return
+      }
+
+      if (result.rejected) {
+        setLoginStep('rejected')
+        return
+      }
       
-      // Check if 2FA is required
       if (result.requires2FA) {
         setUserEmail(result.email || formData.email)
         setLoginStep('2fa')
         return
       }
-      
-      // If no 2FA or email verification required, navigation is handled by the auth context
     } catch (error) {
       // Error is handled by the auth context
-      // Login failed
     }
   }
 
@@ -121,7 +125,65 @@ export default function LoginPage() {
       )}
 
       {/* Login Forms */}
-      {loginStep === 'password' ? (
+      {loginStep === 'rejected' ? (
+        /* Application Rejected */
+        <div className="text-center space-y-6">
+          <div className="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center mx-auto">
+            <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold text-pt-dark-gray mb-2">Application Not Approved</h2>
+            <p className="text-pt-light-gray">
+              Unfortunately your partner application was not approved at this time.
+              Please check your email for further details.
+            </p>
+          </div>
+          <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 text-left">
+            <p className="text-sm text-gray-700 font-medium">
+              If you believe this is an error, please contact us at{' '}
+              <a href="mailto:agent@planettalk.com" className="text-pt-turquoise underline font-bold">agent@planettalk.com</a>
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => { setLoginStep('password'); clearError() }}
+            className="w-full text-pt-turquoise hover:text-pt-turquoise-600 font-medium transition-colors py-2"
+          >
+            &larr; Back to Login
+          </button>
+        </div>
+      ) : loginStep === 'partner_approval' ? (
+        /* Partner Approval Pending */
+        <div className="text-center space-y-6">
+          <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center mx-auto">
+            <svg className="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold text-pt-dark-gray mb-2">Application Under Review</h2>
+            <p className="text-pt-light-gray">
+              Your business partner application is awaiting administrator approval. 
+              You will receive an email once your account is active.
+            </p>
+          </div>
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-left">
+            <p className="text-sm text-blue-800 font-medium">
+              Need to speed things up? Contact us at{' '}
+              <a href="mailto:agent@planettalk.com" className="underline font-bold">agent@planettalk.com</a>
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => { setLoginStep('password'); clearError() }}
+            className="w-full text-pt-turquoise hover:text-pt-turquoise-600 font-medium transition-colors py-2"
+          >
+            &larr; Back to Login
+          </button>
+        </div>
+      ) : loginStep === 'password' ? (
         /* Password Login Form */
         <form onSubmit={handlePasswordSubmit} className="space-y-5">
           <div>
@@ -135,7 +197,7 @@ export default function LoginPage() {
               value={formData.email}
               onChange={handleChange}
               className="w-full px-5 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-pt-turquoise focus:border-pt-turquoise transition-all duration-200 text-lg bg-gray-50 focus:bg-white"
-              placeholder="agent@example.com"
+              placeholder="partner@example.com"
               required
             />
           </div>

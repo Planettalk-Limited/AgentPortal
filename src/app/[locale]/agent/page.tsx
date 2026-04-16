@@ -11,6 +11,35 @@ import { formatCurrencyWithSymbol, parseCurrency } from '@/lib/utils/currency'
 import { MINIMUM_PAYOUT_AMOUNT } from '@/lib/constants/payout'
 import ShareButton from '@/components/ShareButton'
 
+function PayoutStatusBadge({ status }: { status?: string }) {
+  const s = (status || 'pending').toLowerCase()
+  const styles: Record<string, string> = {
+    approved:  'bg-green-100 text-green-800',
+    completed: 'bg-green-100 text-green-800',
+    paid:      'bg-green-100 text-green-800',
+    review:    'bg-orange-100 text-orange-800',
+    rejected:  'bg-red-100 text-red-800',
+    cancelled: 'bg-red-100 text-red-800',
+    pending:   'bg-yellow-100 text-yellow-800',
+  }
+  const labels: Record<string, string> = {
+    approved:  'Approved',
+    completed: 'Completed',
+    paid:      'Paid',
+    review:    'Under Review',
+    rejected:  'Rejected',
+    cancelled: 'Cancelled',
+    pending:   'Pending',
+  }
+  const className = styles[s] || 'bg-gray-100 text-gray-700'
+  const label = labels[s] || s.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+  return (
+    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${className}`}>
+      {label}
+    </span>
+  )
+}
+
 function AgentPage() {
   const [agent, setAgent] = useState<Agent | null>(null)
   const [dashboard, setDashboard] = useState<AgentDashboard | null>(null)
@@ -189,7 +218,7 @@ function AgentPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pt-turquoise mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading agent data...</p>
+          <p className="mt-4 text-gray-600">Loading partner data...</p>
         </div>
       </div>
     )
@@ -219,8 +248,8 @@ function AgentPage() {
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="text-center">
             <div className="text-gray-500 text-6xl mb-4">👥</div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">No Agents Found</h2>
-            <p className="text-gray-600 mb-4">There are no agents in the system yet.</p>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">No Partners Found</h2>
+            <p className="text-gray-600 mb-4">There are no partners in the system yet.</p>
             <button
               onClick={() => {
                 if (typeof window !== 'undefined') {
@@ -229,7 +258,7 @@ function AgentPage() {
               }}
               className="bg-pt-turquoise text-white px-6 py-2 rounded-lg hover:bg-pt-turquoise/90 transition-colors"
             >
-              Manage Users & Agents
+              Manage Users & Partners
             </button>
           </div>
         </div>
@@ -240,8 +269,8 @@ function AgentPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="text-gray-500 text-6xl mb-4">👤</div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">No Agent Data</h2>
-          <p className="text-gray-600">Unable to load agent information.</p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">No Partner Data</h2>
+          <p className="text-gray-600">Unable to load partner information.</p>
         </div>
       </div>
     )
@@ -259,8 +288,15 @@ function AgentPage() {
             </div>
             <div className="flex items-center space-x-4">
               <div className="text-right">
-                <p className="text-sm text-gray-500">Agent Code</p>
+                <p className="text-sm text-gray-500">Partner Code</p>
                 <p className="text-xl font-bold text-pt-turquoise">{agent.agentCode}</p>
+                <span className={`inline-flex items-center gap-1 mt-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                  user?.metadata?.partnerType === 'business'
+                    ? 'bg-violet-100 text-violet-800'
+                    : 'bg-sky-100 text-sky-800'
+                }`}>
+                  {user?.metadata?.partnerType === 'business' ? '🏢 Business Partner' : '👤 Individual Partner'}
+                </span>
               </div>
               {parseFloat(String(agent.availableBalance || '0')) < MINIMUM_PAYOUT_AMOUNT && (
                 <div className="text-right">
@@ -306,7 +342,7 @@ function AgentPage() {
                 ))}
               </select>
               <span className="text-xs text-blue-600">
-                Viewing data for selected agent
+                Viewing data for selected partner
               </span>
             </div>
           </div>
@@ -700,11 +736,11 @@ function AgentPage() {
                       </span>
                     </div>
                     
-                    <h4 className="text-xl font-semibold text-pt-dark-gray mb-2">Your Agent Referral Code</h4>
+                    <h4 className="text-xl font-semibold text-pt-dark-gray mb-2">Your Partner Referral Code</h4>
                     <p className="text-pt-light-gray mb-6">Share this code with customers to start earning commissions</p>
                     
                     <div className="bg-pt-light-gray-50 border border-pt-light-gray-200 rounded-lg p-4 mb-6">
-                      <label className="block text-sm font-medium text-pt-dark-gray mb-2">Agent Code:</label>
+                      <label className="block text-sm font-medium text-pt-dark-gray mb-2">Partner Code:</label>
                       <div className="flex items-center justify-center space-x-3">
                         <span className="font-mono text-2xl font-bold text-pt-turquoise">
                           {agent?.agentCode || 'Loading...'}
@@ -744,7 +780,7 @@ function AgentPage() {
                         <div className="text-left">
                           <h5 className="font-medium text-pt-turquoise-700 mb-1">How it works:</h5>
                           <ul className="text-sm text-pt-turquoise-600 space-y-1">
-                            <li>• Share your agent code with customers</li>
+                            <li>• Share your partner code with customers</li>
                             <li>• They use it when signing up for PlanetTalk</li>
                             <li>• You earn commission on every top-up they make</li>
                             <li>• Commission continues for 24 months per customer</li>
@@ -787,9 +823,7 @@ function AgentPage() {
                                 {payout.method || 'Bank Transfer'}
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap">
-                                <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                                  Pending
-                                </span>
+                                <PayoutStatusBadge status={payout.status} />
                               </td>
                             </tr>
                           ))}
@@ -810,9 +844,7 @@ function AgentPage() {
                                 {new Date(payout.createdAt || Date.now()).toLocaleDateString()}
                               </p>
                             </div>
-                            <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                              Pending
-                            </span>
+                            <PayoutStatusBadge status={payout.status} />
                           </div>
                           <div className="mt-3 pt-3 border-t border-gray-100">
                             <p className="text-xs text-gray-500">{t('payouts.method')}</p>

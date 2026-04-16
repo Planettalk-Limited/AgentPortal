@@ -16,7 +16,7 @@ interface ShareButtonProps {
 
 export default function ShareButton({ 
   code, 
-  agentName = 'Agent',
+  agentName = 'Partner',
   className = '',
   variant = 'primary',
   size = 'md',

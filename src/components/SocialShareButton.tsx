@@ -11,7 +11,7 @@ interface SocialShareButtonProps {
 
 export default function SocialShareButton({ 
   code, 
-  agentName: _agentName = 'Agent',
+  agentName: _agentName = 'Partner',
   className = ''
 }: SocialShareButtonProps) {
   const rawLocale = useLocale()

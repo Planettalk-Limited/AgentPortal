@@ -119,6 +119,7 @@ export default function AgentsPage() {
   const [filters, setFilters] = useState({
     search: '',
     status: '',
+    partnerType: '',
     page: 1,
     limit: 20
   })
@@ -339,6 +340,18 @@ export default function AgentsPage() {
     }
   }
 
+  const getPartnerTypeBadge = (agent: Agent): { label: string; color: string; icon: string } => {
+    const partnerType = agent.user?.metadata?.partnerType
+    if (partnerType === 'business') {
+      return { label: 'Business Partner', color: 'bg-violet-100 text-violet-800', icon: '🏢' }
+    }
+    return { label: 'Individual Partner', color: 'bg-sky-100 text-sky-800', icon: '👤' }
+  }
+
+  const getPartnerTypeLabel = (agent: Agent): string => {
+    return agent.user?.metadata?.partnerType === 'business' ? 'Business Partner' : 'Individual Partner'
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -476,7 +489,7 @@ export default function AgentsPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.707A1 1 0 013 7V4z" />
               </svg>
               <h3 className="text-lg font-medium text-gray-900">Filters & Search</h3>
-              {(filters.status || filters.search) && (
+              {(filters.status || filters.search || filters.partnerType) && (
                 <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-pt-turquoise text-white">
                   Active
                 </span>
@@ -511,13 +524,22 @@ export default function AgentsPage() {
               onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
               className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pt-turquoise focus:border-pt-turquoise"
             >
-              <option value="">All Status</option>
+              <option value="">All Statuses</option>
               <option value="active">Active</option>
               <option value="pending_application">Pending Application</option>
               <option value="application_approved">Application Approved</option>
               <option value="code_generated">Code Generated</option>
               <option value="credentials_sent">Credentials Sent</option>
               <option value="suspended">Suspended</option>
+            </select>
+            <select
+              value={filters.partnerType}
+              onChange={(e) => setFilters(prev => ({ ...prev, partnerType: e.target.value }))}
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pt-turquoise focus:border-pt-turquoise"
+            >
+              <option value="">All Types</option>
+              <option value="business">🏢 Business Partner</option>
+              <option value="individual">👤 Individual Partner</option>
             </select>
           </div>
           </div>
@@ -537,6 +559,7 @@ export default function AgentsPage() {
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Agent</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">Type</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Earnings</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Referrals</th>
@@ -552,7 +575,7 @@ export default function AgentsPage() {
                     >
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
-                          <div className="w-10 h-10 bg-pt-turquoise rounded-full flex items-center justify-center">
+                          <div className="w-10 h-10 bg-pt-turquoise rounded-full flex items-center justify-center flex-shrink-0">
                             <span className="text-white text-sm font-medium">
                               {agent.user.firstName.charAt(0)}{agent.user.lastName.charAt(0)}
                             </span>
@@ -562,9 +585,19 @@ export default function AgentsPage() {
                               {agent.user.firstName} {agent.user.lastName}
                             </div>
                             <div className="text-sm text-gray-500">{agent.user.email}</div>
-                            <div className="text-xs text-gray-400">Code: {agent.agentCode}</div>
+                            <div className="text-xs text-gray-400 font-mono">{agent.agentCode}</div>
                           </div>
                         </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap hidden sm:table-cell">
+                        {(() => {
+                          const pt = getPartnerTypeBadge(agent)
+                          return (
+                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${pt.color}`}>
+                              <span>{pt.icon}</span>{pt.label}
+                            </span>
+                          )
+                        })()}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(agent.status)}`}>
@@ -840,10 +873,21 @@ export default function AgentsPage() {
                       <span className="text-gray-600">Country:</span>
                       <span className="font-medium">{selectedAgent.user.country || 'Not provided'}</span>
                     </div>
-                    <div className="flex justify-between">
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-600">Type:</span>
+                      {(() => {
+                        const pt = getPartnerTypeBadge(selectedAgent)
+                        return (
+                          <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold rounded-full ${pt.color}`}>
+                            <span>{pt.icon}</span>{pt.label}
+                          </span>
+                        )
+                      })()}
+                    </div>
+                    <div className="flex justify-between items-center">
                       <span className="text-gray-600">Status:</span>
                       <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(selectedAgent.status)}`}>
-                        {selectedAgent.status.replace('_', ' ').toUpperCase()}
+                        {selectedAgent.status.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
                       </span>
                     </div>
                     <div className="flex justify-between">
@@ -854,6 +898,37 @@ export default function AgentsPage() {
                     </div>
                   </div>
                 </div>
+
+                {/* Business Partner Details (shown only for business partners) */}
+                {selectedAgent.user?.metadata?.partnerType === 'business' && selectedAgent.user?.metadata?.business && (() => {
+                  const biz = selectedAgent.user.metadata.business as Record<string, string | boolean | undefined>
+                  const activityLabels: Record<string, string> = {
+                    grocery_convenience: 'Grocery / Convenience',
+                    restaurant_cafe: 'Restaurant / Cafe',
+                    bar_pub: 'Bar / Pub',
+                    specialty_food_import: 'Specialty Food Import',
+                    professional_services: 'Professional Services',
+                    other: 'Other',
+                  }
+                  const interactionLabels: Record<string, string> = {
+                    sit_down_table_service: 'Sit-down / Table Service',
+                    grab_and_go: 'Grab-and-go / Over the counter',
+                    appointment_based: 'Appointment based',
+                  }
+                  return (
+                    <div className="bg-violet-50 rounded-xl p-6 lg:col-span-2">
+                      <h4 className="text-lg font-semibold text-violet-900 mb-4">🏢 Business Details</h4>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {biz.companyName && <div><p className="text-xs text-violet-600 mb-0.5">Company</p><p className="text-sm font-medium text-gray-900">{String(biz.companyName)}</p></div>}
+                        {biz.businessAddress && <div><p className="text-xs text-violet-600 mb-0.5">Address</p><p className="text-sm font-medium text-gray-900">{String(biz.businessAddress)}</p></div>}
+                        {biz.primaryBusinessActivity && <div><p className="text-xs text-violet-600 mb-0.5">Activity</p><p className="text-sm font-medium text-gray-900">{activityLabels[String(biz.primaryBusinessActivity)] || String(biz.primaryBusinessActivity)}</p></div>}
+                        {biz.primarySpecialty && <div><p className="text-xs text-violet-600 mb-0.5">Specialty</p><p className="text-sm font-medium text-gray-900">{String(biz.primarySpecialty)}</p></div>}
+                        {biz.customerInteractionType && <div><p className="text-xs text-violet-600 mb-0.5">Customer Interaction</p><p className="text-sm font-medium text-gray-900">{interactionLabels[String(biz.customerInteractionType)] || String(biz.customerInteractionType)}</p></div>}
+                        <div><p className="text-xs text-violet-600 mb-0.5">Sells International Goods</p><p className="text-sm font-medium text-gray-900">{biz.sellsInternationalGoods ? 'Yes' : 'No'}</p></div>
+                      </div>
+                    </div>
+                  )
+                })()}
 
                 {/* Performance Summary */}
                 <div className="bg-gray-50 rounded-xl p-6">

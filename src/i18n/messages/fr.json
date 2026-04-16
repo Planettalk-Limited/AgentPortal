@@ -76,6 +76,34 @@
       }
     }
   },
+  "partnerPaths": {
+    "title": "Deux Façons de Devenir Partenaire PlanetTalk",
+    "subtitle": "Que vous soyez un particulier ou une entreprise, il existe un modèle de partenariat conçu pour vous.",
+    "individual": {
+      "badge": "Pour les Particuliers",
+      "title": "Partenaire Individuel",
+      "description": "Partagez PlanetTalk avec votre réseau personnel et gagnez une commission chaque fois qu'une personne que vous avez recommandée effectue une recharge. Aucune inscription d'entreprise nécessaire — inscrivez-vous et commencez à gagner.",
+      "benefits": [
+        "Commencez à gagner en quelques minutes après l'inscription",
+        "Commissions pendant 24 mois par recommandation",
+        "Tableau de bord en temps réel pour suivre vos gains",
+        "Inscription simple en une étape"
+      ],
+      "cta": "S'inscrire en tant que Particulier"
+    },
+    "business": {
+      "badge": "Pour les Entreprises",
+      "title": "Partenaire Commercial",
+      "description": "Idéal pour les commerces, restaurants et prestataires de services qui servent les communautés internationales. Profitez d'un support dédié, d'une configuration personnalisée et de structures de commission adaptées aux volumes élevés.",
+      "benefits": [
+        "Image de marque personnalisée pour votre entreprise",
+        "Gestionnaire de compte dédié",
+        "Réunion d'intégration avec notre équipe",
+        "Adapté aux épiceries, restaurants et commerces de services"
+      ],
+      "cta": "Postuler en tant qu'Entreprise"
+    }
+  },
   "features": {
     "title": "Votre Tableau de Bord Agent",
     "subtitle": "Suivez vos revenus, gérez vos parrainages et développez votre entreprise de télécommunications avec notre portail agent complet.",
@@ -342,7 +370,73 @@
       },
       "alreadyHaveAccount": "Vous avez déjà un compte ?",
       "signInLink": "Connectez-vous ici",
-      "passwordRequirement": "Doit contenir au moins 8 caractères, une lettre majuscule et un caractère spécial"
+      "passwordRequirement": "Doit contenir au moins 8 caractères, une lettre majuscule et un caractère spécial",
+      "partnerTypeTitle": "Devenir Partenaire",
+      "partnerTypeSubtitle": "Choisissez le type de partenariat qui vous convient",
+      "changePartnerType": "Changer le type de partenariat",
+      "individualPartner": "Partenaire Individuel",
+      "businessPartner": "Partenaire Commercial",
+      "individualDescription": "Idéal pour les particuliers souhaitant gagner des commissions en partageant PlanetTalk avec leur réseau.",
+      "businessDescription": "Pour les entreprises et organisations souhaitant intégrer les services PlanetTalk à grande échelle.",
+      "individualBenefits": {
+        "instantCode": "Code partenaire instantané à l'approbation",
+        "commissions": "Commissions pendant 24 mois",
+        "simpleSetup": "Configuration rapide et simple"
+      },
+      "businessBenefits": {
+        "customCode": "Code partenaire personnalisé",
+        "accountManagement": "Gestion de compte dédiée",
+        "volumeTiers": "Niveaux de commission basés sur le volume"
+      },
+      "business": {
+        "sectionTitle": "Informations Commerciales",
+        "companyName": "Nom de l'entreprise / Commerce",
+        "companyPlaceholder": "ex. Afro Foods Ltd",
+        "businessAddress": "Adresse de l'entreprise",
+        "addressPlaceholder": "ex. 42 High Street, Manchester, M1 2AB",
+        "primaryActivity": "Activité Principale",
+        "selectActivity": "Sélectionner l'activité",
+        "primarySpecialty": "Spécialité Principale",
+        "selectSpecialty": "Sélectionner la spécialité",
+        "customerInteraction": "Type d'Interaction Client",
+        "selectInteraction": "Sélectionner le type d'interaction",
+        "sellsInternational": "Vente de Produits Internationaux",
+        "sellsInternationalDescription": "Votre entreprise vend-elle des produits importés ou destinés aux communautés internationales ?",
+        "scheduleMeeting": "Planifier une Réunion d'Intégration",
+        "bookMeeting": "Réserver Votre Réunion d'Intégration",
+        "bookMeetingDescription": "Obligatoire avant de soumettre votre candidature",
+        "meetingScheduled": "Réunion Planifiée",
+        "meetingScheduledDescription": "Votre réunion d'intégration a été réservée",
+        "reschedule": "Reprogrammer",
+        "mustBookMeeting": "Vous devez réserver une réunion avant de soumettre votre inscription.",
+        "canReschedule": "Réunion réservée avec succès.",
+        "whatHappensNext": "Étapes suivantes",
+        "whatHappensNextDescription": "Après votre inscription, vous vérifierez votre e-mail. Notre équipe examinera ensuite votre candidature et activera votre compte une fois approuvée."
+      },
+      "validation": {
+        "firstNameRequired": "Le prénom est requis",
+        "lastNameRequired": "Le nom de famille est requis",
+        "countryRequired": "Le pays est requis",
+        "countryInvalid": "Veuillez sélectionner un pays valide",
+        "phoneRequired": "Le numéro de téléphone est requis",
+        "phoneInvalid": "Veuillez entrer un numéro de téléphone valide",
+        "emailRequired": "L'adresse e-mail est requise",
+        "emailInvalid": "Veuillez entrer une adresse e-mail valide",
+        "passwordRequired": "Le mot de passe est requis",
+        "passwordMinLength": "Le mot de passe doit contenir au moins 8 caractères",
+        "passwordUppercase": "Le mot de passe doit contenir au moins une lettre majuscule",
+        "passwordSpecialChar": "Le mot de passe doit contenir au moins un caractère spécial",
+        "passwordRequirements": "Le mot de passe doit contenir au moins 8 caractères, une lettre majuscule et un caractère spécial",
+        "passwordMismatch": "Les mots de passe ne correspondent pas",
+        "agentProgramRequired": "Vous devez accepter les Conditions du Programme Partenaire",
+        "partnerProgramRequired": "Vous devez accepter les Conditions du Programme Partenaire",
+        "companyNameRequired": "Le nom de l'entreprise est requis",
+        "businessAddressRequired": "L'adresse de l'entreprise est requise",
+        "primaryActivityRequired": "L'activité principale est requise",
+        "primarySpecialtyRequired": "La spécialité principale est requise",
+        "customerInteractionRequired": "Le type d'interaction client est requis",
+        "meetingRequired": "Veuillez planifier votre réunion d'intégration avant de vous inscrire"
+      }
     },
     "verifyEmail": {
       "title": "Vérifiez votre Email",

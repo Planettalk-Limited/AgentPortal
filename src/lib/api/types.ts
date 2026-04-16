@@ -3,6 +3,28 @@
  */
 
 // User Types
+export interface UserBusinessMeta {
+  companyName?: string;
+  businessAddress?: string;
+  primaryBusinessActivity?: string;
+  primarySpecialty?: string;
+  customerInteractionType?: string;
+  sellsInternationalGoods?: boolean;
+}
+
+export interface UserMetadata {
+  partnerType?: 'individual' | 'business';
+  registrationMethod?: string;
+  pendingApproval?: boolean;
+  business?: UserBusinessMeta;
+  partnerApprovedAt?: string;
+  rejectedAt?: string;
+  rejectionReason?: string | null;
+  twoFactorEnabled?: boolean;
+  emailNotifications?: boolean;
+  [key: string]: unknown;
+}
+
 export interface User {
   id: string;
   email: string;
@@ -10,16 +32,13 @@ export interface User {
   lastName: string;
   username?: string;
   role: 'admin' | 'pt_admin' | 'agent';
-  status: 'active' | 'inactive' | 'suspended';
+  status: 'active' | 'inactive' | 'suspended' | 'pending' | 'awaiting_partner_approval' | 'rejected';
   phoneNumber?: string;
   country?: string;
   lastLoginAt?: string | null;
   emailVerifiedAt?: string | null;
   isFirstLogin?: boolean;
-  metadata?: {
-    twoFactorEnabled?: boolean;
-    [key: string]: string | number | boolean | null | undefined;
-  };
+  metadata?: UserMetadata;
   preferences?: {
     emailNotifications?: boolean;
     smsNotifications?: boolean;
@@ -58,6 +77,13 @@ export interface RegisterRequest {
   email: string;
   phoneNumber: string;
   password: string;
+  partnerType?: 'individual' | 'business';
+  companyName?: string;
+  businessAddress?: string;
+  primaryBusinessActivity?: string;
+  primarySpecialty?: string;
+  customerInteractionType?: string;
+  sellsInternationalGoods?: boolean;
 }
 
 export interface RegisterResponse {
@@ -69,9 +95,19 @@ export interface RegisterResponse {
     lastName: string;
     email: string;
     status: string;
-    createdAt: string;
+    emailVerified?: boolean;
+    createdAt?: string;
   };
-  pendingVerification: boolean;
+  partnerType?: 'individual' | 'business';
+  requiresEmailVerification?: boolean;
+  meetingBookingUrl?: string;
+  agent?: {
+    agentCode: string;
+    tier: string;
+    commissionRate: number;
+    status: string;
+  };
+  pendingVerification?: boolean;
 }
 
 export interface LoginResponse {
@@ -83,11 +119,14 @@ export interface LoginResponse {
   // Email verification fields
   requiresEmailVerification?: boolean;
   emailVerified?: boolean;
-  isFirstSignIn?: boolean; // Flag to show welcome modal for new users
+  isFirstSignIn?: boolean;
   email?: string;
   otpSent?: boolean;
   otpMessage?: string;
   message?: string;
+  // Business partner states
+  requiresPartnerApproval?: boolean;
+  rejected?: boolean;
 }
 
 // 2FA specific types
@@ -707,6 +746,7 @@ export interface UserQueryParams extends PaginationParams {
 export interface AgentQueryParams extends PaginationParams {
   status?: string;
   tier?: string;
+  partnerType?: string;
   search?: string;
 }
 

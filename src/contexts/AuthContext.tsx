@@ -12,8 +12,8 @@ interface AuthContextType {
   error: string | null
   isAuthenticated: boolean
   isFirstSignIn: boolean
-  login: (email: string, password: string) => Promise<{ requires2FA: boolean; requiresEmailVerification?: boolean; email?: string }>
-  register: (data: RegisterRequest) => Promise<{ success: boolean; message: string }>
+  login: (email: string, password: string) => Promise<{ requires2FA: boolean; requiresEmailVerification?: boolean; requiresPartnerApproval?: boolean; rejected?: boolean; email?: string }>
+  register: (data: RegisterRequest) => Promise<{ success: boolean; message: string; partnerType?: string; meetingBookingUrl?: string }>
   verify2FA: (email: string, code: string) => Promise<void>
   logout: () => Promise<void>
   refreshUser: () => Promise<void>
@@ -180,7 +180,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }
 
-  const register = async (data: RegisterRequest): Promise<{ success: boolean; message: string }> => {
+  const register = async (data: RegisterRequest): Promise<{ success: boolean; message: string; partnerType?: string; meetingBookingUrl?: string }> => {
     try {
       setLoading(true)
       setError(null)
@@ -189,57 +189,57 @@ export function AuthProvider({ children }: AuthProviderProps) {
       
       return { 
         success: response.success, 
-        message: response.message 
+        message: response.message,
+        partnerType: response.partnerType,
+        meetingBookingUrl: response.meetingBookingUrl
       }
     } catch (error) {
       const apiError = error as ApiError
-      // Provide user-friendly error message for common registration errors
-      if (apiError.statusCode === 400 && apiError.error?.includes('email already exists')) {
-        setError('An account with this email already exists. Please use a different email or try logging in.')
-      } else {
-        setError(apiError.error || 'Registration failed. Please try again.')
-      }
+      setError(apiError.error || 'Registration failed. Please try again.')
       throw error
     } finally {
       setLoading(false)
     }
   }
 
-  const login = async (email: string, password: string): Promise<{ requires2FA: boolean; requiresEmailVerification?: boolean; email?: string }> => {
+  const login = async (email: string, password: string): Promise<{ requires2FA: boolean; requiresEmailVerification?: boolean; requiresPartnerApproval?: boolean; rejected?: boolean; email?: string }> => {
     try {
       setLoading(true)
       setError(null)
 
       const response = await api.auth.login({ email, password })
       
-      // Check if email verification is required
       if (response.requiresEmailVerification) {
         return { requires2FA: false, requiresEmailVerification: true, email: email }
       }
+
+      if (response.requiresPartnerApproval) {
+        return { requires2FA: false, requiresPartnerApproval: true, email: email }
+      }
+
+      if (response.rejected) {
+        return { requires2FA: false, rejected: true, email: email }
+      }
       
-      // Check if 2FA is required
       if (response.requires2FA) {
         return { requires2FA: true, email: email }
       }
 
-      // Normal login - only proceed if success is true and we have a user
       if (response.success && response.user) {
         const user = response.user
         setUser(user)
         
-        // Set isFirstSignIn flag from response
         if (response.isFirstSignIn) {
           setIsFirstSignIn(true)
         }
 
-        // Redirect based on user role
         switch (user.role) {
           case 'admin':
           case 'pt_admin':
             router.push(createPath('/admin/dashboard'))
             break
           case 'agent':
-            router.push(createPath('/dashboard')) // Updated to use merged dashboard
+            router.push(createPath('/dashboard'))
             break
           default:
             router.push(createPath('/dashboard'))
@@ -250,7 +250,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     } catch (error) {
       const apiError = error as ApiError
       
-      // Provide user-friendly error message for 401 (invalid credentials)
       if (apiError.statusCode === 401) {
         setError('Invalid email or password. Please check your credentials and try again.')
       } else if (apiError.statusCode === 404) {
@@ -265,7 +264,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setError('Login failed. Please try again.')
       }
       
-      // Don't throw - just return failure state
       return { requires2FA: false, requiresEmailVerification: false }
     } finally {
       setLoading(false)

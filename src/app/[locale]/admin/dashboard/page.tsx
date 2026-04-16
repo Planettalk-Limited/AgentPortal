@@ -243,7 +243,7 @@ function AdminDashboardPage() {
                   </svg>
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-gray-500 mb-1">Total Agents</p>
+                  <p className="text-sm font-semibold text-gray-500 mb-1">Total Partners</p>
                   <p className="text-3xl font-bold text-gray-900">{dashboardData.overview.totalAgents.toLocaleString()}</p>
                 </div>
               </div>
@@ -344,7 +344,7 @@ function AdminDashboardPage() {
                 <svg className="w-6 h-6 mr-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
                 </svg>
-                Recent Agents
+                Recent Partners
               </h3>
             </div>
             <div className="p-6">
@@ -381,7 +381,7 @@ function AdminDashboardPage() {
                     ))}
                 </div>
               ) : (
-                <p className="text-center text-gray-500 py-8">No recent agents</p>
+                <p className="text-center text-gray-500 py-8">No recent partners</p>
               )}
             </div>
           </div>
@@ -502,8 +502,8 @@ function AdminDashboardPage() {
                 </svg>
               </div>
               <div>
-                <p className="font-semibold">Agents</p>
-                <p className="text-sm opacity-70">Manage agent network</p>
+                <p className="font-semibold">Partners</p>
+                <p className="text-sm opacity-70">Manage partner network</p>
               </div>
             </Link>
             <Link
@@ -608,7 +608,7 @@ function AdminDashboardPage() {
                 }).length}</span>
               </div>
               <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100">
-                <span className="text-sm text-gray-600">Agents Today</span>
+                <span className="text-sm text-gray-600">Partners Today</span>
                 <span className="text-sm font-bold text-gray-900">{dashboardData.recent.agents.filter(a => {
                   const diffHours = (new Date().getTime() - new Date(a.createdAt).getTime()) / (1000 * 60 * 60)
                   return diffHours < 24

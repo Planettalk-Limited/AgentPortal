@@ -1,7 +1,7 @@
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
 import { AuthProvider } from '../../contexts/AuthContext'
-import FreshchatWidget from '../../components/FreshchatWidget'
+import FreshchatExcludeAuth from '../../components/FreshchatExcludeAuth'
 
 export function generateStaticParams() {
   return [
@@ -37,7 +37,7 @@ export default async function LocaleLayout({
     <NextIntlClientProvider messages={messages} locale={locale}>
       <AuthProvider>
         {children}
-        <FreshchatWidget />
+        <FreshchatExcludeAuth />
       </AuthProvider>
     </NextIntlClientProvider>
   );
