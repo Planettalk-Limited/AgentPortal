@@ -10,6 +10,9 @@ export interface UserBusinessMeta {
   primarySpecialty?: string;
   customerInteractionType?: string;
   sellsInternationalGoods?: boolean;
+  expectedVolume?: string;
+  region?: string;
+  companyRegistrationNumber?: string;
 }
 
 export interface UserMetadata {

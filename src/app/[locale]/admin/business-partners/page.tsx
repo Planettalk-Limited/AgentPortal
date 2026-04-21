@@ -22,6 +22,9 @@ const INTERACTION_LABELS: Record<string, string> = {
   appointment_based: 'Appointment based',
 }
 
+const ACTIVITY_OPTIONS = Object.entries(ACTIVITY_LABELS)
+const INTERACTION_OPTIONS = Object.entries(INTERACTION_LABELS)
+
 function generateSuggestedCode(companyName: string): string {
   return companyName
     .replace(/\b(ltd|limited|plc|inc|llc|co|corp|gmbh)\b/gi, '')
@@ -40,6 +43,9 @@ interface BusinessMeta {
   primarySpecialty?: string
   customerInteractionType?: string
   sellsInternationalGoods?: boolean
+  expectedVolume?: string
+  region?: string
+  companyRegistrationNumber?: string
 }
 
 function getBusinessMeta(user: User): BusinessMeta {
@@ -51,6 +57,7 @@ function BusinessPartnersPage() {
   const [applications, setApplications] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [toast, setToast] = useState<{ message: string; type: 'error' | 'success' } | null>(null)
+  const [statusFilter, setStatusFilter] = useState<'all' | 'awaiting_partner_approval' | 'rejected'>('all')
 
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [partnerCode, setPartnerCode] = useState('')
@@ -58,6 +65,21 @@ function BusinessPartnersPage() {
   const [rejectionReason, setRejectionReason] = useState('')
   const [showRejectConfirm, setShowRejectConfirm] = useState(false)
   const [actionLoading, setActionLoading] = useState(false)
+  const [editForm, setEditForm] = useState({
+    firstName: '',
+    lastName: '',
+    country: '',
+    phoneNumber: '',
+    companyName: '',
+    businessAddress: '',
+    primaryBusinessActivity: '',
+    primarySpecialty: '',
+    customerInteractionType: '',
+    sellsInternationalGoods: false,
+    expectedVolume: '',
+    region: '',
+    companyRegistrationNumber: '',
+  })
 
   useEffect(() => { loadApplications() }, [])
 
@@ -74,11 +96,27 @@ function BusinessPartnersPage() {
   }
 
   const openReview = (user: User) => {
+    const biz = getBusinessMeta(user)
     setSelectedUser(user)
     setPartnerCode('')
     setCodeError(null)
     setRejectionReason('')
     setShowRejectConfirm(false)
+    setEditForm({
+      firstName: user.firstName || '',
+      lastName: user.lastName || '',
+      country: user.country || '',
+      phoneNumber: user.phoneNumber || '',
+      companyName: biz.companyName || '',
+      businessAddress: biz.businessAddress || '',
+      primaryBusinessActivity: biz.primaryBusinessActivity || '',
+      primarySpecialty: biz.primarySpecialty || '',
+      customerInteractionType: biz.customerInteractionType || '',
+      sellsInternationalGoods: Boolean(biz.sellsInternationalGoods),
+      expectedVolume: biz.expectedVolume || '',
+      region: biz.region || '',
+      companyRegistrationNumber: biz.companyRegistrationNumber || '',
+    })
   }
 
   const backToList = () => {
@@ -116,14 +154,103 @@ function BusinessPartnersPage() {
     }
   }
 
+  const handleSaveApplicationChanges = async () => {
+    if (!selectedUser) return
+    try {
+      setActionLoading(true)
+      const payload = {
+        firstName: editForm.firstName.trim() || undefined,
+        lastName: editForm.lastName.trim() || undefined,
+        country: editForm.country.trim() || undefined,
+        phoneNumber: editForm.phoneNumber.trim() || undefined,
+        companyName: editForm.companyName.trim() || undefined,
+        businessAddress: editForm.businessAddress.trim() || undefined,
+        primaryBusinessActivity: editForm.primaryBusinessActivity || undefined,
+        primarySpecialty: editForm.primarySpecialty.trim() || undefined,
+        customerInteractionType: editForm.customerInteractionType || undefined,
+        sellsInternationalGoods: editForm.sellsInternationalGoods,
+        expectedVolume: editForm.expectedVolume.trim() || undefined,
+        region: editForm.region.trim() || undefined,
+        companyRegistrationNumber: editForm.companyRegistrationNumber.trim() || undefined,
+      }
+
+      await api.admin.updateBusinessPartnerApplication(selectedUser.id, payload)
+
+      const nextStatus =
+        selectedUser.status === 'rejected' ? 'awaiting_partner_approval' : selectedUser.status
+      const nextUser: User = {
+        ...selectedUser,
+        firstName: payload.firstName || selectedUser.firstName,
+        lastName: payload.lastName || selectedUser.lastName,
+        country: payload.country || selectedUser.country,
+        phoneNumber: payload.phoneNumber ?? selectedUser.phoneNumber,
+        status: nextStatus,
+        metadata: {
+          ...(selectedUser.metadata || {}),
+          business: {
+            ...(getBusinessMeta(selectedUser) || {}),
+            companyName: payload.companyName ?? getBusinessMeta(selectedUser).companyName,
+            businessAddress: payload.businessAddress ?? getBusinessMeta(selectedUser).businessAddress,
+            primaryBusinessActivity: payload.primaryBusinessActivity ?? getBusinessMeta(selectedUser).primaryBusinessActivity,
+            primarySpecialty: payload.primarySpecialty ?? getBusinessMeta(selectedUser).primarySpecialty,
+            customerInteractionType: payload.customerInteractionType ?? getBusinessMeta(selectedUser).customerInteractionType,
+            sellsInternationalGoods: payload.sellsInternationalGoods ?? getBusinessMeta(selectedUser).sellsInternationalGoods,
+            expectedVolume: payload.expectedVolume ?? getBusinessMeta(selectedUser).expectedVolume,
+            region: payload.region ?? getBusinessMeta(selectedUser).region,
+            companyRegistrationNumber: payload.companyRegistrationNumber ?? getBusinessMeta(selectedUser).companyRegistrationNumber,
+          },
+        },
+      }
+
+      setSelectedUser(nextUser)
+      setApplications(prev => prev.map(u => (u.id === selectedUser.id ? nextUser : u)))
+      setToast({
+        message:
+          selectedUser.status === 'rejected'
+            ? 'Application updated and moved back to review.'
+            : 'Application details updated successfully.',
+        type: 'success',
+      })
+    } catch (err: any) {
+      setToast({ message: err.error || err.message || 'Failed to update application', type: 'error' })
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
+  const handleMoveToReview = async () => {
+    if (!selectedUser) return
+    try {
+      setActionLoading(true)
+      await api.admin.moveBusinessPartnerToReview(selectedUser.id)
+      const nextUser: User = { ...selectedUser, status: 'awaiting_partner_approval' }
+      setSelectedUser(nextUser)
+      setApplications(prev => prev.map(u => (u.id === selectedUser.id ? nextUser : u)))
+      setToast({ message: 'Application moved back to review.', type: 'success' })
+    } catch (err: any) {
+      setToast({ message: err.error || err.message || 'Failed to move application to review', type: 'error' })
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
   const handleReject = async () => {
     if (!selectedUser) return
     try {
       setActionLoading(true)
       await api.admin.rejectBusinessPartner(selectedUser.id, rejectionReason.trim() || undefined)
-      setApplications(prev => prev.filter(u => u.id !== selectedUser.id))
+      const nextUser: User = {
+        ...selectedUser,
+        status: 'rejected',
+        metadata: {
+          ...(selectedUser.metadata || {}),
+          rejectionReason: rejectionReason.trim() || null,
+        },
+      }
+      setApplications(prev => prev.map(u => (u.id === selectedUser.id ? nextUser : u)))
+      setSelectedUser(nextUser)
+      setShowRejectConfirm(false)
       setToast({ message: `Application from ${getBusinessMeta(selectedUser).companyName || selectedUser.firstName} has been rejected.`, type: 'success' })
-      backToList()
     } catch (err: any) {
       setCodeError(err.error || err.message || 'Rejection failed')
     } finally {
@@ -146,6 +273,7 @@ function BusinessPartnersPage() {
   // ── Review Detail View ──
   if (selectedUser) {
     const biz = getBusinessMeta(selectedUser)
+    const isRejected = selectedUser.status === 'rejected'
 
     return (
       <div className="p-4 sm:p-6 max-w-4xl mx-auto">
@@ -163,6 +291,16 @@ function BusinessPartnersPage() {
         <div className="mb-8">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{biz.companyName || 'Business Application'}</h1>
           <p className="text-gray-500 mt-1">{selectedUser.firstName} {selectedUser.lastName} &middot; {selectedUser.email}</p>
+          <div className="mt-3 inline-flex items-center gap-2">
+            <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold ${
+              isRejected ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'
+            }`}>
+              {isRejected ? 'Rejected' : 'In Review'}
+            </span>
+            {isRejected && selectedUser.metadata?.rejectionReason && (
+              <span className="text-xs text-red-600">Reason: {String(selectedUser.metadata.rejectionReason)}</span>
+            )}
+          </div>
         </div>
 
         {/* Application Details */}
@@ -177,6 +315,72 @@ function BusinessPartnersPage() {
             <Detail label="Primary Specialty" value={biz.primarySpecialty} />
             <Detail label="Customer Interaction" value={INTERACTION_LABELS[biz.customerInteractionType || ''] || biz.customerInteractionType} />
             <Detail label="Sells International Goods" value={biz.sellsInternationalGoods ? 'Yes' : 'No'} />
+          </div>
+        </div>
+
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm mb-6">
+          <div className="px-6 py-4 border-b border-gray-100">
+            <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">Edit Application Details</h2>
+          </div>
+          {isRejected && (
+            <div className="mx-6 mt-5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-sm font-semibold text-amber-800">Application is currently rejected</p>
+                <p className="text-xs text-amber-700 mt-0.5">Use this action after making corrections to send it back to the review queue.</p>
+              </div>
+              <button
+                onClick={handleMoveToReview}
+                disabled={actionLoading}
+                className="inline-flex items-center justify-center px-4 py-2.5 rounded-lg bg-amber-600 text-white text-sm font-semibold hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors w-full sm:w-auto"
+              >
+                {actionLoading ? 'Moving...' : 'Move to Review'}
+              </button>
+            </div>
+          )}
+          <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Input label="First Name" value={editForm.firstName} onChange={(v) => setEditForm(f => ({ ...f, firstName: v }))} />
+            <Input label="Last Name" value={editForm.lastName} onChange={(v) => setEditForm(f => ({ ...f, lastName: v }))} />
+            <Input label="Country (2-char)" value={editForm.country} onChange={(v) => setEditForm(f => ({ ...f, country: v.toUpperCase() }))} />
+            <Input label="Phone Number" value={editForm.phoneNumber} onChange={(v) => setEditForm(f => ({ ...f, phoneNumber: v }))} />
+            <Input label="Company Name" value={editForm.companyName} onChange={(v) => setEditForm(f => ({ ...f, companyName: v }))} />
+            <Input label="Business Address" value={editForm.businessAddress} onChange={(v) => setEditForm(f => ({ ...f, businessAddress: v }))} />
+            <SelectInput
+              label="Primary Business Activity"
+              value={editForm.primaryBusinessActivity}
+              options={ACTIVITY_OPTIONS}
+              onChange={(v) => setEditForm(f => ({ ...f, primaryBusinessActivity: v }))}
+            />
+            <Input label="Primary Specialty" value={editForm.primarySpecialty} onChange={(v) => setEditForm(f => ({ ...f, primarySpecialty: v }))} />
+            <SelectInput
+              label="Customer Interaction"
+              value={editForm.customerInteractionType}
+              options={INTERACTION_OPTIONS}
+              onChange={(v) => setEditForm(f => ({ ...f, customerInteractionType: v }))}
+            />
+            <Input label="Expected Volume" value={editForm.expectedVolume} onChange={(v) => setEditForm(f => ({ ...f, expectedVolume: v }))} />
+            <Input label="Region" value={editForm.region} onChange={(v) => setEditForm(f => ({ ...f, region: v }))} />
+            <Input label="Company Registration Number" value={editForm.companyRegistrationNumber} onChange={(v) => setEditForm(f => ({ ...f, companyRegistrationNumber: v }))} />
+            <label className="text-sm text-gray-700 flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={editForm.sellsInternationalGoods}
+                onChange={(e) => setEditForm(f => ({ ...f, sellsInternationalGoods: e.target.checked }))}
+              />
+              Sells International Goods
+            </label>
+          </div>
+          <div className="px-6 pb-6">
+            <button
+              onClick={handleSaveApplicationChanges}
+              disabled={actionLoading}
+              className="px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 disabled:opacity-50"
+            >
+              {actionLoading
+                ? 'Saving...'
+                : isRejected
+                  ? 'Save Changes & Move to Review'
+                  : 'Save Changes'}
+            </button>
           </div>
         </div>
 
@@ -248,7 +452,9 @@ function BusinessPartnersPage() {
           {/* Reject */}
           <div className="bg-white rounded-2xl border-2 border-red-200 shadow-sm p-6">
             <h2 className="text-sm font-semibold text-red-600 uppercase tracking-wider mb-4">Reject Application</h2>
-            {!showRejectConfirm ? (
+            {isRejected ? (
+              <p className="text-sm text-red-600">This application is already rejected. You can edit details and move it back to review.</p>
+            ) : !showRejectConfirm ? (
               <div className="flex items-center justify-center h-[calc(100%-2rem)]">
                 <button
                   onClick={() => setShowRejectConfirm(true)}
@@ -310,12 +516,26 @@ function BusinessPartnersPage() {
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         <div className="bg-white rounded-xl border border-gray-200 p-5">
-          <p className="text-sm text-gray-500">Pending Review</p>
-          <p className="text-3xl font-bold text-amber-600 mt-1">{applications.length}</p>
+          <p className="text-sm text-gray-500">In Review</p>
+          <p className="text-3xl font-bold text-amber-600 mt-1">{applications.filter(a => a.status === 'awaiting_partner_approval').length}</p>
+        </div>
+        <div className="bg-white rounded-xl border border-gray-200 p-5">
+          <p className="text-sm text-gray-500">Rejected</p>
+          <p className="text-3xl font-bold text-red-600 mt-1">{applications.filter(a => a.status === 'rejected').length}</p>
+        </div>
+        <div className="bg-white rounded-xl border border-gray-200 p-5">
+          <p className="text-sm text-gray-500">Total</p>
+          <p className="text-3xl font-bold text-gray-800 mt-1">{applications.length}</p>
         </div>
       </div>
 
-      {applications.length === 0 ? (
+      <div className="mb-4 flex items-center gap-2">
+        <button onClick={() => setStatusFilter('all')} className={`px-3 py-1.5 rounded-lg text-sm ${statusFilter === 'all' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-700'}`}>All</button>
+        <button onClick={() => setStatusFilter('awaiting_partner_approval')} className={`px-3 py-1.5 rounded-lg text-sm ${statusFilter === 'awaiting_partner_approval' ? 'bg-amber-600 text-white' : 'bg-amber-100 text-amber-700'}`}>In Review</button>
+        <button onClick={() => setStatusFilter('rejected')} className={`px-3 py-1.5 rounded-lg text-sm ${statusFilter === 'rejected' ? 'bg-red-600 text-white' : 'bg-red-100 text-red-700'}`}>Rejected</button>
+      </div>
+
+      {applications.filter(a => statusFilter === 'all' || a.status === statusFilter).length === 0 ? (
         <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center">
           <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -323,7 +543,7 @@ function BusinessPartnersPage() {
             </svg>
           </div>
           <h3 className="text-lg font-semibold text-gray-700 mb-1">All caught up</h3>
-          <p className="text-gray-500 text-sm">No pending business partner applications at this time.</p>
+          <p className="text-gray-500 text-sm">No business partner applications found for this filter.</p>
         </div>
       ) : (
         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
@@ -336,11 +556,14 @@ function BusinessPartnersPage() {
                   <th className="text-left px-5 py-3 font-semibold text-gray-600 hidden md:table-cell">Activity</th>
                   <th className="text-left px-5 py-3 font-semibold text-gray-600 hidden lg:table-cell">Specialty</th>
                   <th className="text-left px-5 py-3 font-semibold text-gray-600 hidden lg:table-cell">Submitted</th>
+                  <th className="text-left px-5 py-3 font-semibold text-gray-600">Status</th>
                   <th className="text-right px-5 py-3 font-semibold text-gray-600">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {applications.map(user => {
+                {applications
+                  .filter(user => statusFilter === 'all' || user.status === statusFilter)
+                  .map(user => {
                   const biz = getBusinessMeta(user)
                   return (
                     <tr key={user.id} className="hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => openReview(user)}>
@@ -362,6 +585,13 @@ function BusinessPartnersPage() {
                       </td>
                       <td className="px-5 py-4 hidden lg:table-cell text-gray-500 text-xs">
                         {user.createdAt ? new Date(user.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}
+                      </td>
+                      <td className="px-5 py-4">
+                        <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold ${
+                          user.status === 'rejected' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'
+                        }`}>
+                          {user.status === 'rejected' ? 'Rejected' : 'In Review'}
+                        </span>
                       </td>
                       <td className="px-5 py-4 text-right">
                         <button
@@ -389,6 +619,57 @@ function Detail({ label, value }: { label: string; value?: string | null }) {
       <p className="text-xs text-gray-500 mb-0.5">{label}</p>
       <p className="text-sm font-medium text-gray-900">{value || '—'}</p>
     </div>
+  )
+}
+
+function Input({
+  label,
+  value,
+  onChange,
+}: {
+  label: string
+  value: string
+  onChange: (value: string) => void
+}) {
+  return (
+    <label className="block">
+      <span className="text-xs text-gray-500">{label}</span>
+      <input
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-pt-turquoise/30"
+      />
+    </label>
+  )
+}
+
+function SelectInput({
+  label,
+  value,
+  options,
+  onChange,
+}: {
+  label: string
+  value: string
+  options: Array<[string, string]>
+  onChange: (value: string) => void
+}) {
+  return (
+    <label className="block">
+      <span className="text-xs text-gray-500">{label}</span>
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-pt-turquoise/30 bg-white"
+      >
+        <option value="">Select an option</option>
+        {options.map(([optionValue, optionLabel]) => (
+          <option key={optionValue} value={optionValue}>
+            {optionLabel}
+          </option>
+        ))}
+      </select>
+    </label>
   )
 }
 

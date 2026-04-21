@@ -31,12 +31,13 @@
     "middle": "",
     "subtitle": "",
     "subtitle2": "Earn When You Help Families Stay Connected Across Borders",
-    "description": "Join a fast-growing network of Partners helping friends and families abroad stay close, while earning every time they top up on PlanetTalk.",
-    "info": "Thousands of people in the UK, France and Canada are using the PlanetTalk app to connect and support their loved ones via cheap international calls, easy airtime and data credit recharges and top-ups, e-vouchers, gift cards, and utility bill payments at unbeatable rates.",
+    "description": "Join a fast-growing network of partners helping friends and families abroad stay close, while earning every time they use PlanetTalk.",
+    "info": "Thousands of people in the UK, US, Canada, France, and Ireland are using the PlanetTalk app to connect and support their loved ones via cheap international calls, easy airtime and data credit recharges and top-ups, e-vouchers, gift cards, and utility bill payments at unbeatable rates.",
     "helpThemStay": "You can help them stay connected with loved ones and make some money in the process!",
     "ctaPrimary": "Partner Sign In",
     "ctaSecondary": "Become a Partner",
-    "signUp": "Sign Up Now",
+    "signUp": "Sign Up",
+    "signIn": "Sign In",
     "cta": "Ready to Start?",
     "ctaDescription": "Join us today and turn your connections into cash!",
     "whyJoin": {
@@ -77,31 +78,33 @@
     }
   },
   "partnerPaths": {
-    "title": "Two Ways to Partner with PlanetTalk",
-    "subtitle": "Whether you're an individual or a business, there's a partnership model designed for you.",
+    "title": "Partner with PlanetTalk",
+    "subtitle": "Choose individual or business.",
     "individual": {
       "badge": "For Individuals",
       "title": "Individual Partner",
-      "description": "Share PlanetTalk with your personal network and earn a commission every time someone you refer makes a top-up. No business registration needed — just sign up and start earning.",
+      "description": "Share PlanetTalk with your friends and family — earn every time they use the app.",
       "benefits": [
-        "Start earning within minutes of signing up",
-        "Earn commission for 24 months per referral",
-        "Real-time dashboard to track earnings",
-        "Simple one-step registration"
+        "Sign up and submit your details",
+        "Get your unique partner code",
+        "Share with your network",
+        "Earn commission for up to 24 months on every referral",
+        "Track your earnings and request payouts anytime from your dashboard"
       ],
-      "cta": "Sign Up as Individual"
+      "cta": "Start earning as an Individual"
     },
     "business": {
       "badge": "For Businesses",
       "title": "Business Partner",
-      "description": "Ideal for shops, restaurants, and service providers that serve international communities. Enjoy dedicated support, a personalised setup, and higher-volume commission structures.",
+      "description": "Turn your customers into recurring income with PlanetTalk. Perfect for shops, restaurants, and service providers serving international communities.",
       "benefits": [
-        "Personalised branding for your business",
-        "Dedicated account manager",
-        "Onboarding meeting with our team",
-        "Tailored for grocery, food, and service businesses"
+        "Register your business and get verified",
+        "Get a dedicated account manager to support you",
+        "Receive your unique partner code + branded marketing materials",
+        "Get onboarded step-by-step by our team",
+        "Track earnings and request payouts from your dashboard"
       ],
-      "cta": "Apply as Business"
+      "cta": "Grow your business with PlanetTalk"
     }
   },
   "features": {

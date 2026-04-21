@@ -115,6 +115,41 @@ export class AdminService extends BaseService {
   }
 
   /**
+   * Move a rejected business partner application back to review
+   */
+  async moveBusinessPartnerToReview(id: string, note?: string): Promise<{ success: boolean; user: Partial<User>; message: string }> {
+    return this.execute(() =>
+      this.client.post(`admin/users/${id}/review-business-partner`, note ? { note } : {})
+    );
+  }
+
+  /**
+   * Update business partner application details
+   */
+  async updateBusinessPartnerApplication(
+    id: string,
+    data: {
+      firstName?: string;
+      lastName?: string;
+      country?: string;
+      phoneNumber?: string;
+      companyName?: string;
+      businessAddress?: string;
+      primaryBusinessActivity?: string;
+      primarySpecialty?: string;
+      customerInteractionType?: string;
+      sellsInternationalGoods?: boolean;
+      expectedVolume?: string;
+      region?: string;
+      companyRegistrationNumber?: string;
+    },
+  ): Promise<{ success: boolean; user: Partial<User>; message: string }> {
+    return this.execute(() =>
+      this.client.patch(`admin/users/${id}/business-partner-application`, data)
+    );
+  }
+
+  /**
    * Approve a business partner and assign a custom partner code
    */
   async approveBusinessPartner(id: string, partnerCode: string): Promise<{ success: boolean; user: Partial<User>; agent: { id: string; agentCode: string; status: string } }> {
