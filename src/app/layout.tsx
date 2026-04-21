@@ -10,11 +10,11 @@ const roboto = Roboto({
 
 export const metadata: Metadata = {
   title: {
-    template: '%s | PlanetTalk Agent Portal',
-    default: 'PlanetTalk Agent Portal - Join Our Global Telecommunications Network',
+    template: '%s | PlanetTalk Partner Portal',
+    default: 'PlanetTalk Partner Portal - Join Our Global Telecommunications Network',
   },
-  description: 'Join PlanetTalk\'s global telecommunications network. Earn commissions by sharing your unique agent code and helping customers with top-ups worldwide.',
-  keywords: 'PlanetTalk, Agent, Portal, Telecommunications, International Calls',
+  description: 'Join PlanetTalk\'s global telecommunications network. Earn commissions by sharing your unique partner code and helping customers with top-ups worldwide.',
+  keywords: 'PlanetTalk, Partner, Portal, Telecommunications, International Calls',
   authors: { name: 'PlanetTalk Limited' },
   creator: 'PlanetTalk Limited',
   publisher: 'PlanetTalk Limited',
@@ -34,16 +34,16 @@ export const metadata: Metadata = {
   },
   manifest: '/site.webmanifest',
   openGraph: {
-    title: 'PlanetTalk Agent Portal - Join Our Global Network',
-    description: 'Join PlanetTalk\'s global telecommunications network. Earn commissions by sharing your unique agent code and helping customers with top-ups worldwide.',
+    title: 'PlanetTalk Partner Portal - Join Our Global Network',
+    description: 'Join PlanetTalk\'s global telecommunications network. Earn commissions by sharing your unique partner code and helping customers with top-ups worldwide.',
     url: 'https://agent.planettalk.com',
-    siteName: 'PlanetTalk Agent Portal',
+    siteName: 'PlanetTalk Partner Portal',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'PlanetTalk Agent Portal - Join Our Global Network',
-    description: 'Join PlanetTalk\'s global telecommunications network. Earn commissions by sharing your unique agent code and helping customers with top-ups worldwide.',
+    title: 'PlanetTalk Partner Portal - Join Our Global Network',
+    description: 'Join PlanetTalk\'s global telecommunications network. Earn commissions by sharing your unique partner code and helping customers with top-ups worldwide.',
   },
   robots: {
     index: true,

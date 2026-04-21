@@ -160,7 +160,7 @@ export default function ReferralPage() {
         <meta property="og:image" content="https://portal.planettalk.com/icon-512x512.png" />
         <meta property="og:image:width" content="512" />
         <meta property="og:image:height" content="512" />
-        <meta property="og:site_name" content="PlanetTalk Agent Portal" />
+        <meta property="og:site_name" content="PlanetTalk Partner Portal" />
         
         {/* Twitter */}
         <meta property="twitter:card" content="summary" />

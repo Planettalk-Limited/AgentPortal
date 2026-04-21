@@ -1,18 +1,18 @@
 {
   "navigation": {
-    "agentPortal": "Agent Portal",
+    "agentPortal": "Partner Portal",
     "about": "About",
     "features": "Features",
     "planettalkWebsite": "PlanetTalk.com",
     "dashboard": "Dashboard",
-    "agent": "My Agent Account",
-    "agents": "Agents",
+    "agent": "My Partner Account",
+    "agents": "Partners",
     "payouts": "Payouts",
     "users": "Users",
     "profile": "Profile",
     "signIn": "Sign In",
     "signOut": "Sign Out",
-    "becomeAgent": "Become an Agent",
+    "becomeAgent": "Become a Partner",
     "welcome": "Welcome, {name}",
     "home": "Home",
     "myProfile": "My Profile",
@@ -26,17 +26,18 @@
     "joinOurChannel": "Join Our Channel"
   },
   "hero": {
-    "badge": "Agent Portal Live",
-    "title": "Become a PlanetTalk Agent",
+    "badge": "Partner Portal Live",
+    "title": "Become a PlanetTalk Partner",
     "middle": "",
     "subtitle": "",
     "subtitle2": "Earn When You Help Families Stay Connected Across Borders",
-    "description": "Join a fast-growing network of Agents helping friends and families abroad stay close, while earning every time they top up on PlanetTalk.",
-    "info": "Thousands of people in the UK, France and Canada are using the PlanetTalk app to connect and support their loved ones via cheap international calls, easy airtime and data credit recharges and top-ups, e-vouchers, gift cards, and utility bill payments at unbeatable rates.",
+    "description": "Join a fast-growing network of partners helping friends and families abroad stay close, while earning every time they use PlanetTalk.",
+    "info": "Thousands of people in the UK, US, Canada, France, and Ireland are using the PlanetTalk app to connect and support their loved ones via cheap international calls, easy airtime and data credit recharges and top-ups, e-vouchers, gift cards, and utility bill payments at unbeatable rates.",
     "helpThemStay": "You can help them stay connected with loved ones and make some money in the process!",
-    "ctaPrimary": "Agent Sign In",
-    "ctaSecondary": "Become an Agent",
-    "signUp": "Sign Up Now",
+    "ctaPrimary": "Partner Sign In",
+    "ctaSecondary": "Become a Partner",
+    "signUp": "Sign Up",
+    "signIn": "Sign In",
     "cta": "Ready to Start?",
     "ctaDescription": "Join us today and turn your connections into cash!",
     "whyJoin": {
@@ -47,8 +48,8 @@
           "description": "Receive commissions on each customer for 24 months from their first successful top-up."
         },
         {
-          "title": "Unique Agent Code",
-          "description": "Share your unique code with your network, they use it once and you earn commission every time they top up."
+        "title": "Unique Partner Code",
+        "description": "Share your unique code with your network, they use it once and you earn commission every time they top up."
         },
         {
           "title": "Make a Positive Impact",
@@ -68,7 +69,7 @@
       },
       "step2": {
         "title": "Get Your Code",
-        "description": "Receive your unique agent code and portal access credentials via email"
+        "description": "Receive your unique partner code and portal access credentials via email"
       },
       "step3": {
         "title": "Start Earning",
@@ -76,16 +77,46 @@
       }
     }
   },
+  "partnerPaths": {
+    "title": "Partner with PlanetTalk",
+    "subtitle": "Choose individual or business.",
+    "individual": {
+      "badge": "For Individuals",
+      "title": "Individual Partner",
+      "description": "Share PlanetTalk with your friends and family — earn every time they use the app.",
+      "benefits": [
+        "Sign up and submit your details",
+        "Get your unique partner code",
+        "Share with your network",
+        "Earn commission for up to 24 months on every referral",
+        "Track your earnings and request payouts anytime from your dashboard"
+      ],
+      "cta": "Start earning as an Individual"
+    },
+    "business": {
+      "badge": "For Businesses",
+      "title": "Business Partner",
+      "description": "Turn your customers into recurring income with PlanetTalk. Perfect for shops, restaurants, and service providers serving international communities.",
+      "benefits": [
+        "Register your business and get verified",
+        "Get a dedicated account manager to support you",
+        "Receive your unique partner code + branded marketing materials",
+        "Get onboarded step-by-step by our team",
+        "Track earnings and request payouts from your dashboard"
+      ],
+      "cta": "Grow your business with PlanetTalk"
+    }
+  },
   "features": {
-    "title": "Your Agent Portal Dashboard",
-    "subtitle": "Track your earnings, manage your referrals, and grow your telecommunications business with our comprehensive agent portal.",
-    "cta": "Start Your Agent Journey",
+    "title": "Your Partner Portal Dashboard",
+    "subtitle": "Track your earnings, manage your referrals, and grow your telecommunications business with our comprehensive partner portal.",
+    "cta": "Start Your Partner Journey",
     "items": {
       "agentCode": {
-        "title": "Agent Code Management",
-        "description": "Your unique agent code is your key to earning. Share it easily and track its usage across all platforms.",
+        "title": "Partner Code Management",
+        "description": "Your unique partner code is your key to earning. Share it easily and track its usage across all platforms.",
         "benefits": [
-          "Unique shareable agent code",
+          "Unique shareable partner code",
           "One-click copy & share",
           "Social media integration",
           "QR code generation"
@@ -93,7 +124,7 @@
       },
       "tracking": {
         "title": "Customer Usage Tracking",
-        "description": "See exactly how many customers have used your agent code and monitor their top-up activities.",
+        "description": "See exactly how many customers have used your partner code and monitor their top-up activities.",
         "benefits": [
           "Customer usage statistics",
           "Top-up activity tracking",
@@ -133,7 +164,7 @@
       },
       "checklist": {
         "title": "Getting Started Checklist",
-        "description": "Follow our step-by-step onboarding checklist to get your agent business up and running quickly.",
+        "description": "Follow our step-by-step onboarding checklist to get your partner business up and running quickly.",
         "benefits": [
           "Step-by-step onboarding",
           "Progress tracking",
@@ -144,7 +175,7 @@
     }
   },
   "about": {
-    "title": "Your Agent Journey",
+    "title": "Your Partner Journey",
     "subtitle": "From application to earning monthly commissions - here's how our automated system works for you.",
     "steps": {
       "registration": {
@@ -161,7 +192,7 @@
         "description": "Automated system vetting and approval process",
         "items": [
           "Automatic application vetting",
-          "Unique agent code generation",
+          "Unique partner code generation",
           "Login credentials sent via email"
         ]
       },
@@ -169,7 +200,7 @@
         "title": "Portal Access",
         "description": "Complete dashboard with all your business tools",
         "items": [
-          "Track customers using your agent code",
+          "Track customers using your partner code",
           "Monitor top-up activities and commissions",
           "Share your code via email and social media",
           "Access training materials and resources"
@@ -178,14 +209,14 @@
     },
     "stats": {
       "title": "Join Our Growing Network",
-      "activeAgents": "Active Agents",
+      "activeAgents": "Active Partners",
       "countries": "Countries",
       "earningsPaid": "Earnings Paid",
       "support": "Support"
     }
   },
   "footer": {
-    "agentPortal": "Agent Portal",
+    "agentPortal": "Partner Portal",
     "description": "helping you connect and support your loved ones!",
     "downloadApp": "Download PlanetTalk App",
     "sections": {
@@ -194,12 +225,12 @@
       "company": "Company"
     },
     "links": {
-      "agentSignIn": "Agent Sign In",
-      "becomeAgent": "Become an Agent",
+      "agentSignIn": "Partner Sign In",
+      "becomeAgent": "Become a Partner",
       "dashboard": "Dashboard",
       "helpSupport": "Help & Support",
       "contactSupport": "Contact Support",
-      "agentResources": "Agent Resources",
+      "agentResources": "Partner Resources",
       "planettalkWebsite": "PlanetTalk.com",
       "blog": "Blog",
       "partnerWithUs": "Partner with Us",
@@ -211,20 +242,20 @@
   },
   "admin": {
     "agents": {
-      "title": "Agent Management",
-      "subtitle": "Manage agents, applications, and monitor performance",
+      "title": "Partner Management",
+      "subtitle": "Manage partners, applications, and monitor performance",
       "stats": {
-        "total": "Total Agents",
+        "total": "Total Partners",
         "active": "Active",
         "pending": "Pending",
         "suspended": "Suspended"
       },
       "tabs": {
-        "agents": "Agents",
+        "agents": "Partners",
         "applications": "Applications"
       },
       "filters": {
-        "search": "Search agents...",
+        "search": "Search partners...",
         "allStatus": "All Status",
         "allTiers": "All Tiers"
       },
@@ -251,12 +282,12 @@
       },
       "empty": {
         "title": "No {type} found",
-        "description": "Get started by adding a new agent or application."
+        "description": "Get started by adding a new partner or application."
       }
     },
     "earnings": {
       "title": "Pending Earnings",
-      "subtitle": "Review and approve agent referral commissions",
+      "subtitle": "Review and approve partner referral commissions",
       "loading": "Loading pending earnings...",
       "noEarnings": "No pending earnings",
       "noEarningsDescription": "All earnings have been reviewed.",
@@ -270,7 +301,7 @@
       },
       "table": {
         "date": "Date",
-        "agent": "Agent",
+        "agent": "Partner",
         "customer": "Customer",
         "amount": "Amount",
         "commissionRate": "Commission Rate",
@@ -314,7 +345,7 @@
   "auth": {
     "login": {
       "title": "Welcome Back",
-      "subtitle": "Sign in to your agent account",
+      "subtitle": "Sign in to your partner account",
       "email": "Email Address",
       "password": "Password",
       "rememberMe": "Remember me",
@@ -322,7 +353,7 @@
       "signIn": "Sign In",
       "signingIn": "Signing in...",
       "noAccount": "Don't have an account?",
-      "applyLink": "Apply to become an agent"
+      "applyLink": "Apply to become a partner"
     },
     "forgotPassword": {
       "title": "Forgot Password?",
@@ -353,8 +384,8 @@
       }
     },
     "apply": {
-      "title": "Apply to Become an Agent",
-      "subtitle": "Join our network of successful telecommunications agents",
+      "title": "Apply to Become a Partner",
+      "subtitle": "Join our network of successful telecommunications partners",
       "steps": {
         "personal": "Personal Information",
         "address": "Address & Experience"
@@ -372,7 +403,7 @@
         "country": "Country",
         "experience": "Relevant Experience",
         "experiencePlaceholder": "Describe your relevant sales, customer service, or telecommunications experience...",
-        "motivation": "Why do you want to become a PlanetTalk agent?",
+        "motivation": "Why do you want to become a PlanetTalk partner?",
         "motivationPlaceholder": "Tell us about your motivation and goals...",
         "hasLicense": "I have a valid telecommunications or sales license",
         "licenseNumber": "License Number"
@@ -385,16 +416,16 @@
       },
       "success": {
         "title": "Application Submitted!",
-        "message": "Thank you for your interest in becoming a PlanetTalk agent. We've received your application and will review it shortly.",
+        "message": "Thank you for your interest in becoming a PlanetTalk partner. We've received your application and will review it shortly.",
         "nextSteps": "What's next?",
-        "nextStepsDescription": "Our team will review your application within 2-3 business days. If approved, you'll receive an email with your agent credentials and next steps.",
+        "nextStepsDescription": "Our team will review your application within 2-3 business days. If approved, you'll receive an email with your partner credentials and next steps.",
         "backToHome": "Back to Home"
       },
       "alreadyHaveAccount": "Already have an account?"
     },
     "register": {
       "title": "Create Your Account",
-      "subtitle": "Join the PlanetTalk agent network and start earning today",
+      "subtitle": "Join the PlanetTalk partner network and start earning today",
       "fields": {
         "firstName": "First Name",
         "lastName": "Last Name",
@@ -412,6 +443,66 @@
         "password": "Create a secure password",
         "confirmPassword": "Confirm your password"
       },
+      "optIn": {
+        "termsPrefix": "I agree to the",
+        "termsLink": "Terms & Conditions",
+        "and": "and",
+        "privacyLink": "Privacy Policy",
+        "newsletter": "I agree to receive newsletters and accept the data privacy statement."
+      },
+      "passwordRequirement": "Must be at least 8 characters, contain one uppercase letter and one special character",
+      "submit": "Create Account",
+      "submitting": "Creating Account...",
+      "success": {
+        "title": "Registration Successful!",
+        "subtitle": "What's Next?",
+        "description": "Please check your email for your login credentials. Our team will review your application and send you your temporary password and partner code.",
+        "loginButton": "Go to Login"
+      },
+      "alreadyHaveAccount": "Already have an account?",
+      "signInLink": "Sign in here",
+      "partnerTypeTitle": "Become a Partner",
+      "partnerTypeSubtitle": "Choose the partner type that best fits you",
+      "changePartnerType": "Change partner type",
+      "individualPartner": "Individual Partner",
+      "businessPartner": "Business Partner",
+      "individualDescription": "Perfect for individuals looking to earn commissions by sharing PlanetTalk with their network.",
+      "businessDescription": "For companies and organisations looking to integrate PlanetTalk services at scale.",
+      "individualBenefits": {
+        "instantCode": "Instant partner code on approval",
+        "commissions": "Earn commissions for 24 months",
+        "simpleSetup": "Quick and simple setup"
+      },
+      "businessBenefits": {
+        "customCode": "Custom partner code",
+        "accountManagement": "Dedicated account management",
+        "volumeTiers": "Volume-based commission tiers"
+      },
+      "business": {
+        "sectionTitle": "Business Information",
+        "companyName": "Company / Business Name",
+        "companyPlaceholder": "e.g. Afro Foods Ltd",
+        "businessAddress": "Business Address",
+        "addressPlaceholder": "e.g. 42 High Street, Manchester, M1 2AB",
+        "primaryActivity": "Primary Business Activity",
+        "selectActivity": "Select activity",
+        "primarySpecialty": "Primary Specialty",
+        "selectSpecialty": "Select specialty",
+        "customerInteraction": "Customer Interaction Type",
+        "selectInteraction": "Select interaction type",
+        "sellsInternational": "Sells International Goods",
+        "sellsInternationalDescription": "Does your business sell goods imported from or targeted at international communities?",
+        "scheduleMeeting": "Schedule Onboarding Meeting",
+        "bookMeeting": "Book Your Onboarding Meeting",
+        "bookMeetingDescription": "Required before you can submit your application",
+        "meetingScheduled": "Meeting Scheduled",
+        "meetingScheduledDescription": "Your onboarding meeting has been booked",
+        "reschedule": "Reschedule",
+        "mustBookMeeting": "You must book a meeting before submitting your registration.",
+        "canReschedule": "Meeting booked successfully.",
+        "whatHappensNext": "What happens next",
+        "whatHappensNextDescription": "After registering you'll verify your email. Our team will then review your application and activate your account once approved."
+      },
       "validation": {
         "firstNameRequired": "First name is required",
         "lastNameRequired": "Last name is required",
@@ -427,26 +518,15 @@
         "passwordSpecialChar": "Password must contain at least one special character",
         "passwordRequirements": "Password must be at least 8 characters, contain one uppercase letter and one special character",
         "passwordMismatch": "Passwords do not match",
-        "agentProgramRequired": "You must accept the Agent Program Terms & Conditions"
-      },
-      "optIn": {
-        "termsPrefix": "I agree to the",
-        "termsLink": "Terms & Conditions",
-        "and": "and",
-        "privacyLink": "Privacy Policy",
-        "newsletter": "I agree to receive newsletters and accept the data privacy statement."
-      },
-      "passwordRequirement": "Must be at least 8 characters, contain one uppercase letter and one special character",
-      "submit": "Create Account",
-      "submitting": "Creating Account...",
-      "success": {
-        "title": "Registration Successful!",
-        "subtitle": "What's Next?",
-        "description": "Please check your email for your login credentials. Our team will review your application and send you your temporary password and agent code.",
-        "loginButton": "Go to Login"
-      },
-      "alreadyHaveAccount": "Already have an account?",
-      "signInLink": "Sign in here"
+        "agentProgramRequired": "You must accept the Partner Program Terms & Conditions",
+        "partnerProgramRequired": "You must accept the Partner Program Terms & Conditions",
+        "companyNameRequired": "Company name is required",
+        "businessAddressRequired": "Business address is required",
+        "primaryActivityRequired": "Primary business activity is required",
+        "primarySpecialtyRequired": "Primary specialty is required",
+        "customerInteractionRequired": "Customer interaction type is required",
+        "meetingRequired": "Please schedule your onboarding meeting before registering"
+      }
     },
     "verifyEmail": {
       "title": "Verify Your Email",
@@ -475,8 +555,8 @@
     }
   },
   "agent": {
-    "title": "My Agent Account",
-    "subtitle": "Manage your agent account, track earnings, and view performance",
+    "title": "My Partner Account",
+    "subtitle": "Manage your partner account, track earnings, and view performance",
     "stats": {
       "totalEarnings": "Total Earnings",
       "availableBalance": "Available Balance",
@@ -565,8 +645,8 @@
     },
     "overview": {
       "accountStatus": "Account Status",
-      "accountStatusDescription": "Your agent account is active and ready to earn",
-      "agentTier": "Agent Tier",
+      "accountStatusDescription": "Your partner account is active and ready to earn",
+      "agentTier": "Partner Tier",
       "agentTierDescription": "Higher tiers earn better commission rates",
       "activeReferrals": "Active Referrals",
       "activeReferralsDescription": "Customers currently using your codes",
@@ -577,7 +657,7 @@
       "totalEarnings": "Total Earnings",
       "accountTimeline": "Account Timeline",
       "accountCreated": "Account Created",
-      "accountCreatedDescription": "Your agent account was successfully created",
+      "accountCreatedDescription": "Your partner account was successfully created",
       "accountActivated": "Account Activated",
       "accountActivatedDescription": "Your account was activated and ready to earn",
       "lastActivity": "Last Activity",
@@ -591,7 +671,7 @@
     "title": "Dashboard",
     "welcome": "Welcome to your Dashboard!",
     "welcomeBack": "Welcome back, {name}! 👋",
-    "agentId": "Agent ID",
+    "agentId": "Partner ID",
     "totalEarnings": "Total Earnings",
     "earnings": "Earnings",
     "referrals": "Referrals", 
@@ -599,15 +679,15 @@
     "availableForPayout": "Available for Payout",
     "totalReferrals": "Total Referrals",
     "activeReferrals": "Active Referrals",
-    "agentTier": "Agent Tier",
+    "agentTier": "Partner Tier",
     "pendingBalance": "Pending Balance", 
-    "agentStatus": "Agent Status",
+    "agentStatus": "Partner Status",
     "availableBalance": "Available Balance",
-    "agentCode": "Agent Code",
-    "welcomeTitle": "🎉 Welcome to PlanetTalk Agent Portal!",
-    "welcomeDescription": "You've successfully logged in as {name}. Your agent dashboard is ready with all the tools you need to grow your telecommunications business.",
+    "agentCode": "Partner Code",
+    "welcomeTitle": "🎉 Welcome to PlanetTalk Partner Portal!",
+    "welcomeDescription": "You've successfully logged in as {name}. Your partner dashboard is ready with all the tools you need to grow your telecommunications business.",
     "nextSteps": "Next Steps:",
-    "shareAgentCode": "Share Your Agent Code",
+    "shareAgentCode": "Share Your Partner Code",
     "shareAgentCodeDescription": "Use code {code} to start earning",
     "shareToEarn": "Share with friends and family to start earning commissions",
     "trackEarnings": "Track Your Earnings",
@@ -621,8 +701,8 @@
     "earningsThisMonth": "Earnings This Month",
     "referralsThisMonth": "Referrals This Month",
     "shareAndEarn": "Share & Earn Commissions", 
-    "shareDescription": "Share the PlanetTalk app with your agent code to earn commissions when customers use it during signup",
-    "yourAgentCode": "YOUR AGENT CODE",
+    "shareDescription": "Share the PlanetTalk app with your partner code to earn commissions when customers use it during signup",
+    "yourAgentCode": "YOUR PARTNER CODE",
     "copyCode": "Copy Code",
     "whatsapp": "WhatsApp",
     "email": "Email",
@@ -664,22 +744,22 @@
     "rejected": "Rejected",
     "cancelled": "Cancelled",
     "noEarningsYet": "No earnings yet",
-    "startSharing": "Start sharing your agent code to earn commissions",
+    "startSharing": "Start sharing your partner code to earn commissions",
     "noPayoutsYet": "No payouts yet",
     "requestFirstPayout": "Request your first payout when you reach ${amount}",
     "available": "Available",
     "toPayout": "to payout",
     "readyForPayoutShort": "Ready for payout",
     "shareAndEarnHeader": "Share & Earn Commissions",
-    "shareAgentCodeEarn": "Share your agent code and earn on every customer top-up",
-    "agentCodeCopied": "Agent code copied to clipboard!",
+    "shareAgentCodeEarn": "Share your partner code and earn on every customer top-up",
+    "agentCodeCopied": "Partner code copied to clipboard!",
     "failedToCopyCode": "Failed to copy code",
     "allTime": "All time",
     "loadingDashboard": "Loading your dashboard...",
     "unableToLoad": "Unable to Load Dashboard",
     "tryAgain": "Try Again",
-    "noAgentData": "No Agent Data",
-    "unableToLoadAgent": "Unable to load your agent information",
+    "noAgentData": "No Partner Data",
+    "unableToLoadAgent": "Unable to load your partner information",
     "shareReferralLink": "Share Referral Link",
     "referralUrl": "Referral URL:",
     "thisMonth": "this month",
@@ -882,15 +962,15 @@
   },
 
   "termsPage": {
-    "pageTitle": "Agent Program Terms & Conditions",
-    "metaDescription": "Please read our terms and conditions carefully before participating in the PlanetTalk Agent Program.",
+    "pageTitle": "Partner Program Terms & Conditions",
+    "metaDescription": "Please read our terms and conditions carefully before participating in the PlanetTalk Partner Program.",
     "breadcrumb": {
       "home": "Home",
       "current": "Terms & Conditions"
     },
     "header": {
-      "title": "Agent Program Terms & Conditions",
-      "subtitle": "Please read our terms and conditions carefully before participating in the PlanetTalk Agent Program."
+      "title": "Partner Program Terms & Conditions",
+      "subtitle": "Please read our terms and conditions carefully before participating in the PlanetTalk Partner Program."
     },
     "document": {
       "title": "Terms & Conditions Document",
@@ -914,7 +994,7 @@
     }
   },
   "welcomeMessage": {
-    "title": "Welcome to the PlanetTalk Agent Network!",
+    "title": "Welcome to the PlanetTalk Partner Network!",
     "greeting": "Congratulations {userName},",
     "intro": "You're now part of a global community helping families stay connected across borders.",
     "earnStart": "Start earning",
@@ -927,11 +1007,11 @@
   },
   "whatsappGroup": {
     "title": "Join Our WhatsApp Group",
-    "description": "Connect with fellow agents, get exclusive updates, and receive instant support!",
+    "description": "Connect with fellow partners, get exclusive updates, and receive instant support!",
     "benefitsTitle": "What you'll get:",
     "benefit1": "Instant updates on new features and promotions",
     "benefit2": "Direct support from our team",
-    "benefit3": "Tips and best practices from top agents",
+    "benefit3": "Tips and best practices from top partners",
     "joinNow": "Join Group",
     "cancel": "Maybe Later",
     "dontShowAgain": "Don't show this again"

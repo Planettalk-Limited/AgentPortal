@@ -285,12 +285,17 @@ export default function DashboardPage() {
                 </div>
                 <div className="min-w-0">
                   <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white">
-                    {t('welcomeBack', { name: user?.firstName || 'Agent' })}
+                    {t('welcomeBack', { name: user?.firstName || 'Partner' })}
                   </h1>
                   <div className="flex items-center gap-2 mt-2">
                     <span className="text-xs sm:text-sm text-white/80 font-medium">{t('agentCode')}:</span>
                     <span className="font-mono font-bold text-sm sm:text-base lg:text-lg text-white bg-white/10 backdrop-blur-sm px-3 py-1 rounded-lg">
                       {agent.agentCode}
+                    </span>
+                  </div>
+                  <div className="mt-2">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-white/20 text-white/90">
+                      {user?.metadata?.partnerType === 'business' ? '🏢 Business Partner' : '👤 Individual Partner'}
                     </span>
                   </div>
                 </div>

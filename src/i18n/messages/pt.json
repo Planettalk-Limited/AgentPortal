@@ -36,7 +36,8 @@
     "helpThemStay": "Você pode ajudá-los a permanecer conectados com seus entes queridos e ganhar dinheiro no processo!",
     "ctaPrimary": "Login do Agente",
     "ctaSecondary": "Tornar-se Agente",
-    "signUp": "Inscreva-se Agora",
+    "signUp": "Inscreva-se",
+    "signIn": "Entrar",
     "cta": "Pronto para Começar?",
     "ctaDescription": "Junte-se a nós hoje e transforme suas conexões em dinheiro!",
     "whyJoin": {
@@ -74,6 +75,34 @@
         "title": "Comece a Ganhar",
         "description": "Compartilhe seu código, acompanhe recargas de clientes e ganhe comissões mensais"
       }
+    }
+  },
+  "partnerPaths": {
+    "title": "Duas Formas de Ser Parceiro PlanetTalk",
+    "subtitle": "Seja como pessoa individual ou como empresa, existe um modelo de parceria feito para si.",
+    "individual": {
+      "badge": "Para Particulares",
+      "title": "Parceiro Individual",
+      "description": "Partilhe o PlanetTalk com a sua rede pessoal e ganhe uma comissão sempre que alguém que indicou fizer uma recarga. Sem necessidade de registo de empresa — basta inscrever-se e começar a ganhar.",
+      "benefits": [
+        "Comece a ganhar em poucos minutos após o registo",
+        "Comissões durante 24 meses por indicação",
+        "Painel em tempo real para acompanhar ganhos",
+        "Registo simples num único passo"
+      ],
+      "cta": "Registar como Particular"
+    },
+    "business": {
+      "badge": "Para Empresas",
+      "title": "Parceiro Comercial",
+      "description": "Ideal para lojas, restaurantes e prestadores de serviços que servem comunidades internacionais. Desfrute de suporte dedicado, uma configuração personalizada e estruturas de comissão para volumes elevados.",
+      "benefits": [
+        "Marca personalizada para o seu negócio",
+        "Gestor de conta dedicado",
+        "Reunião de integração com a nossa equipa",
+        "Feito à medida para mercearias, restaurantes e negócios de serviços"
+      ],
+      "cta": "Candidatar como Empresa"
     }
   },
   "features": {
@@ -342,7 +371,73 @@
       },
       "alreadyHaveAccount": "Já tem uma conta?",
       "signInLink": "Faça login aqui",
-      "passwordRequirement": "Deve ter pelo menos 8 caracteres, uma letra maiúscula e um caractere especial"
+      "passwordRequirement": "Deve ter pelo menos 8 caracteres, uma letra maiúscula e um caractere especial",
+      "partnerTypeTitle": "Tornar-se Parceiro",
+      "partnerTypeSubtitle": "Escolha o tipo de parceria que melhor se adapta a si",
+      "changePartnerType": "Alterar tipo de parceria",
+      "individualPartner": "Parceiro Individual",
+      "businessPartner": "Parceiro Comercial",
+      "individualDescription": "Ideal para pessoas que procuram ganhar comissões partilhando o PlanetTalk com a sua rede.",
+      "businessDescription": "Para empresas e organizações que procuram integrar os serviços PlanetTalk em grande escala.",
+      "individualBenefits": {
+        "instantCode": "Código de parceiro instantâneo após aprovação",
+        "commissions": "Comissões durante 24 meses",
+        "simpleSetup": "Configuração rápida e simples"
+      },
+      "businessBenefits": {
+        "customCode": "Código de parceiro personalizado",
+        "accountManagement": "Gestão de conta dedicada",
+        "volumeTiers": "Níveis de comissão baseados em volume"
+      },
+      "business": {
+        "sectionTitle": "Informações do Negócio",
+        "companyName": "Nome da Empresa / Negócio",
+        "companyPlaceholder": "ex. Afro Foods Ltd",
+        "businessAddress": "Morada do Negócio",
+        "addressPlaceholder": "ex. 42 High Street, Manchester, M1 2AB",
+        "primaryActivity": "Atividade Principal do Negócio",
+        "selectActivity": "Selecionar atividade",
+        "primarySpecialty": "Especialidade Principal",
+        "selectSpecialty": "Selecionar especialidade",
+        "customerInteraction": "Tipo de Interação com o Cliente",
+        "selectInteraction": "Selecionar tipo de interação",
+        "sellsInternational": "Vende Produtos Internacionais",
+        "sellsInternationalDescription": "O seu negócio vende produtos importados ou dirigidos a comunidades internacionais?",
+        "scheduleMeeting": "Agendar Reunião de Integração",
+        "bookMeeting": "Marque a Sua Reunião de Integração",
+        "bookMeetingDescription": "Obrigatório antes de submeter a sua candidatura",
+        "meetingScheduled": "Reunião Agendada",
+        "meetingScheduledDescription": "A sua reunião de integração foi marcada",
+        "reschedule": "Reagendar",
+        "mustBookMeeting": "Deve marcar uma reunião antes de submeter o seu registo.",
+        "canReschedule": "Reunião marcada com sucesso.",
+        "whatHappensNext": "Próximos passos",
+        "whatHappensNextDescription": "Após o registo, verificará o seu e-mail. A nossa equipa irá então analisar a sua candidatura e ativar a sua conta após aprovação."
+      },
+      "validation": {
+        "firstNameRequired": "O primeiro nome é obrigatório",
+        "lastNameRequired": "O sobrenome é obrigatório",
+        "countryRequired": "O país é obrigatório",
+        "countryInvalid": "Por favor selecione um país válido",
+        "phoneRequired": "O número de telefone é obrigatório",
+        "phoneInvalid": "Por favor introduza um número de telefone válido",
+        "emailRequired": "O e-mail é obrigatório",
+        "emailInvalid": "Por favor introduza um endereço de e-mail válido",
+        "passwordRequired": "A senha é obrigatória",
+        "passwordMinLength": "A senha deve ter pelo menos 8 caracteres",
+        "passwordUppercase": "A senha deve conter pelo menos uma letra maiúscula",
+        "passwordSpecialChar": "A senha deve conter pelo menos um caractere especial",
+        "passwordRequirements": "A senha deve ter pelo menos 8 caracteres, uma letra maiúscula e um caractere especial",
+        "passwordMismatch": "As senhas não coincidem",
+        "agentProgramRequired": "Deve aceitar os Termos e Condições do Programa de Parceiros",
+        "partnerProgramRequired": "Deve aceitar os Termos e Condições do Programa de Parceiros",
+        "companyNameRequired": "O nome da empresa é obrigatório",
+        "businessAddressRequired": "A morada do negócio é obrigatória",
+        "primaryActivityRequired": "A atividade principal do negócio é obrigatória",
+        "primarySpecialtyRequired": "A especialidade principal é obrigatória",
+        "customerInteractionRequired": "O tipo de interação com o cliente é obrigatório",
+        "meetingRequired": "Por favor agende a sua reunião de integração antes de se registar"
+      }
     },
     "verifyEmail": {
       "title": "Verifique seu Email",

@@ -2,15 +2,18 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useTranslations, useLocale } from 'next-intl'
 import { useAuth } from '@/contexts/AuthContext'
 import { validatePassword } from '@/lib/passwordValidation'
 import CountryPicker from '@/components/CountryPicker'
 import PhoneNumberInput from '@/components/PhoneNumberInput'
 import { createLocalizedPath } from '@/lib/utils/navigation'
+import MeetingBookingModal from '@/components/MeetingBookingModal'
+import Toast from '@/components/Toast'
 
-// Mapping from country codes to phone codes
+const MEETING_BOOKING_URL = process.env.NEXT_PUBLIC_PARTNER_MEETING_BOOKING_URL || 'https://calendar.app.google/4qT4xSicq7ZQqsvMA'
+
 const countryToPhoneCodeMap: Record<string, string> = {
   'US': '+1', 'CA': '+1', 'GB': '+44', 'AU': '+61', 'DE': '+49', 'FR': '+33', 'IT': '+39', 'ES': '+34',
   'NL': '+31', 'BE': '+32', 'CH': '+41', 'AT': '+43', 'SE': '+46', 'NO': '+47', 'DK': '+45', 'FI': '+358',
@@ -40,6 +43,8 @@ const countryToPhoneCodeMap: Record<string, string> = {
   'NU': '+683', 'CK': '+682', 'TK': '+690', 'AS': '+1684', 'GU': '+1671', 'MP': '+1670'
 }
 
+type PartnerType = 'individual' | 'business' | null
+
 interface FormData {
   firstName: string
   lastName: string
@@ -48,10 +53,17 @@ interface FormData {
   phoneNumber: string
   password: string
   confirmPassword: string
-  acceptAgentProgram: boolean
+  acceptPartnerProgram: boolean
+  companyName: string
+  businessAddress: string
+  primaryBusinessActivity: string
+  primarySpecialty: string
+  customerInteractionType: string
+  sellsInternationalGoods: boolean
 }
 
 export default function RegisterPage() {
+  const [partnerType, setPartnerType] = useState<PartnerType>(null)
   const [formData, setFormData] = useState<FormData>({
     firstName: '',
     lastName: '',
@@ -60,229 +72,515 @@ export default function RegisterPage() {
     phoneNumber: '',
     password: '',
     confirmPassword: '',
-    acceptAgentProgram: false
+    acceptPartnerProgram: false,
+    companyName: '',
+    businessAddress: '',
+    primaryBusinessActivity: '',
+    primarySpecialty: '',
+    customerInteractionType: '',
+    sellsInternationalGoods: false
   })
-  const [phoneCountryCode, setPhoneCountryCode] = useState('+44') // Default to UK
+  const [phoneCountryCode, setPhoneCountryCode] = useState('+44')
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [success, setSuccess] = useState(false)
-  const [successMessage, setSuccessMessage] = useState('')
   const [showTermsModal, setShowTermsModal] = useState(false)
+  const [showBookingModal, setShowBookingModal] = useState(false)
+  const [meetingBooked, setMeetingBooked] = useState(false)
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
+  const [toast, setToast] = useState<{ message: string; type: 'error' | 'success' } | null>(null)
   const [downloadStatus, setDownloadStatus] = useState<'idle' | 'downloading' | 'downloaded'>('idle')
   const [isIOS, setIsIOS] = useState(false)
   
   const { register, loading, error, clearError } = useAuth()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const locale = useLocale()
   const t = useTranslations('auth.register')
   const tTerms = useTranslations('termsPage')
+
+  useEffect(() => {
+    const typeParam = searchParams.get('type')
+    if (typeParam === 'individual' || typeParam === 'business') {
+      setPartnerType(typeParam)
+    }
+  }, [searchParams])
   
-  // Detect iOS
   useEffect(() => {
     const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
                 (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
     setIsIOS(iOS)
   }, [])
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
-    
-    // Clear error when user starts typing
-    if (error) {
-      clearError()
-    }
+    if (error) clearError()
+    if (fieldErrors[name]) setFieldErrors(prev => { const next = { ...prev }; delete next[name]; return next })
   }
 
   const handleCountryChange = (countryCode: string) => {
     setFormData(prev => ({ ...prev, country: countryCode }))
-    
-    // Automatically update phone country code when country changes
     const phoneCode = countryToPhoneCodeMap[countryCode]
     if (phoneCode) {
       setPhoneCountryCode(phoneCode)
-      // Reset phone number to avoid confusion with old country code
       setFormData(prev => ({ ...prev, phoneNumber: '' }))
     }
-    
-    // Clear error when user makes changes
-    if (error) {
-      clearError()
-    }
+    if (error) clearError()
   }
 
-  const validateForm = () => {
-    if (!formData.firstName.trim()) {
-      return t('validation.firstNameRequired')
+  const validateForm = (): Record<string, string> => {
+    const errors: Record<string, string> = {}
+    if (!formData.firstName.trim()) errors.firstName = t('validation.firstNameRequired')
+    if (!formData.lastName.trim()) errors.lastName = t('validation.lastNameRequired')
+    if (!formData.country) errors.country = t('validation.countryRequired')
+    else if (!/^[A-Z]{2}$/.test(formData.country)) errors.country = t('validation.countryInvalid')
+    if (!formData.email.trim()) errors.email = t('validation.emailRequired')
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) errors.email = t('validation.emailInvalid')
+    if (!formData.password) errors.password = t('validation.passwordRequired')
+    else {
+      const passwordValidation = validatePassword(formData.password)
+      if (!passwordValidation.isValid) errors.password = t('validation.passwordRequirements')
     }
-    if (!formData.lastName.trim()) {
-      return t('validation.lastNameRequired')
+    if (formData.password && formData.confirmPassword && formData.password !== formData.confirmPassword) errors.confirmPassword = t('validation.passwordMismatch')
+    else if (!formData.confirmPassword && formData.password) errors.confirmPassword = t('validation.passwordMismatch')
+    if (!formData.phoneNumber.trim()) errors.phoneNumber = t('validation.phoneRequired')
+    else if (!/^\+[1-9]\d{1,14}$/.test(formData.phoneNumber)) errors.phoneNumber = t('validation.phoneInvalid')
+    if (!formData.acceptPartnerProgram) errors.acceptPartnerProgram = t('validation.partnerProgramRequired')
+
+    if (partnerType === 'business') {
+      if (!formData.companyName.trim()) errors.companyName = t('validation.companyNameRequired')
+      if (!formData.businessAddress.trim()) errors.businessAddress = t('validation.businessAddressRequired')
+      if (!formData.primaryBusinessActivity) errors.primaryBusinessActivity = t('validation.primaryActivityRequired')
+      if (!formData.primarySpecialty) errors.primarySpecialty = t('validation.primarySpecialtyRequired')
+      if (!formData.customerInteractionType) errors.customerInteractionType = t('validation.customerInteractionRequired')
+      if (!meetingBooked) errors.meeting = t('validation.meetingRequired')
     }
-    if (!formData.country) {
-      return t('validation.countryRequired')
-    }
-    if (!/^[A-Z]{2}$/.test(formData.country)) {
-      return t('validation.countryInvalid')
-    }
-    if (!formData.email.trim()) {
-      return t('validation.emailRequired')
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      return t('validation.emailInvalid')
-    }
-    if (!formData.password) {
-      return t('validation.passwordRequired')
-    }
-    const passwordValidation = validatePassword(formData.password)
-    if (!passwordValidation.isValid) {
-      return t('validation.passwordRequirements')
-    }
-    if (formData.password !== formData.confirmPassword) {
-      return t('validation.passwordMismatch')
-    }
-    if (!formData.phoneNumber.trim()) {
-      return t('validation.phoneRequired')
-    }
-    if (!/^\+[1-9]\d{1,14}$/.test(formData.phoneNumber)) {
-      return t('validation.phoneInvalid')
-    }
-    if (!formData.acceptAgentProgram) {
-      return t('validation.agentProgramRequired')
-    }
-    return null
+    return errors
   }
+
+  const isFormComplete = (() => {
+    if (!formData.firstName.trim() || !formData.lastName.trim()) return false
+    if (!formData.country || !formData.email.trim()) return false
+    if (!formData.password || !formData.confirmPassword) return false
+    if (!formData.phoneNumber.trim()) return false
+    if (!formData.acceptPartnerProgram) return false
+    if (partnerType === 'business') {
+      if (!formData.companyName.trim() || !formData.businessAddress.trim()) return false
+      if (!formData.primaryBusinessActivity || !formData.primarySpecialty) return false
+      if (!formData.customerInteractionType || !meetingBooked) return false
+    }
+    return true
+  })()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
-    const validationError = validateForm()
-    if (validationError) {
-      // You can set this as an error state if needed
+    setToast(null)
+    const errors = validateForm()
+    setFieldErrors(errors)
+    if (Object.keys(errors).length > 0) {
+      setTimeout(() => {
+        const firstErrorField = document.querySelector('[data-field-error="true"]')
+        if (firstErrorField) firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }, 50)
+      console.log('[Register] Validation failed:', errors)
       return
     }
 
     try {
-      const result = await register({
+      const payload: Record<string, string | boolean | undefined> = {
         firstName: formData.firstName.trim(),
         lastName: formData.lastName.trim(),
         country: formData.country,
         email: formData.email.trim(),
         phoneNumber: formData.phoneNumber.trim(),
-        password: formData.password
-      })
+        password: formData.password,
+        partnerType: partnerType || 'individual'
+      }
+
+      if (partnerType === 'business') {
+        payload.companyName = formData.companyName.trim()
+        payload.businessAddress = formData.businessAddress.trim()
+        payload.primaryBusinessActivity = formData.primaryBusinessActivity
+        payload.primarySpecialty = formData.primarySpecialty
+        payload.customerInteractionType = formData.customerInteractionType
+        payload.sellsInternationalGoods = formData.sellsInternationalGoods
+      }
+
+      console.log('[Register] Submitting payload:', JSON.stringify(payload, null, 2))
+
+      const result = await register(payload as any)
+      console.log('[Register] Response:', JSON.stringify(result, null, 2))
       
       if (result.success) {
-        // Redirect to email verification with the registered email
-        router.push(`/${locale}/auth/verify-email?email=${encodeURIComponent(formData.email)}`)
+        const params = new URLSearchParams({ email: formData.email })
+        if (partnerType === 'business') params.set('partnerType', 'business')
+        if (result.meetingBookingUrl) params.set('meetingBookingUrl', result.meetingBookingUrl)
+        router.push(`/${locale}/auth/verify-email?${params.toString()}`)
       }
-    } catch (error) {
-      // Error is handled by the auth context
+    } catch (err: any) {
+      const message = err?.error || err?.message || 'Registration failed. Please try again.'
+      setToast({ message, type: 'error' })
     }
   }
 
-  if (success) {
+  // ── Partner Type Selection Screen ──
+  if (!partnerType) {
     return (
-      <div className="text-center">
-        <div className="mb-6">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
-          <h2 className="text-2xl font-bold text-pt-dark-gray mb-2">{t('success.title')}</h2>
-          <p className="text-pt-light-gray mb-6">{successMessage}</p>
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-            <h3 className="font-semibold text-blue-800 mb-2">{t('success.subtitle')}</h3>
-            <p className="text-blue-700 text-sm">
-              {t('success.description')}
-            </p>
-          </div>
-          <Link 
-            href={createLocalizedPath('/auth/login', locale)}
-            className="inline-flex items-center px-6 py-3 bg-pt-turquoise text-white font-medium rounded-lg hover:bg-pt-turquoise-600 transition-colors"
+      <div className="w-full">
+        <div className="text-center mb-8 sm:mb-10">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-pt-dark-gray mb-3 sm:mb-4">
+            {t('partnerTypeTitle')}
+          </h1>
+          <p className="text-sm sm:text-base md:text-lg text-gray-600">
+            {t('partnerTypeSubtitle')}
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-8">
+          {/* Individual Partner Card */}
+          <button
+            onClick={() => setPartnerType('individual')}
+            className="group relative bg-white border-2 border-gray-200 rounded-2xl p-6 sm:p-8 text-left hover:border-pt-turquoise hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
           >
-            {t('success.loginButton')}
-          </Link>
+            <div className="absolute top-4 right-4 w-8 h-8 rounded-full border-2 border-gray-300 group-hover:border-pt-turquoise group-hover:bg-pt-turquoise transition-all duration-300 flex items-center justify-center">
+              <svg className="w-4 h-4 text-white opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+
+            <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-pt-turquoise/10 to-teal-50 rounded-2xl flex items-center justify-center mb-5">
+              <svg className="w-7 h-7 sm:w-8 sm:h-8 text-pt-turquoise" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </div>
+
+            <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">{t('individualPartner')}</h3>
+            <p className="text-gray-600 text-sm sm:text-base mb-4">{t('individualDescription')}</p>
+
+            <ul className="space-y-2 text-sm text-gray-600">
+              {(['instantCode', 'commissions', 'simpleSetup'] as const).map(key => (
+                <li key={key} className="flex items-center">
+                  <svg className="w-4 h-4 text-pt-turquoise mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  {t(`individualBenefits.${key}`)}
+                </li>
+              ))}
+            </ul>
+          </button>
+
+          {/* Business Partner Card */}
+          <button
+            onClick={() => setPartnerType('business')}
+            className="group relative bg-white border-2 border-gray-200 rounded-2xl p-6 sm:p-8 text-left hover:border-pt-turquoise hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]"
+          >
+            <div className="absolute top-4 right-4 w-8 h-8 rounded-full border-2 border-gray-300 group-hover:border-pt-turquoise group-hover:bg-pt-turquoise transition-all duration-300 flex items-center justify-center">
+              <svg className="w-4 h-4 text-white opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+
+            <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-pt-turquoise/10 to-teal-50 rounded-2xl flex items-center justify-center mb-5">
+              <svg className="w-7 h-7 sm:w-8 sm:h-8 text-pt-turquoise-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+            </div>
+
+            <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">{t('businessPartner')}</h3>
+            <p className="text-gray-600 text-sm sm:text-base mb-4">{t('businessDescription')}</p>
+
+            <ul className="space-y-2 text-sm text-gray-600">
+              {(['customCode', 'accountManagement', 'volumeTiers'] as const).map(key => (
+                <li key={key} className="flex items-center">
+                  <svg className="w-4 h-4 text-pt-turquoise mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  {t(`businessBenefits.${key}`)}
+                </li>
+              ))}
+            </ul>
+          </button>
+        </div>
+
+        <div className="text-center pt-2 pb-4">
+          <p className="text-base text-gray-600">
+            {t('alreadyHaveAccount')}{' '}
+            <Link 
+              href={createLocalizedPath('/auth/login', locale)} 
+              className="text-pt-turquoise hover:text-pt-turquoise-600 font-bold underline decoration-2 underline-offset-4 transition-colors"
+            >
+              {t('signInLink')}
+            </Link>
+          </p>
         </div>
       </div>
     )
   }
 
+  // ── Registration Form ──
   return (
     <div className="w-full">
-      {/* Header */}
-      <div className="text-center mb-6 sm:mb-8 md:mb-10">
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-pt-dark-gray mb-2 sm:mb-3 md:mb-4">{t('title')}</h1>
-        <p className="text-sm sm:text-base md:text-lg text-gray-600">{t('subtitle')}</p>
+      {/* Back Button + Header */}
+      <div className="mb-6 sm:mb-8">
+        <button
+          onClick={() => { setPartnerType(null); clearError(); setMeetingBooked(false) }}
+          className="inline-flex items-center text-sm text-gray-500 hover:text-pt-turquoise transition-colors mb-4"
+        >
+          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+          </svg>
+          {t('changePartnerType')}
+        </button>
+
+        <div className="text-center">
+          <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold mb-3 ${
+            partnerType === 'business' ? 'bg-pt-turquoise/10 text-pt-turquoise-700' : 'bg-pt-turquoise/10 text-pt-turquoise'
+          }`}>
+            {partnerType === 'business' ? t('businessPartner') : t('individualPartner')}
+          </span>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-pt-dark-gray mb-2 sm:mb-3">
+            {t('title')}
+          </h1>
+          <p className="text-sm sm:text-base text-gray-600">{t('subtitle')}</p>
+        </div>
       </div>
 
-      {/* Error Alert */}
-      {error && (
-        <div className="bg-red-50 border-l-4 border-red-400 text-red-700 px-6 py-4 rounded-r-2xl mb-8 shadow-sm">
-          <div className="flex items-center">
-            <svg className="w-5 h-5 mr-3 text-red-400" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-            </svg>
-            <span className="font-medium">{error}</span>
-          </div>
-        </div>
+      {/* Toast notification */}
+      {toast && (
+        <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6 md:space-y-8">
-        {/* First Name - Full Width */}
-        <div className="group">
-          <label htmlFor="firstName" className="block text-sm sm:text-base font-semibold text-gray-800 mb-2 sm:mb-3">
-            {t('fields.firstName')} <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            id="firstName"
-            name="firstName"
-            value={formData.firstName}
-            onChange={handleChange}
-            className="w-full px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-200 rounded-xl sm:rounded-2xl focus:border-pt-turquoise focus:ring-0 transition-colors duration-200 bg-gray-50 focus:bg-white text-base sm:text-lg"
-            placeholder={t('placeholders.firstName')}
-            required
-          />
+      <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+        {/* Name Fields - side by side on larger screens */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+          <div className="group" {...(fieldErrors.firstName ? {'data-field-error': 'true'} : {})}>
+            <label htmlFor="firstName" className="block text-sm sm:text-base font-semibold text-gray-800 mb-2">
+              {t('fields.firstName')} <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              id="firstName"
+              name="firstName"
+              value={formData.firstName}
+              onChange={handleChange}
+              className={`w-full px-4 sm:px-6 py-3 sm:py-4 border-2 rounded-xl sm:rounded-2xl focus:ring-0 transition-colors duration-200 bg-gray-50 focus:bg-white text-base sm:text-lg ${fieldErrors.firstName ? 'border-red-400 focus:border-red-500' : 'border-gray-200 focus:border-pt-turquoise'}`}
+              placeholder={t('placeholders.firstName')}
+            />
+            {fieldErrors.firstName && <p className="text-xs text-red-500 mt-1.5">{fieldErrors.firstName}</p>}
+          </div>
+          <div className="group" {...(fieldErrors.lastName ? {'data-field-error': 'true'} : {})}>
+            <label htmlFor="lastName" className="block text-sm sm:text-base font-semibold text-gray-800 mb-2">
+              {t('fields.lastName')} <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              id="lastName"
+              name="lastName"
+              value={formData.lastName}
+              onChange={handleChange}
+              className={`w-full px-4 sm:px-6 py-3 sm:py-4 border-2 rounded-xl sm:rounded-2xl focus:ring-0 transition-colors duration-200 bg-gray-50 focus:bg-white text-base sm:text-lg ${fieldErrors.lastName ? 'border-red-400 focus:border-red-500' : 'border-gray-200 focus:border-pt-turquoise'}`}
+              placeholder={t('placeholders.lastName')}
+            />
+            {fieldErrors.lastName && <p className="text-xs text-red-500 mt-1.5">{fieldErrors.lastName}</p>}
+          </div>
         </div>
 
-        {/* Last Name - Full Width */}
-        <div className="group">
-          <label htmlFor="lastName" className="block text-sm sm:text-base font-semibold text-gray-800 mb-2 sm:mb-3">
-            {t('fields.lastName')} <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            id="lastName"
-            name="lastName"
-            value={formData.lastName}
-            onChange={handleChange}
-            className="w-full px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-200 rounded-xl sm:rounded-2xl focus:border-pt-turquoise focus:ring-0 transition-colors duration-200 bg-gray-50 focus:bg-white text-base sm:text-lg"
-            placeholder={t('placeholders.lastName')}
-            required
-          />
-        </div>
+        {/* Business-specific fields */}
+        {partnerType === 'business' && (
+          <div className="bg-pt-turquoise/5 border-2 border-pt-turquoise/20 rounded-2xl p-4 sm:p-6 space-y-4 sm:space-y-6">
+            <h3 className="text-sm font-semibold text-pt-turquoise-700 uppercase tracking-wider">{t('business.sectionTitle')}</h3>
+            
+            <div className="group" {...(fieldErrors.companyName ? {'data-field-error': 'true'} : {})}>
+              <label htmlFor="companyName" className="block text-sm sm:text-base font-semibold text-gray-800 mb-2">
+                {t('business.companyName')} <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                id="companyName"
+                name="companyName"
+                value={formData.companyName}
+                onChange={handleChange}
+                className={`w-full px-4 sm:px-6 py-3 sm:py-4 border-2 rounded-xl sm:rounded-2xl focus:ring-0 transition-colors duration-200 bg-white text-base sm:text-lg ${fieldErrors.companyName ? 'border-red-400 focus:border-red-500' : 'border-gray-200 focus:border-pt-turquoise'}`}
+                placeholder={t('business.companyPlaceholder')}
+              />
+              {fieldErrors.companyName && <p className="text-xs text-red-500 mt-1.5">{fieldErrors.companyName}</p>}
+            </div>
 
-        {/* Country - Full Width */}
-        <div className="group">
-          <label htmlFor="country" className="block text-sm sm:text-base font-semibold text-gray-800 mb-2 sm:mb-3">
+            <div className="group" {...(fieldErrors.businessAddress ? {'data-field-error': 'true'} : {})}>
+              <label htmlFor="businessAddress" className="block text-sm sm:text-base font-semibold text-gray-800 mb-2">
+                {t('business.businessAddress')} <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                id="businessAddress"
+                name="businessAddress"
+                value={formData.businessAddress}
+                onChange={handleChange}
+                className={`w-full px-4 sm:px-6 py-3 sm:py-4 border-2 rounded-xl sm:rounded-2xl focus:ring-0 transition-colors duration-200 bg-white text-base sm:text-lg ${fieldErrors.businessAddress ? 'border-red-400 focus:border-red-500' : 'border-gray-200 focus:border-pt-turquoise'}`}
+                placeholder={t('business.addressPlaceholder')}
+              />
+              {fieldErrors.businessAddress && <p className="text-xs text-red-500 mt-1.5">{fieldErrors.businessAddress}</p>}
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+              <div className="group" {...(fieldErrors.primaryBusinessActivity ? {'data-field-error': 'true'} : {})}>
+                <label htmlFor="primaryBusinessActivity" className="block text-sm sm:text-base font-semibold text-gray-800 mb-2">
+                  {t('business.primaryActivity')} <span className="text-red-500">*</span>
+                </label>
+                <select
+                  id="primaryBusinessActivity"
+                  name="primaryBusinessActivity"
+                  value={formData.primaryBusinessActivity}
+                  onChange={handleChange}
+                  className={`w-full px-4 sm:px-6 py-3 sm:py-4 border-2 rounded-xl sm:rounded-2xl focus:ring-0 transition-colors duration-200 bg-white text-base sm:text-lg ${fieldErrors.primaryBusinessActivity ? 'border-red-400 focus:border-red-500' : 'border-gray-200 focus:border-pt-turquoise'}`}
+                >
+                  <option value="">{t('business.selectActivity')}</option>
+                  <option value="grocery_convenience">Grocery / Convenience</option>
+                  <option value="restaurant_cafe">Restaurant / Cafe</option>
+                  <option value="bar_pub">Bar / Pub</option>
+                  <option value="specialty_food_import">Specialty Food Import</option>
+                  <option value="professional_services">Professional Services</option>
+                  <option value="other">Other</option>
+                </select>
+                {fieldErrors.primaryBusinessActivity && <p className="text-xs text-red-500 mt-1.5">{fieldErrors.primaryBusinessActivity}</p>}
+              </div>
+              <div className="group" {...(fieldErrors.primarySpecialty ? {'data-field-error': 'true'} : {})}>
+                <label htmlFor="primarySpecialty" className="block text-sm sm:text-base font-semibold text-gray-800 mb-2">
+                  {t('business.primarySpecialty')} <span className="text-red-500">*</span>
+                </label>
+                <select
+                  id="primarySpecialty"
+                  name="primarySpecialty"
+                  value={formData.primarySpecialty}
+                  onChange={handleChange}
+                  className={`w-full px-4 sm:px-6 py-3 sm:py-4 border-2 rounded-xl sm:rounded-2xl focus:ring-0 transition-colors duration-200 bg-white text-base sm:text-lg ${fieldErrors.primarySpecialty ? 'border-red-400 focus:border-red-500' : 'border-gray-200 focus:border-pt-turquoise'}`}
+                >
+                  <option value="">{t('business.selectSpecialty')}</option>
+                  <option value="African">African</option>
+                  <option value="Caribbean">Caribbean</option>
+                  <option value="South Asian">South Asian</option>
+                  <option value="Middle Eastern">Middle Eastern</option>
+                  <option value="East Asian">East Asian</option>
+                  <option value="Latin American">Latin American</option>
+                  <option value="European">European</option>
+                  <option value="Mixed / General">Mixed / General</option>
+                  <option value="Other">Other</option>
+                </select>
+                {fieldErrors.primarySpecialty && <p className="text-xs text-red-500 mt-1.5">{fieldErrors.primarySpecialty}</p>}
+              </div>
+            </div>
+
+            <div className="group" {...(fieldErrors.customerInteractionType ? {'data-field-error': 'true'} : {})}>
+              <label htmlFor="customerInteractionType" className="block text-sm sm:text-base font-semibold text-gray-800 mb-2">
+                {t('business.customerInteraction')} <span className="text-red-500">*</span>
+              </label>
+              <select
+                id="customerInteractionType"
+                name="customerInteractionType"
+                value={formData.customerInteractionType}
+                onChange={handleChange}
+                className={`w-full px-4 sm:px-6 py-3 sm:py-4 border-2 rounded-xl sm:rounded-2xl focus:ring-0 transition-colors duration-200 bg-white text-base sm:text-lg ${fieldErrors.customerInteractionType ? 'border-red-400 focus:border-red-500' : 'border-gray-200 focus:border-pt-turquoise'}`}
+              >
+                <option value="">{t('business.selectInteraction')}</option>
+                <option value="sit_down_table_service">Sit-down / Table Service</option>
+                <option value="grab_and_go">Grab-and-go / Over the counter</option>
+                <option value="appointment_based">Appointment based</option>
+              </select>
+              {fieldErrors.customerInteractionType && <p className="text-xs text-red-500 mt-1.5">{fieldErrors.customerInteractionType}</p>}
+            </div>
+
+            <div className="flex items-start space-x-3 bg-white rounded-xl p-4 border border-pt-turquoise/20">
+              <input
+                type="checkbox"
+                id="sellsInternationalGoods"
+                name="sellsInternationalGoods"
+                checked={formData.sellsInternationalGoods}
+                onChange={(e) => setFormData(prev => ({ ...prev, sellsInternationalGoods: e.target.checked }))}
+                className="w-5 h-5 text-pt-turquoise bg-white border-2 border-gray-300 rounded focus:ring-pt-turquoise focus:ring-2 mt-0.5"
+              />
+              <label htmlFor="sellsInternationalGoods" className="cursor-pointer">
+                <span className="text-sm sm:text-base font-semibold text-gray-800">{t('business.sellsInternational')}</span>
+                <p className="text-sm text-gray-500 mt-0.5">
+                  {t('business.sellsInternationalDescription')}
+                </p>
+              </label>
+            </div>
+
+            {/* Schedule Meeting — required before registration */}
+            <div className="group">
+              <label className="block text-sm sm:text-base font-semibold text-gray-800 mb-2">
+                {t('business.scheduleMeeting')} <span className="text-red-500">*</span>
+              </label>
+              {meetingBooked ? (
+                <div className="w-full flex items-center px-4 sm:px-6 py-3 sm:py-4 border-2 border-green-300 rounded-xl sm:rounded-2xl bg-green-50/60">
+                  <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0 mr-4">
+                    <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <span className="block text-base font-semibold text-green-800">{t('business.meetingScheduled')}</span>
+                    <span className="block text-sm text-green-600 mt-0.5">{t('business.meetingScheduledDescription')}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowBookingModal(true)}
+                    className="text-sm text-green-700 underline font-medium ml-3 flex-shrink-0 hover:text-green-800"
+                  >
+                    {t('business.reschedule')}
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setShowBookingModal(true)}
+                  className="w-full flex items-center px-4 sm:px-6 py-3 sm:py-4 border-2 border-pt-turquoise/40 rounded-xl sm:rounded-2xl bg-pt-turquoise/5 hover:border-pt-turquoise hover:bg-pt-turquoise/10 transition-colors duration-200 text-left group"
+                >
+                  <div className="w-10 h-10 bg-pt-turquoise/10 rounded-xl flex items-center justify-center flex-shrink-0 mr-4 group-hover:bg-pt-turquoise/20 transition-colors">
+                    <svg className="w-5 h-5 text-pt-turquoise" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <span className="block text-base sm:text-lg font-semibold text-pt-dark-gray">
+                      {t('business.bookMeeting')}
+                    </span>
+                    <span className="block text-sm text-pt-turquoise mt-0.5">
+                      {t('business.bookMeetingDescription')}
+                    </span>
+                  </div>
+                  <svg className="w-5 h-5 text-pt-turquoise/50 flex-shrink-0 ml-3 group-hover:text-pt-turquoise transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              )}
+              <p className={`text-xs mt-1.5 ml-1 ${fieldErrors.meeting ? 'text-red-500 font-medium' : 'text-gray-500'}`}>
+                {fieldErrors.meeting || (meetingBooked ? t('business.canReschedule') : t('business.mustBookMeeting'))}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Country */}
+        <div className="group" {...(fieldErrors.country ? {'data-field-error': 'true'} : {})}>
+          <label htmlFor="country" className="block text-sm sm:text-base font-semibold text-gray-800 mb-2">
             {t('fields.country')} <span className="text-red-500">*</span>
           </label>
           <CountryPicker
             value={formData.country}
-            onChange={handleCountryChange}
+            onChange={(v) => { handleCountryChange(v); if (fieldErrors.country) setFieldErrors(prev => { const next = { ...prev }; delete next.country; return next }) }}
             placeholder={t('placeholders.country')}
             required
-            error={!formData.country && error ? t('validation.countryRequired') : undefined}
+            error={fieldErrors.country}
           />
         </div>
 
-        {/* Phone Number - Full Width */}
-        <div className="group">
+        {/* Phone Number */}
+        <div className="group" {...(fieldErrors.phoneNumber ? {'data-field-error': 'true'} : {})}>
           <PhoneNumberInput
             label={t('fields.phone')}
             value={formData.phoneNumber}
-            onChange={(phoneNumber) => setFormData(prev => ({ ...prev, phoneNumber }))}
+            onChange={(phoneNumber) => { setFormData(prev => ({ ...prev, phoneNumber })); if (fieldErrors.phoneNumber) setFieldErrors(prev => { const next = { ...prev }; delete next.phoneNumber; return next }) }}
             countryCode={phoneCountryCode}
             onCountryCodeChange={setPhoneCountryCode}
             required
@@ -290,11 +588,12 @@ export default function RegisterPage() {
             showFullNumber={false}
             className=""
           />
+          {fieldErrors.phoneNumber && <p className="text-xs text-red-500 mt-1.5">{fieldErrors.phoneNumber}</p>}
         </div>
 
-        {/* Email - Full Width */}
-        <div className="group">
-          <label htmlFor="email" className="block text-sm sm:text-base font-semibold text-gray-800 mb-2 sm:mb-3">
+        {/* Email */}
+        <div className="group" {...(fieldErrors.email ? {'data-field-error': 'true'} : {})}>
+          <label htmlFor="email" className="block text-sm sm:text-base font-semibold text-gray-800 mb-2">
             {t('fields.email')} <span className="text-red-500">*</span>
           </label>
           <input
@@ -303,15 +602,15 @@ export default function RegisterPage() {
             name="email"
             value={formData.email}
             onChange={handleChange}
-            className="w-full px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-200 rounded-xl sm:rounded-2xl focus:border-pt-turquoise focus:ring-0 transition-colors duration-200 bg-gray-50 focus:bg-white text-base sm:text-lg"
+            className={`w-full px-4 sm:px-6 py-3 sm:py-4 border-2 rounded-xl sm:rounded-2xl focus:ring-0 transition-colors duration-200 bg-gray-50 focus:bg-white text-base sm:text-lg ${fieldErrors.email ? 'border-red-400 focus:border-red-500' : 'border-gray-200 focus:border-pt-turquoise'}`}
             placeholder={t('placeholders.email')}
-            required
           />
+          {fieldErrors.email && <p className="text-xs text-red-500 mt-1.5">{fieldErrors.email}</p>}
         </div>
 
-        {/* Password - Full Width */}
-        <div className="group">
-          <label htmlFor="password" className="block text-sm sm:text-base font-semibold text-gray-800 mb-2 sm:mb-3">
+        {/* Password */}
+        <div className="group" {...(fieldErrors.password ? {'data-field-error': 'true'} : {})}>
+          <label htmlFor="password" className="block text-sm sm:text-base font-semibold text-gray-800 mb-2">
             {t('fields.password')} <span className="text-red-500">*</span>
           </label>
           <div className="relative">
@@ -321,9 +620,8 @@ export default function RegisterPage() {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              className="w-full px-4 sm:px-6 py-3 sm:py-4 pr-12 sm:pr-14 border-2 border-gray-200 rounded-xl sm:rounded-2xl focus:border-pt-turquoise focus:ring-0 transition-colors duration-200 bg-gray-50 focus:bg-white text-base sm:text-lg"
+              className={`w-full px-4 sm:px-6 py-3 sm:py-4 pr-12 sm:pr-14 border-2 rounded-xl sm:rounded-2xl focus:ring-0 transition-colors duration-200 bg-gray-50 focus:bg-white text-base sm:text-lg ${fieldErrors.password ? 'border-red-400 focus:border-red-500' : 'border-gray-200 focus:border-pt-turquoise'}`}
               placeholder={t('placeholders.password')}
-              required
               minLength={8}
             />
             <button
@@ -343,17 +641,20 @@ export default function RegisterPage() {
               )}
             </button>
           </div>
-          <p className="text-xs sm:text-sm text-gray-500 mt-1 sm:mt-2 flex items-center">
-            <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            {t('passwordRequirement')}
-          </p>
+          {fieldErrors.password
+            ? <p className="text-xs text-red-500 mt-1.5">{fieldErrors.password}</p>
+            : <p className="text-xs sm:text-sm text-gray-500 mt-1 sm:mt-2 flex items-center">
+                <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                {t('passwordRequirement')}
+              </p>
+          }
         </div>
 
-        {/* Confirm Password - Full Width */}
-        <div className="group">
-          <label htmlFor="confirmPassword" className="block text-sm sm:text-base font-semibold text-gray-800 mb-2 sm:mb-3">
+        {/* Confirm Password */}
+        <div className="group" {...(fieldErrors.confirmPassword ? {'data-field-error': 'true'} : {})}>
+          <label htmlFor="confirmPassword" className="block text-sm sm:text-base font-semibold text-gray-800 mb-2">
             {t('fields.confirmPassword')} <span className="text-red-500">*</span>
           </label>
           <div className="relative">
@@ -363,9 +664,8 @@ export default function RegisterPage() {
               name="confirmPassword"
               value={formData.confirmPassword}
               onChange={handleChange}
-              className="w-full px-4 sm:px-6 py-3 sm:py-4 pr-12 sm:pr-14 border-2 border-gray-200 rounded-xl sm:rounded-2xl focus:border-pt-turquoise focus:ring-0 transition-colors duration-200 bg-gray-50 focus:bg-white text-base sm:text-lg"
+              className={`w-full px-4 sm:px-6 py-3 sm:py-4 pr-12 sm:pr-14 border-2 rounded-xl sm:rounded-2xl focus:ring-0 transition-colors duration-200 bg-gray-50 focus:bg-white text-base sm:text-lg ${fieldErrors.confirmPassword ? 'border-red-400 focus:border-red-500' : 'border-gray-200 focus:border-pt-turquoise'}`}
               placeholder={t('placeholders.confirmPassword')}
-              required
             />
             <button
               type="button"
@@ -384,32 +684,32 @@ export default function RegisterPage() {
               )}
             </button>
           </div>
+          {fieldErrors.confirmPassword && <p className="text-xs text-red-500 mt-1.5">{fieldErrors.confirmPassword}</p>}
         </div>
 
         {/* Agreement Section */}
-        <div className="bg-gradient-to-r from-pt-turquoise to-teal-500 rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 md:p-8 text-white mt-6 sm:mt-8 md:mt-10">
-          <div className="flex items-start space-x-3 sm:space-x-4 md:space-x-5">
+        <div className={`rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 md:p-8 text-white mt-6 sm:mt-8 ${fieldErrors.acceptPartnerProgram ? 'bg-gradient-to-r from-red-500 to-red-600 ring-2 ring-red-300' : 'bg-gradient-to-r from-pt-turquoise to-teal-500'}`} {...(fieldErrors.acceptPartnerProgram ? {'data-field-error': 'true'} : {})}>
+          <div className="flex items-start space-x-3 sm:space-x-4">
             <input
               type="checkbox"
-              id="acceptAgentProgram"
-              name="acceptAgentProgram"
-              checked={formData.acceptAgentProgram}
-              onChange={(e) => setFormData(prev => ({ ...prev, acceptAgentProgram: e.target.checked }))}
+              id="acceptPartnerProgram"
+              name="acceptPartnerProgram"
+              checked={formData.acceptPartnerProgram}
+              onChange={(e) => { setFormData(prev => ({ ...prev, acceptPartnerProgram: e.target.checked })); if (fieldErrors.acceptPartnerProgram) setFieldErrors(prev => { const next = { ...prev }; delete next.acceptPartnerProgram; return next }) }}
               className="w-5 h-5 sm:w-6 sm:h-6 text-pt-turquoise bg-white border-2 border-white rounded focus:ring-white focus:ring-2 mt-1"
-              required
             />
             <div className="flex-1">
-              <label htmlFor="acceptAgentProgram" className="text-white cursor-pointer">
-                <span className="font-bold text-lg sm:text-xl">Agent Program Agreement</span>
+              <label htmlFor="acceptPartnerProgram" className="text-white cursor-pointer">
+                <span className="font-bold text-lg sm:text-xl">Partner Program Agreement</span>
                 <span className="text-red-200 ml-1 sm:ml-2">*</span>
-                <p className="text-white/90 mt-1 sm:mt-2 text-sm sm:text-base md:text-lg">
+                <p className="text-white/90 mt-1 sm:mt-2 text-sm sm:text-base">
                   I agree to the{' '}
                   <button
                     type="button"
                     onClick={() => setShowTermsModal(true)}
                     className="text-white underline hover:text-gray-100 font-semibold decoration-2 underline-offset-2"
                   >
-                    Agent Program Terms & Conditions
+                    Partner Program Terms & Conditions
                   </button>
                 </p>
               </label>
@@ -417,31 +717,48 @@ export default function RegisterPage() {
           </div>
         </div>
 
+        {/* Business partner info callout */}
+        {partnerType === 'business' && (
+          <div className="bg-pt-turquoise/5 border-2 border-pt-turquoise/20 rounded-xl p-4 sm:p-5">
+            <div className="flex items-start space-x-3">
+              <svg className="w-5 h-5 text-pt-turquoise mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div>
+                <p className="text-sm font-semibold text-pt-turquoise-700">{t('business.whatHappensNext')}</p>
+                <p className="text-sm text-pt-dark-gray mt-1">
+                  {t('business.whatHappensNextDescription')}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Submit Button */}
-        <div className="mt-8 sm:mt-10 md:mt-12">
+        <div className="mt-8 sm:mt-10">
           <button
             type="submit"
-            disabled={loading}
-            className="w-full bg-gradient-to-r from-pt-turquoise to-teal-500 text-white py-4 sm:py-5 md:py-6 px-6 sm:px-7 md:px-8 rounded-xl sm:rounded-2xl font-bold text-lg sm:text-xl shadow-2xl hover:shadow-3xl hover:from-pt-turquoise-600 hover:to-teal-600 focus:outline-none focus:ring-4 focus:ring-pt-turquoise/30 disabled:opacity-50 disabled:cursor-not-allowed transform transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+            disabled={loading || !isFormComplete}
+            className="w-full bg-gradient-to-r from-pt-turquoise to-teal-500 text-white py-4 sm:py-5 px-6 sm:px-8 rounded-xl sm:rounded-2xl font-bold text-lg sm:text-xl shadow-2xl hover:shadow-3xl hover:from-pt-turquoise-600 hover:to-teal-600 focus:outline-none focus:ring-4 focus:ring-pt-turquoise/30 disabled:opacity-50 disabled:cursor-not-allowed transform transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
           >
             {loading ? (
               <div className="flex items-center justify-center">
-                <div className="animate-spin rounded-full h-6 w-6 sm:h-7 sm:w-7 border-b-3 border-white mr-3 sm:mr-4"></div>
-                <span className="text-lg sm:text-xl font-bold">{t('submitting')}</span>
+                <div className="animate-spin rounded-full h-6 w-6 border-b-3 border-white mr-3"></div>
+                <span>{t('submitting')}</span>
               </div>
             ) : (
-              <span className="text-lg sm:text-xl font-bold">{t('submit')}</span>
+              <span>{t('submit')}</span>
             )}
           </button>
         </div>
 
         {/* Login Link */}
-        <div className="text-center pt-6 sm:pt-8 pb-6 sm:pb-8 md:pb-10">
-          <p className="text-base sm:text-lg text-gray-600">
+        <div className="text-center pt-6 pb-6 sm:pb-8">
+          <p className="text-base text-gray-600">
             {t('alreadyHaveAccount')}{' '}
             <Link 
               href={createLocalizedPath('/auth/login', locale)} 
-              className="text-pt-turquoise hover:text-pt-turquoise-600 font-bold underline decoration-2 underline-offset-4 hover:decoration-pt-turquoise-600 transition-colors"
+              className="text-pt-turquoise hover:text-pt-turquoise-600 font-bold underline decoration-2 underline-offset-4 transition-colors"
             >
               {t('signInLink')}
             </Link>
@@ -449,12 +766,11 @@ export default function RegisterPage() {
         </div>
       </form>
 
-      {/* Terms & Conditions Modal - Full Screen */}
+      {/* Terms & Conditions Modal */}
       {showTermsModal && (
         <div className="fixed inset-0 z-[9999] bg-white flex flex-col safe-area-inset">
-          {/* Modal Header */}
           <div className="flex items-center justify-between p-3 sm:p-4 lg:p-6 border-b border-gray-200 bg-white flex-shrink-0">
-            <h2 className="text-sm sm:text-base lg:text-lg font-bold text-gray-900 pr-2 leading-tight">Agent Program Terms & Conditions</h2>
+            <h2 className="text-sm sm:text-base lg:text-lg font-bold text-gray-900 pr-2 leading-tight">Partner Program Terms & Conditions</h2>
             <button
               onClick={() => setShowTermsModal(false)}
               className="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-100 rounded-lg flex-shrink-0"
@@ -465,10 +781,8 @@ export default function RegisterPage() {
             </button>
           </div>
 
-          {/* Modal Content - PDF Viewer - iOS Safari Compatible */}
           <div className="flex-1 overflow-auto bg-gray-100 flex items-center justify-center p-4 sm:p-6" style={{ WebkitOverflowScrolling: 'touch' }}>
             {isIOS ? (
-              /* iOS Safari - Show instructions to open PDF */
               <div className="max-w-md mx-auto bg-white shadow-xl rounded-2xl p-6 sm:p-8 text-center">
                 <div className="w-16 h-16 sm:w-20 sm:h-20 bg-pt-turquoise-100 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
                   <svg className="w-8 h-8 sm:w-10 sm:h-10 text-pt-turquoise" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -477,126 +791,64 @@ export default function RegisterPage() {
                 </div>
                 <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3">{tTerms('viewTitle')}</h3>
                 <p className="text-gray-600 mb-6">{tTerms('viewMessage')}</p>
-                
                 <div className="space-y-3">
-                  {/* Open in Safari */}
-                  <a
-                    href="/terms-and-conditions.pdf"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-pt-turquoise text-white rounded-lg font-medium hover:bg-pt-turquoise-600 transition-colors"
-                  >
+                  <a href="/terms-and-conditions.pdf" target="_blank" rel="noopener noreferrer"
+                    className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-pt-turquoise text-white rounded-lg font-medium hover:bg-pt-turquoise-600 transition-colors">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                     </svg>
                     {tTerms('openInSafari')}
                   </a>
-                  
-                  {/* Download Button */}
-                  <a
-                    href="/terms-and-conditions.pdf"
-                    download
+                  <a href="/terms-and-conditions.pdf" download
                     onClick={() => {
                       setDownloadStatus('downloading')
-                      setTimeout(() => {
-                        setDownloadStatus('downloaded')
-                        setTimeout(() => setDownloadStatus('idle'), 2000)
-                      }, 500)
+                      setTimeout(() => { setDownloadStatus('downloaded'); setTimeout(() => setDownloadStatus('idle'), 2000) }, 500)
                     }}
                     className={`w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-medium transition-all ${
-                      downloadStatus === 'downloaded' 
-                        ? 'bg-green-500 text-white hover:bg-green-600' 
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    {downloadStatus === 'downloading' ? (
-                      <>
-                        <svg className="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                        </svg>
-                        {tTerms('downloading')}
-                      </>
-                    ) : downloadStatus === 'downloaded' ? (
-                      <>
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                        </svg>
-                        {tTerms('downloaded')}
-                      </>
-                    ) : (
-                      <>
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                        </svg>
-                        {tTerms('download')}
-                      </>
-                    )}
+                      downloadStatus === 'downloaded' ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}>
+                    {downloadStatus === 'downloaded' ? tTerms('downloaded') : tTerms('download')}
                   </a>
                 </div>
               </div>
             ) : (
-              /* Desktop - Use iframe */
               <div className="w-full h-full p-2 sm:p-4">
                 <div className="max-w-4xl mx-auto h-full bg-white shadow-lg rounded-lg overflow-hidden">
-                  <iframe
-                    src="/terms-and-conditions.pdf#view=FitH"
-                    className="w-full h-full min-h-[800px]"
-                    title="Terms and Conditions"
-                  />
+                  <iframe src="/terms-and-conditions.pdf#view=FitH" className="w-full h-full min-h-[800px]" title="Terms and Conditions" />
                 </div>
               </div>
             )}
           </div>
 
-          {/* Modal Footer */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 sm:gap-4 p-3 sm:p-4 lg:p-6 border-t border-gray-200 bg-white flex-shrink-0">
-            <button
-              onClick={() => setShowTermsModal(false)}
-              className="w-full sm:w-auto px-4 py-2.5 sm:px-6 sm:py-3 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors text-center"
-            >
+            <button onClick={() => setShowTermsModal(false)}
+              className="w-full sm:w-auto px-4 py-2.5 sm:px-6 sm:py-3 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors text-center">
               {tTerms('close')}
             </button>
-            <a
-              href="/terms-and-conditions.pdf"
-              download
+            <a href="/terms-and-conditions.pdf" download
               onClick={() => {
                 setDownloadStatus('downloading')
-                setTimeout(() => {
-                  setDownloadStatus('downloaded')
-                  setTimeout(() => setDownloadStatus('idle'), 2000)
-                }, 500)
+                setTimeout(() => { setDownloadStatus('downloaded'); setTimeout(() => setDownloadStatus('idle'), 2000) }, 500)
               }}
               className={`w-full sm:w-auto px-4 py-2.5 sm:px-6 sm:py-3 rounded-lg font-medium transition-all flex items-center justify-center gap-2 ${
-                downloadStatus === 'downloaded' 
-                  ? 'bg-green-500 text-white hover:bg-green-600' 
-                  : 'bg-pt-turquoise text-white hover:bg-pt-turquoise-600'
-              }`}
-            >
-              {downloadStatus === 'downloading' ? (
-                <>
-                  <svg className="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                  </svg>
-                  {tTerms('downloading')}
-                </>
-              ) : downloadStatus === 'downloaded' ? (
-                <>
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                  </svg>
-                  {tTerms('downloaded')}
-                </>
-              ) : (
-                <>
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                  </svg>
-                  {tTerms('download')}
-                </>
-              )}
+                downloadStatus === 'downloaded' ? 'bg-green-500 text-white' : 'bg-pt-turquoise text-white hover:bg-pt-turquoise-600'
+              }`}>
+              {downloadStatus === 'downloaded' ? tTerms('downloaded') : tTerms('download')}
             </a>
           </div>
         </div>
+      )}
+
+      {/* Meeting Booking Modal */}
+      {partnerType === 'business' && (
+        <MeetingBookingModal
+          isOpen={showBookingModal}
+          onClose={() => {
+            setShowBookingModal(false)
+            setMeetingBooked(true)
+          }}
+          bookingUrl={MEETING_BOOKING_URL}
+        />
       )}
     </div>
   )

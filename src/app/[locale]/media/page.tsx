@@ -46,8 +46,8 @@ export default function MediaPage() {
   // Static Terms & Conditions PDF
   const staticTermsPDF: any = {
     id: 'static-terms-pdf',
-    title: 'Agent Program Terms & Conditions',
-    description: 'Official terms and conditions for the PlanetTalk Agent Program',
+    title: 'Partner Program Terms & Conditions',
+    description: 'Official terms and conditions for the PlanetTalk Partner Program',
     fileName: 'terms-and-conditions.pdf',
     originalName: 'terms-and-conditions.pdf',
     fileSize: 0,
@@ -60,7 +60,7 @@ export default function MediaPage() {
     isEmbedded: false,
     viewCount: 0,
     downloadCount: 0,
-    tags: ['terms', 'conditions', 'agent program', 'official'],
+    tags: ['terms', 'conditions', 'partner program', 'official'],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   }

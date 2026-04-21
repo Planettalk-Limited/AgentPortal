@@ -41,6 +41,8 @@ export class AuthService extends BaseService {
   async verifyEmail(data: { email: string; code: string }): Promise<{
     success: boolean;
     message: string;
+    requiresPartnerApproval?: boolean;
+    meetingBookingUrl?: string;
     user?: {
       id: string;
       email: string;
@@ -54,7 +56,6 @@ export class AuthService extends BaseService {
       this.client.post('auth/verify-email', data)
     );
     
-    // If verification is successful and we get a user with token, store it
     if (response.success && response.user && response.access_token) {
       this.client.setAuthToken(response.access_token);
     }

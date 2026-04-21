@@ -207,21 +207,45 @@ export default function UsersPage() {
   }
 
   const getStatusColor = (status: string) => {
-    const colors = {
+    const colors: Record<string, string> = {
       'active': 'bg-green-100 text-green-800 border-green-200',
       'inactive': 'bg-gray-100 text-gray-800 border-gray-200',
-      'suspended': 'bg-red-100 text-red-800 border-red-200'
+      'suspended': 'bg-red-100 text-red-800 border-red-200',
+      'pending': 'bg-yellow-100 text-yellow-800 border-yellow-200',
+      'awaiting_partner_approval': 'bg-amber-100 text-amber-800 border-amber-200',
+      'rejected': 'bg-red-100 text-red-800 border-red-200',
     }
-    return colors[status as keyof typeof colors] || 'bg-gray-100 text-gray-800 border-gray-200'
+    return colors[status] || 'bg-gray-100 text-gray-800 border-gray-200'
+  }
+
+  const getStatusLabel = (status: string) => {
+    const labels: Record<string, string> = {
+      'active': 'Active',
+      'inactive': 'Inactive',
+      'suspended': 'Suspended',
+      'pending': 'Pending Verification',
+      'awaiting_partner_approval': 'Awaiting Approval',
+      'rejected': 'Rejected',
+    }
+    return labels[status] || status.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
   }
 
   const getRoleColor = (role: string) => {
-    const colors = {
+    const colors: Record<string, string> = {
       'admin': 'bg-purple-100 text-purple-800 border-purple-200',
       'pt_admin': 'bg-indigo-100 text-indigo-800 border-indigo-200',
-      'agent': 'bg-blue-100 text-blue-800 border-blue-200'
+      'agent': 'bg-blue-100 text-blue-800 border-blue-200',
     }
-    return colors[role as keyof typeof colors] || 'bg-gray-100 text-gray-800 border-gray-200'
+    return colors[role] || 'bg-gray-100 text-gray-800 border-gray-200'
+  }
+
+  const getPartnerTypeInfo = (user: User): { label: string; color: string; icon: string } | null => {
+    if (user.role !== 'agent') return null
+    const partnerType = user.metadata?.partnerType
+    if (partnerType === 'business') {
+      return { label: 'Business', color: 'bg-violet-100 text-violet-800 border-violet-200', icon: '🏢' }
+    }
+    return { label: 'Individual', color: 'bg-sky-100 text-sky-800 border-sky-200', icon: '👤' }
   }
 
   const validateForm = () => {
@@ -572,10 +596,10 @@ export default function UsersPage() {
                 <tr>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-pt-dark-gray uppercase tracking-wider">User</th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-pt-dark-gray uppercase tracking-wider">Contact</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-pt-dark-gray uppercase tracking-wider">Country</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-pt-dark-gray uppercase tracking-wider">Role</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-pt-dark-gray uppercase tracking-wider hidden md:table-cell">Country</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-pt-dark-gray uppercase tracking-wider">Role / Type</th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-pt-dark-gray uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-pt-dark-gray uppercase tracking-wider">Joined</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-pt-dark-gray uppercase tracking-wider hidden lg:table-cell">Joined</th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-pt-dark-gray uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
@@ -606,7 +630,7 @@ export default function UsersPage() {
                         <div className="text-xs text-pt-light-gray">@{user.username}</div>
                       )}
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-4 hidden md:table-cell">
                       {user.country ? (
                         <div className="flex items-center">
                           <span className="text-lg mr-2">{getCountryInfo(user.country).flag}</span>
@@ -620,16 +644,26 @@ export default function UsersPage() {
                       )}
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${getRoleColor(user.role)}`}>
-                        {user.role.replace('_', ' ').toUpperCase()}
-                      </span>
+                      <div className="flex flex-col gap-1.5">
+                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border w-fit ${getRoleColor(user.role)}`}>
+                          {user.role === 'pt_admin' ? 'PT Admin' : user.role.replace('_', ' ').replace(/\b\w/g, c => c.toUpperCase())}
+                        </span>
+                        {(() => {
+                          const pt = getPartnerTypeInfo(user)
+                          return pt ? (
+                            <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium border w-fit ${pt.color}`}>
+                              <span>{pt.icon}</span>{pt.label} Partner
+                            </span>
+                          ) : null
+                        })()}
+                      </div>
                     </td>
                     <td className="px-6 py-4">
                       <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(user.status)}`}>
-                        {user.status.toUpperCase()}
+                        {getStatusLabel(user.status)}
                       </span>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-4 hidden lg:table-cell">
                       <div className="text-sm text-pt-dark-gray">
                         {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
                       </div>
@@ -991,14 +1025,24 @@ export default function UsersPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-pt-light-gray mb-1">Role</label>
-                    <span className={`inline-flex items-center px-2 py-1 rounded-lg text-xs font-medium border ${getRoleColor(selectedUser.role)}`}>
-                      {selectedUser.role.replace('_', ' ').toUpperCase()}
-                    </span>
+                    <div className="flex flex-wrap gap-1.5">
+                      <span className={`inline-flex items-center px-2 py-1 rounded-lg text-xs font-medium border ${getRoleColor(selectedUser.role)}`}>
+                        {selectedUser.role === 'pt_admin' ? 'PT Admin' : selectedUser.role.replace('_', ' ').replace(/\b\w/g, c => c.toUpperCase())}
+                      </span>
+                      {(() => {
+                        const pt = getPartnerTypeInfo(selectedUser)
+                        return pt ? (
+                          <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium border ${pt.color}`}>
+                            <span>{pt.icon}</span>{pt.label} Partner
+                          </span>
+                        ) : null
+                      })()}
+                    </div>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-pt-light-gray mb-1">Status</label>
                     <span className={`inline-flex items-center px-2 py-1 rounded-lg text-xs font-medium border ${getStatusColor(selectedUser.status)}`}>
-                      {selectedUser.status.toUpperCase()}
+                      {getStatusLabel(selectedUser.status)}
                     </span>
                   </div>
                 </div>

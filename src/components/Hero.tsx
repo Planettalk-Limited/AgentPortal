@@ -75,7 +75,7 @@ const Hero = () => {
                   {t('description')}
                 </p>
 
-                <div className="mt-6 md:mt-8 opacity-0 animate-slide-up delay-300 flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0">
+                <div className="mt-6 md:mt-8 opacity-0 animate-slide-up delay-300 flex flex-col sm:flex-row sm:items-center gap-3">
                   <button 
                     type="button" 
                     className="group relative overflow-hidden rounded-lg inline-flex items-center justify-center px-6 py-3 md:px-8 md:py-4 text-lg md:text-xl font-semibold text-pt-turquoise transition-all duration-300 w-full sm:w-auto"
@@ -85,11 +85,15 @@ const Hero = () => {
                     <span className="absolute inset-0 bg-white/80 translate-x-full group-hover:translate-x-0 transition-transform duration-500"></span>
                     <span className="relative flex items-center justify-center">
                       {t('signUp') || t('ctaSecondary')}
-                      <svg className="ml-2 w-4 h-4 md:w-5 md:h-5 group-hover:translate-x-1 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                      </svg>
                     </span>
                   </button>
+
+                  <Link
+                    href={createLocalizedPath('/auth/login')}
+                    className="inline-flex items-center justify-center rounded-lg border border-white/70 bg-white/10 px-6 py-3 md:px-8 md:py-4 text-lg md:text-xl font-semibold text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/20 hover:border-white w-full sm:w-auto"
+                  >
+                    {t('signIn')}
+                  </Link>
                 </div>
               </div>
             </div>
@@ -108,7 +112,7 @@ const Hero = () => {
                   <div className="relative rounded-2xl overflow-hidden border-0 md:border md:border-white/20 shadow-lg transform hover:scale-[1.02] transition-transform duration-500">
                     <img 
                       src="/images/agent-signup.jpg" 
-                      alt="Become a PlanetTalk Agent" 
+                      alt="Become a PlanetTalk Partner" 
                       className="relative w-full h-full object-cover md:object-contain max-w-xl mx-auto lg:max-w-none"
                       style={{minHeight: '250px', maxHeight: '60vh', objectPosition: 'center'}}
                       onError={(e) => {
@@ -191,8 +195,8 @@ const Hero = () => {
                     <h4 className="text-sm font-semibold text-gray-700 mb-2">Terms and Conditions</h4>
                     <p className="text-sm text-gray-600">
                       Please read this before filling out the form. By submitting this form, you agree to our 
-                      <a href="/terms-and-conditions.pdf" target="_blank" className="text-pt-turquoise underline hover:no-underline"> Agent Program Terms and Conditions</a>. 
-                      You consent to receive communications about the PlanetTalk Agent Program and understand that your data will be processed in accordance with our Privacy Policy.
+                      <a href="/terms-and-conditions.pdf" target="_blank" className="text-pt-turquoise underline hover:no-underline"> Partner Program Terms and Conditions</a>.
+                      You consent to receive communications about the PlanetTalk Partner Program and understand that your data will be processed in accordance with our Privacy Policy.
                     </p>
                   </div>
                 </div>

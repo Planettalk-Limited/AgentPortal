@@ -364,14 +364,23 @@ export default function ProfilePage() {
                   <p className="text-gray-600">
                     {typeof user.email === 'string' ? user.email : (user.email && typeof user.email === 'object' ? JSON.stringify(user.email) : (user.email ? String(user.email) : 'No email'))}
                   </p>
-                  <div className="flex items-center mt-2 space-x-4">
+                  <div className="flex items-center mt-2 flex-wrap gap-2">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                       user.role === 'admin' ? 'bg-purple-100 text-purple-800' :
                       user.role === 'pt_admin' ? 'bg-blue-100 text-blue-800' :
                       'bg-green-100 text-green-800'
                     }`}>
-                      {user.role.replace('_', ' ').toUpperCase()}
+                      {user.role === 'pt_admin' ? 'PT Admin' : user.role.replace('_', ' ').replace(/\b\w/g, c => c.toUpperCase())}
                     </span>
+                    {user.role === 'agent' && (
+                      <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        user.metadata?.partnerType === 'business'
+                          ? 'bg-violet-100 text-violet-800'
+                          : 'bg-sky-100 text-sky-800'
+                      }`}>
+                        {user.metadata?.partnerType === 'business' ? '🏢 Business Partner' : '👤 Individual Partner'}
+                      </span>
+                    )}
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                       user.status === 'active' ? 'bg-green-100 text-green-800' :
                       'bg-red-100 text-red-800'
@@ -672,6 +681,54 @@ export default function ProfilePage() {
                     </div>
                   </div>
                 </div>
+
+                {/* Business Details Section — shown only for business partners */}
+                {user?.metadata?.partnerType === 'business' && user.metadata.business && (() => {
+                  const biz = user.metadata.business
+                  const activityLabels: Record<string, string> = {
+                    grocery_convenience: 'Grocery / Convenience',
+                    restaurant_cafe: 'Restaurant / Cafe',
+                    bar_pub: 'Bar / Pub',
+                    specialty_food_import: 'Specialty Food Import',
+                    professional_services: 'Professional Services',
+                    other: 'Other',
+                  }
+                  const interactionLabels: Record<string, string> = {
+                    sit_down_table_service: 'Sit-down / Table Service',
+                    grab_and_go: 'Grab-and-go / Over the counter',
+                    appointment_based: 'Appointment based',
+                  }
+                  return (
+                    <div className="max-w-2xl border-t pt-8">
+                      <div className="flex items-center space-x-3 mb-6">
+                        <div className="h-8 w-8 bg-violet-100 rounded-lg flex items-center justify-center">
+                          <span className="text-violet-600">🏢</span>
+                        </div>
+                        <h3 className="text-xl font-semibold text-gray-900">Business Details</h3>
+                      </div>
+                      <p className="text-sm text-gray-500 mb-4">
+                        These details were submitted during registration. Contact support to update them.
+                      </p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {[
+                          { label: 'Company Name', value: biz.companyName },
+                          { label: 'Business Address', value: biz.businessAddress },
+                          { label: 'Primary Activity', value: activityLabels[biz.primaryBusinessActivity || ''] || biz.primaryBusinessActivity },
+                          { label: 'Primary Specialty', value: biz.primarySpecialty },
+                          { label: 'Customer Interaction', value: interactionLabels[biz.customerInteractionType || ''] || biz.customerInteractionType },
+                          { label: 'Sells International Goods', value: biz.sellsInternationalGoods ? 'Yes' : 'No' },
+                        ].map(({ label, value }) => value ? (
+                          <div key={label} className="space-y-1">
+                            <label className="block text-sm font-medium text-gray-700">{label}</label>
+                            <div className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50 text-gray-700 text-sm">
+                              {String(value)}
+                            </div>
+                          </div>
+                        ) : null)}
+                      </div>
+                    </div>
+                  )
+                })()}
 
                 {/* Notification Preferences Section */}
                 <div className="max-w-3xl border-t pt-8">

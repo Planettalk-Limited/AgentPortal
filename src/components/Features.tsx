@@ -16,7 +16,7 @@ const Features = () => {
     <>
       <div className="bg-pt-turquoise relative">
         {/* Info Section with enhanced design */}
-        <div className="container relative z-10 pb-16 md:pb-24">
+        <div className="container relative z-10 py-16 md:py-24">
           <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 md:p-8 border border-white/20 shadow-lg relative overflow-hidden">
             {/* Decorative elements */}
             <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/5 rounded-full blur-2xl"></div>

@@ -36,7 +36,8 @@
     "helpThemStay": "¡Puedes ayudarlos a mantenerse conectados con sus seres queridos y ganar dinero en el proceso!",
     "ctaPrimary": "Iniciar Sesión de Agente",
     "ctaSecondary": "Convertirse en Agente",
-    "signUp": "Registrarse Ahora",
+    "signUp": "Registrarse",
+    "signIn": "Iniciar sesión",
     "cta": "¿Listo para Comenzar?",
     "ctaDescription": "¡Únete a nosotros hoy y convierte tus conexiones en dinero!",
     "whyJoin": {
@@ -74,6 +75,34 @@
         "title": "Comience a Ganar",
         "description": "Comparta su código, rastree recargas de clientes y gane comisiones mensuales"
       }
+    }
+  },
+  "partnerPaths": {
+    "title": "Dos Formas de Asociarse con PlanetTalk",
+    "subtitle": "Ya sea como particular o como empresa, hay un modelo de asociación diseñado para usted.",
+    "individual": {
+      "badge": "Para Particulares",
+      "title": "Socio Individual",
+      "description": "Comparta PlanetTalk con su red personal y gane una comisión cada vez que alguien que refiera haga una recarga. No se necesita registro de empresa — solo regístrese y comience a ganar.",
+      "benefits": [
+        "Comience a ganar a los pocos minutos de registrarse",
+        "Comisiones durante 24 meses por referido",
+        "Panel en tiempo real para rastrear ganancias",
+        "Registro simple en un solo paso"
+      ],
+      "cta": "Registrarse como Particular"
+    },
+    "business": {
+      "badge": "Para Empresas",
+      "title": "Socio Comercial",
+      "description": "Ideal para tiendas, restaurantes y proveedores de servicios que atienden a comunidades internacionales. Disfrute de soporte dedicado, una configuración personalizada y estructuras de comisión de alto volumen.",
+      "benefits": [
+        "Marca personalizada para su negocio",
+        "Gestor de cuenta dedicado",
+        "Reunión de incorporación con nuestro equipo",
+        "Diseñado para tiendas de alimentos, restaurantes y negocios de servicios"
+      ],
+      "cta": "Aplicar como Empresa"
     }
   },
   "features": {
@@ -344,7 +373,73 @@
       },
       "alreadyHaveAccount": "¿Ya tiene una cuenta?",
       "signInLink": "Inicie sesión aquí",
-      "passwordRequirement": "Debe tener al menos 8 caracteres, una letra mayúscula y un carácter especial"
+      "passwordRequirement": "Debe tener al menos 8 caracteres, una letra mayúscula y un carácter especial",
+      "partnerTypeTitle": "Convertirse en Socio",
+      "partnerTypeSubtitle": "Elija el tipo de socio que mejor se adapte a usted",
+      "changePartnerType": "Cambiar tipo de socio",
+      "individualPartner": "Socio Individual",
+      "businessPartner": "Socio Comercial",
+      "individualDescription": "Ideal para personas que buscan ganar comisiones compartiendo PlanetTalk con su red.",
+      "businessDescription": "Para empresas y organizaciones que buscan integrar los servicios de PlanetTalk a gran escala.",
+      "individualBenefits": {
+        "instantCode": "Código de socio instantáneo al ser aprobado",
+        "commissions": "Comisiones durante 24 meses",
+        "simpleSetup": "Configuración rápida y sencilla"
+      },
+      "businessBenefits": {
+        "customCode": "Código de socio personalizado",
+        "accountManagement": "Gestión de cuenta dedicada",
+        "volumeTiers": "Niveles de comisión basados en volumen"
+      },
+      "business": {
+        "sectionTitle": "Información del Negocio",
+        "companyName": "Nombre de la Empresa / Negocio",
+        "companyPlaceholder": "ej. Afro Foods Ltd",
+        "businessAddress": "Dirección del Negocio",
+        "addressPlaceholder": "ej. 42 High Street, Manchester, M1 2AB",
+        "primaryActivity": "Actividad Principal del Negocio",
+        "selectActivity": "Seleccionar actividad",
+        "primarySpecialty": "Especialidad Principal",
+        "selectSpecialty": "Seleccionar especialidad",
+        "customerInteraction": "Tipo de Interacción con el Cliente",
+        "selectInteraction": "Seleccionar tipo de interacción",
+        "sellsInternational": "Vende Productos Internacionales",
+        "sellsInternationalDescription": "¿Su negocio vende productos importados o dirigidos a comunidades internacionales?",
+        "scheduleMeeting": "Programar Reunión de Incorporación",
+        "bookMeeting": "Reserve Su Reunión de Incorporación",
+        "bookMeetingDescription": "Obligatorio antes de enviar su solicitud",
+        "meetingScheduled": "Reunión Programada",
+        "meetingScheduledDescription": "Su reunión de incorporación ha sido reservada",
+        "reschedule": "Reprogramar",
+        "mustBookMeeting": "Debe reservar una reunión antes de enviar su registro.",
+        "canReschedule": "Reunión reservada exitosamente.",
+        "whatHappensNext": "Próximos pasos",
+        "whatHappensNextDescription": "Después de registrarse, verificará su correo electrónico. Nuestro equipo revisará su solicitud y activará su cuenta una vez aprobada."
+      },
+      "validation": {
+        "firstNameRequired": "El nombre es requerido",
+        "lastNameRequired": "El apellido es requerido",
+        "countryRequired": "El país es requerido",
+        "countryInvalid": "Por favor seleccione un país válido",
+        "phoneRequired": "El número de teléfono es requerido",
+        "phoneInvalid": "Por favor ingrese un número de teléfono válido",
+        "emailRequired": "El correo electrónico es requerido",
+        "emailInvalid": "Por favor ingrese una dirección de correo electrónico válida",
+        "passwordRequired": "La contraseña es requerida",
+        "passwordMinLength": "La contraseña debe tener al menos 8 caracteres",
+        "passwordUppercase": "La contraseña debe contener al menos una letra mayúscula",
+        "passwordSpecialChar": "La contraseña debe contener al menos un carácter especial",
+        "passwordRequirements": "La contraseña debe tener al menos 8 caracteres, una letra mayúscula y un carácter especial",
+        "passwordMismatch": "Las contraseñas no coinciden",
+        "agentProgramRequired": "Debe aceptar los Términos y Condiciones del Programa de Socios",
+        "partnerProgramRequired": "Debe aceptar los Términos y Condiciones del Programa de Socios",
+        "companyNameRequired": "El nombre de la empresa es requerido",
+        "businessAddressRequired": "La dirección del negocio es requerida",
+        "primaryActivityRequired": "La actividad principal del negocio es requerida",
+        "primarySpecialtyRequired": "La especialidad principal es requerida",
+        "customerInteractionRequired": "El tipo de interacción con el cliente es requerido",
+        "meetingRequired": "Por favor programe su reunión de incorporación antes de registrarse"
+      }
     },
     "verifyEmail": {
       "title": "Verifica tu Email",
