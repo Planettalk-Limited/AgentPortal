@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useTranslations, useLocale } from 'next-intl'
@@ -62,7 +62,7 @@ interface FormData {
   sellsInternationalGoods: boolean
 }
 
-export default function RegisterPage() {
+function RegisterPageContent() {
   const [partnerType, setPartnerType] = useState<PartnerType>(null)
   const [formData, setFormData] = useState<FormData>({
     firstName: '',
@@ -851,5 +851,19 @@ export default function RegisterPage() {
         />
       )}
     </div>
+  )
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pt-turquoise"></div>
+        </div>
+      }
+    >
+      <RegisterPageContent />
+    </Suspense>
   )
 }
