@@ -412,13 +412,15 @@
         "mustBookMeeting": "Vous devez réserver une réunion avant de soumettre votre inscription.",
         "canReschedule": "Réunion réservée avec succès.",
         "whatHappensNext": "Étapes suivantes",
-        "whatHappensNextDescription": "Après votre inscription, vous vérifierez votre e-mail. Notre équipe examinera ensuite votre candidature et activera votre compte une fois approuvée."
+        "whatHappensNextDescription": "Après votre inscription, vous vérifierez votre e-mail. Notre équipe examinera ensuite votre candidature et activera votre compte une fois approuvée.",
+        "countryRestrictionHint": "Les candidatures au Programme Partenaire Entreprise ne sont actuellement disponibles qu'au Royaume-Uni, aux États-Unis, au Canada, en France et en Irlande."
       },
       "validation": {
         "firstNameRequired": "Le prénom est requis",
         "lastNameRequired": "Le nom de famille est requis",
         "countryRequired": "Le pays est requis",
         "countryInvalid": "Veuillez sélectionner un pays valide",
+        "countryNotSupported": "Les candidatures au Programme Partenaire Entreprise ne sont disponibles qu'au Royaume-Uni, aux États-Unis, au Canada, en France et en Irlande.",
         "phoneRequired": "Le numéro de téléphone est requis",
         "phoneInvalid": "Veuillez entrer un numéro de téléphone valide",
         "emailRequired": "L'adresse e-mail est requise",

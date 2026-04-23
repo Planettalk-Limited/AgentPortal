@@ -501,13 +501,15 @@
         "mustBookMeeting": "You must book a meeting before submitting your registration.",
         "canReschedule": "Meeting booked successfully.",
         "whatHappensNext": "What happens next",
-        "whatHappensNextDescription": "After registering you'll verify your email. Our team will then review your application and activate your account once approved."
+        "whatHappensNextDescription": "After registering you'll verify your email. Our team will then review your application and activate your account once approved.",
+        "countryRestrictionHint": "Business Partner applications are currently only available in the United Kingdom, United States, Canada, France, and Ireland."
       },
       "validation": {
         "firstNameRequired": "First name is required",
         "lastNameRequired": "Last name is required",
         "countryRequired": "Country is required",
         "countryInvalid": "Please select a valid country",
+        "countryNotSupported": "Business Partner applications are only available in the United Kingdom, United States, Canada, France, and Ireland.",
         "phoneRequired": "Phone number is required",
         "phoneInvalid": "Please enter a valid phone number",
         "emailRequired": "Email is required",
