@@ -412,13 +412,15 @@
         "mustBookMeeting": "Deve marcar uma reunião antes de submeter o seu registo.",
         "canReschedule": "Reunião marcada com sucesso.",
         "whatHappensNext": "Próximos passos",
-        "whatHappensNextDescription": "Após o registo, verificará o seu e-mail. A nossa equipa irá então analisar a sua candidatura e ativar a sua conta após aprovação."
+        "whatHappensNextDescription": "Após o registo, verificará o seu e-mail. A nossa equipa irá então analisar a sua candidatura e ativar a sua conta após aprovação.",
+        "countryRestrictionHint": "As candidaturas ao Programa de Parceiros Empresariais estão atualmente disponíveis apenas no Reino Unido, Estados Unidos, Canadá, França e Irlanda."
       },
       "validation": {
         "firstNameRequired": "O primeiro nome é obrigatório",
         "lastNameRequired": "O sobrenome é obrigatório",
         "countryRequired": "O país é obrigatório",
         "countryInvalid": "Por favor selecione um país válido",
+        "countryNotSupported": "As candidaturas ao Programa de Parceiros Empresariais estão disponíveis apenas no Reino Unido, Estados Unidos, Canadá, França e Irlanda.",
         "phoneRequired": "O número de telefone é obrigatório",
         "phoneInvalid": "Por favor introduza um número de telefone válido",
         "emailRequired": "O e-mail é obrigatório",

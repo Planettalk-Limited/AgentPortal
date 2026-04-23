@@ -414,13 +414,15 @@
         "mustBookMeeting": "Debe reservar una reunión antes de enviar su registro.",
         "canReschedule": "Reunión reservada exitosamente.",
         "whatHappensNext": "Próximos pasos",
-        "whatHappensNextDescription": "Después de registrarse, verificará su correo electrónico. Nuestro equipo revisará su solicitud y activará su cuenta una vez aprobada."
+        "whatHappensNextDescription": "Después de registrarse, verificará su correo electrónico. Nuestro equipo revisará su solicitud y activará su cuenta una vez aprobada.",
+        "countryRestrictionHint": "Las solicitudes del Programa de Socios Empresariales solo están disponibles actualmente en el Reino Unido, Estados Unidos, Canadá, Francia e Irlanda."
       },
       "validation": {
         "firstNameRequired": "El nombre es requerido",
         "lastNameRequired": "El apellido es requerido",
         "countryRequired": "El país es requerido",
         "countryInvalid": "Por favor seleccione un país válido",
+        "countryNotSupported": "Las solicitudes del Programa de Socios Empresariales solo están disponibles en el Reino Unido, Estados Unidos, Canadá, Francia e Irlanda.",
         "phoneRequired": "El número de teléfono es requerido",
         "phoneInvalid": "Por favor ingrese un número de teléfono válido",
         "emailRequired": "El correo electrónico es requerido",

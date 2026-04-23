@@ -11,6 +11,10 @@ import PhoneNumberInput from '@/components/PhoneNumberInput'
 import { createLocalizedPath } from '@/lib/utils/navigation'
 import MeetingBookingModal from '@/components/MeetingBookingModal'
 import Toast from '@/components/Toast'
+import {
+  BUSINESS_PARTNER_PRESENCE_COUNTRIES,
+  isBusinessPartnerPresenceCountry,
+} from '@/lib/constants/presenceCountries'
 
 const MEETING_BOOKING_URL = process.env.NEXT_PUBLIC_PARTNER_MEETING_BOOKING_URL || 'https://calendar.app.google/4qT4xSicq7ZQqsvMA'
 
@@ -104,6 +108,24 @@ function RegisterPageContent() {
       setPartnerType(typeParam)
     }
   }, [searchParams])
+
+  // When switching to the business partner flow, drop any previously selected
+  // country that is outside PlanetTalk's supported markets so the user is
+  // forced to pick a valid one from the restricted list.
+  useEffect(() => {
+    if (
+      partnerType === 'business' &&
+      formData.country &&
+      !isBusinessPartnerPresenceCountry(formData.country)
+    ) {
+      setFormData(prev => ({ ...prev, country: '' }))
+      setFieldErrors(prev => {
+        const next = { ...prev }
+        delete next.country
+        return next
+      })
+    }
+  }, [partnerType, formData.country])
   
   useEffect(() => {
     const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
@@ -148,6 +170,9 @@ function RegisterPageContent() {
     if (!formData.acceptPartnerProgram) errors.acceptPartnerProgram = t('validation.partnerProgramRequired')
 
     if (partnerType === 'business') {
+      if (formData.country && !isBusinessPartnerPresenceCountry(formData.country)) {
+        errors.country = t('validation.countryNotSupported')
+      }
       if (!formData.companyName.trim()) errors.companyName = t('validation.companyNameRequired')
       if (!formData.businessAddress.trim()) errors.businessAddress = t('validation.businessAddressRequired')
       if (!formData.primaryBusinessActivity) errors.primaryBusinessActivity = t('validation.primaryActivityRequired')
@@ -572,7 +597,13 @@ function RegisterPageContent() {
             placeholder={t('placeholders.country')}
             required
             error={fieldErrors.country}
+            allowedCodes={partnerType === 'business' ? BUSINESS_PARTNER_PRESENCE_COUNTRIES : undefined}
           />
+          {partnerType === 'business' && !fieldErrors.country && (
+            <p className="text-xs text-gray-500 mt-1.5">
+              {t('business.countryRestrictionHint')}
+            </p>
+          )}
         </div>
 
         {/* Phone Number */}

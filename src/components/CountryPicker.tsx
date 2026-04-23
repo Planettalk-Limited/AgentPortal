@@ -16,6 +16,13 @@ interface CountryPickerProps {
   error?: string
   required?: boolean
   disabled?: boolean
+  /**
+   * Optional whitelist of ISO 3166-1 alpha-2 country codes. When provided,
+   * only the listed countries are shown / searchable. Intended for flows
+   * like the Business Partner application where only supported markets
+   * are eligible. Leave undefined to expose the full worldwide list.
+   */
+  allowedCodes?: readonly string[]
 }
 
 // Comprehensive list of countries with ISO codes and flags
@@ -228,7 +235,8 @@ const CountryPicker: React.FC<CountryPickerProps> = ({
   className = '',
   error,
   required = false,
-  disabled = false
+  disabled = false,
+  allowedCodes
 }) => {
   const [isOpen, setIsOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
@@ -236,9 +244,15 @@ const CountryPicker: React.FC<CountryPickerProps> = ({
   const dropdownRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const selectedCountry = countries.find(country => country.code === value)
-  
-  const filteredCountries = countries.filter(country =>
+  const availableCountries = React.useMemo(() => {
+    if (!allowedCodes || allowedCodes.length === 0) return countries
+    const allowed = new Set(allowedCodes)
+    return countries.filter(country => allowed.has(country.code))
+  }, [allowedCodes])
+
+  const selectedCountry = availableCountries.find(country => country.code === value)
+
+  const filteredCountries = availableCountries.filter(country =>
     country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     country.code.toLowerCase().includes(searchTerm.toLowerCase())
   )
@@ -366,9 +380,9 @@ const CountryPicker: React.FC<CountryPickerProps> = ({
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-50 max-h-60 overflow-hidden">
+        <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-50 flex flex-col max-h-[22rem] overflow-hidden">
           {/* Search Input */}
-          <div className="p-3 border-b border-gray-200">
+          <div className="p-3 border-b border-gray-200 flex-shrink-0">
             <input
               ref={inputRef}
               type="text"
@@ -381,7 +395,7 @@ const CountryPicker: React.FC<CountryPickerProps> = ({
           </div>
 
           {/* Countries List */}
-          <div className="max-h-48 overflow-y-auto">
+          <div className="flex-1 min-h-0 overflow-y-auto py-2">
             {filteredCountries.length > 0 ? (
               filteredCountries.map((country, index) => (
                 <button
