@@ -241,8 +241,12 @@ export default function UsersPage() {
 
   const getPartnerTypeInfo = (user: User): { label: string; color: string; icon: string } | null => {
     if (user.role !== 'agent') return null
-    const partnerType = user.metadata?.partnerType
-    if (partnerType === 'business') {
+    const meta = user.metadata
+    const isBusiness =
+      meta?.partnerType === 'business' ||
+      !!meta?.business ||
+      meta?.registrationMethod === 'self_registration_business'
+    if (isBusiness) {
       return { label: 'Business', color: 'bg-violet-100 text-violet-800 border-violet-200', icon: '🏢' }
     }
     return { label: 'Individual', color: 'bg-sky-100 text-sky-800 border-sky-200', icon: '👤' }

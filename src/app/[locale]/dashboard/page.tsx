@@ -295,7 +295,7 @@ export default function DashboardPage() {
                   </div>
                   <div className="mt-2">
                     <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-white/20 text-white/90">
-                      {user?.metadata?.partnerType === 'business' ? '🏢 Business Partner' : '👤 Individual Partner'}
+                      {(user?.metadata?.partnerType === 'business' || !!user?.metadata?.business || user?.metadata?.registrationMethod === 'self_registration_business') ? '🏢 Business Partner' : '👤 Individual Partner'}
                     </span>
                   </div>
                 </div>

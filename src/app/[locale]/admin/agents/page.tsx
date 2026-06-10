@@ -340,16 +340,24 @@ export default function AgentsPage() {
     }
   }
 
+  const isBusinessAgent = (agent: Agent): boolean => {
+    const meta = agent.user?.metadata
+    return (
+      meta?.partnerType === 'business' ||
+      !!meta?.business ||
+      meta?.registrationMethod === 'self_registration_business'
+    )
+  }
+
   const getPartnerTypeBadge = (agent: Agent): { label: string; color: string; icon: string } => {
-    const partnerType = agent.user?.metadata?.partnerType
-    if (partnerType === 'business') {
+    if (isBusinessAgent(agent)) {
       return { label: 'Business Partner', color: 'bg-violet-100 text-violet-800', icon: '🏢' }
     }
     return { label: 'Individual Partner', color: 'bg-sky-100 text-sky-800', icon: '👤' }
   }
 
   const getPartnerTypeLabel = (agent: Agent): string => {
-    return agent.user?.metadata?.partnerType === 'business' ? 'Business Partner' : 'Individual Partner'
+    return isBusinessAgent(agent) ? 'Business Partner' : 'Individual Partner'
   }
 
   if (loading) {
