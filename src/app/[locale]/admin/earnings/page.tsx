@@ -10,6 +10,8 @@ interface BulkUploadData {
   earningsForCurrentMonth: number
   totalReferrals: number
   referralsForCurrentMonth: number
+  totalReferralBonusIncome: number
+  referralBonusIncomeForCurrentMonth: number
   availableBalance: number
   totalPayoutAmount: number
 }
@@ -154,33 +156,39 @@ export default function EarningsPage() {
       const agentCodeIndex = headers.findIndex(h => h.includes('agent'))
       const totalEarningsIndex = headers.findIndex(h => h.includes('total') && h.includes('earning'))
       const currentMonthEarningsIndex = headers.findIndex(h => h.includes('current') && h.includes('month') && h.includes('earning'))
-      const totalReferralsIndex = headers.findIndex(h => h.includes('total') && h.includes('referral'))
-      const currentMonthReferralsIndex = headers.findIndex(h => h.includes('current') && h.includes('month') && h.includes('referral'))
+      // Bonus columns are checked before the plain referral-count columns below, since
+      // "Total Referral Bonus Income" would otherwise also match "total" + "referral"
+      const totalReferralBonusIndex = headers.findIndex(h => h.includes('referral') && h.includes('bonus') && !(h.includes('current') && h.includes('month')))
+      const currentMonthReferralBonusIndex = headers.findIndex(h => h.includes('current') && h.includes('month') && h.includes('referral') && h.includes('bonus'))
+      const totalReferralsIndex = headers.findIndex(h => h.includes('total') && h.includes('referral') && !h.includes('bonus'))
+      const currentMonthReferralsIndex = headers.findIndex(h => h.includes('current') && h.includes('month') && h.includes('referral') && !h.includes('bonus'))
       const availableBalanceIndex = headers.findIndex(h => h.includes('available') || h.includes('balance'))
       const totalPayoutIndex = headers.findIndex(h => h.includes('payout'))
-      
+
       if (agentCodeIndex === -1 || totalEarningsIndex === -1 || currentMonthEarningsIndex === -1) {
         setError('CSV must contain columns: Agent Code, Total Earnings, Earnings for Current Month')
         return
       }
-      
+
       // Parse CSV data
       const agentsData: BulkUploadData[] = []
-      
+
       for (let i = 1; i < lines.length; i++) {
         const columns = lines[i].split(',').map(col => col.trim())
         if (columns.length < 3) continue
-        
+
         const agentData: BulkUploadData = {
           agentCode: columns[agentCodeIndex],
           totalEarnings: parseFloat(columns[totalEarningsIndex]) || 0,
           earningsForCurrentMonth: parseFloat(columns[currentMonthEarningsIndex]) || 0,
           totalReferrals: totalReferralsIndex !== -1 ? parseInt(columns[totalReferralsIndex]) || 0 : 0,
           referralsForCurrentMonth: currentMonthReferralsIndex !== -1 ? parseInt(columns[currentMonthReferralsIndex]) || 0 : 0,
+          totalReferralBonusIncome: totalReferralBonusIndex !== -1 ? parseFloat(columns[totalReferralBonusIndex]) || 0 : 0,
+          referralBonusIncomeForCurrentMonth: currentMonthReferralBonusIndex !== -1 ? parseFloat(columns[currentMonthReferralBonusIndex]) || 0 : 0,
           availableBalance: availableBalanceIndex !== -1 ? parseFloat(columns[availableBalanceIndex]) || 0 : 0,
           totalPayoutAmount: totalPayoutIndex !== -1 ? parseFloat(columns[totalPayoutIndex]) || 0 : 0
         }
-        
+
         agentsData.push(agentData)
       }
       
@@ -305,11 +313,11 @@ export default function EarningsPage() {
 
   const downloadSampleCsv = () => {
     const sampleData = [
-      ['Agent Code', 'Total Earnings', 'Earnings for Current Month', 'Total Referrals', 'Referrals for Current Month', 'Available Balance', 'Total Payout Amount'],
-      ['AGT21618', '125.50', '25.50', '45', '5', '100.00', '25.50'],
-      ['AGT92654', '250.00', '50.00', '80', '10', '200.00', '50.00'],
-      ['AGT33421', '175.75', '35.75', '60', '8', '150.00', '25.75'],
-      ['AGT88012', '95.25', '20.25', '30', '4', '80.00', '15.25']
+      ['Agent Code', 'Total Earnings', 'Earnings for Current Month', 'Total Referrals', 'Referrals for Current Month', 'Total Referral Bonus Income', 'Referral Bonus Income for Current Month', 'Available Balance', 'Total Payout Amount'],
+      ['AGT21618', '125.50', '25.50', '45', '5', '18.00', '3.00', '100.00', '25.50'],
+      ['AGT92654', '250.00', '50.00', '80', '10', '36.00', '6.00', '200.00', '50.00'],
+      ['AGT33421', '175.75', '35.75', '60', '8', '27.00', '3.00', '150.00', '25.75'],
+      ['AGT88012', '95.25', '20.25', '30', '4', '12.00', '3.00', '80.00', '15.25']
     ]
     
     const csvContent = sampleData.map(row => row.join(',')).join('\n')
@@ -932,6 +940,8 @@ export default function EarningsPage() {
                         <ul className="list-disc list-inside space-y-0.5 ml-2">
                           <li>Total Referrals</li>
                           <li>Referrals for Current Month</li>
+                          <li>Total Referral Bonus Income (one-time sign-up bonus, separate from commission)</li>
+                          <li>Referral Bonus Income for Current Month</li>
                           <li>Available Balance</li>
                           <li>Total Payout Amount</li>
                         </ul>

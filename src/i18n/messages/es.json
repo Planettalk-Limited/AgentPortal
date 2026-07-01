@@ -615,6 +615,9 @@
     "currentMonth": "Este Mes",
     "earningsThisMonth": "Ganancias Este Mes",
     "referralsThisMonth": "Referencias Este Mes",
+    "referralBonusIncome": "Ingresos por Bono de Referidos",
+    "referralBonusIncomeThisMonth": "Bono Este Mes",
+    "totalIncome": "Ingreso Total",
     "totalReferrals": "Referencias Totales",
     "shareAndEarn": "Comparte y Gana Comisiones",
     "shareDescription": "Comparte la app PlanetTalk con tu código de agente para ganar comisiones cuando los clientes lo usen al registrarse",
@@ -908,7 +911,7 @@
     "help": {
       "title": "¿Preguntas sobre nuestros términos?",
       "description": "Si tiene alguna pregunta sobre estos términos y condiciones, no dude en contactarnos.",
-      "email": "agent@planettalk.com"
+      "email": "partnerst@planettalk.com"
     }
   },
   "welcomeMessage": {

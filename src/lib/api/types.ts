@@ -201,6 +201,8 @@ export interface Agent {
   activeReferrals: number;
   earningsThisMonth?: number;
   referralsThisMonth?: number;
+  totalReferralBonusIncome?: number;
+  referralBonusIncomeCurrentMonth?: number;
   commissionRate: number;
   user: User;
   createdAt: string;
@@ -897,6 +899,8 @@ export interface BulkAgentDataUploadRequest {
     earningsForCurrentMonth?: number;
     totalReferrals?: number;
     referralsForCurrentMonth?: number;
+    totalReferralBonusIncome?: number;
+    referralBonusIncomeForCurrentMonth?: number;
     availableBalance?: number;
     totalPayoutAmount?: number;
     availableMonth?: string; // Format: "YYYY-MM"
