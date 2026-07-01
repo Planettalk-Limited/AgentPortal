@@ -304,6 +304,11 @@ export default function DashboardPage() {
               {/* Right side - Stats */}
               <div className="flex items-center gap-4 sm:gap-6 lg:gap-8">
                 <div className="text-center">
+                  <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">{formatCurrencyWithSymbol((Number(agent.totalEarnings) || 0) + (Number(agent.totalReferralBonusIncome) || 0))}</div>
+                  <div className="text-pt-turquoise-100 text-xs sm:text-sm whitespace-nowrap mt-1">{t('totalIncome')}</div>
+                </div>
+                <div className="w-px h-12 sm:h-14 lg:h-16 bg-white/30"></div>
+                <div className="text-center">
                   <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">{parseFloat(String(agent.commissionRate || '10'))}%</div>
                   <div className="text-pt-turquoise-100 text-xs sm:text-sm whitespace-nowrap mt-1">{t('commissionRate')}</div>
                 </div>
@@ -320,8 +325,8 @@ export default function DashboardPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Key Metrics - 2-column grid on mobile, 4 columns on desktop */}
-        <div className="grid grid-cols-2 gap-2.5 sm:gap-3 lg:grid-cols-4 lg:gap-4 transform -translate-y-6 sm:-translate-y-8 lg:-translate-y-10 relative z-10">
-          {/* Total Earnings */}
+        <div className="grid grid-cols-2 gap-2.5 sm:gap-3 lg:grid-cols-3 lg:gap-4 transform -translate-y-6 sm:-translate-y-8 lg:-translate-y-10 relative z-10">
+          {/* Total Earnings (commission from top-ups) */}
           <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 lg:p-6 shadow-lg border border-gray-100">
             <div className="flex flex-col lg:flex-row lg:items-center gap-2 lg:gap-4">
               <div className="p-2 sm:p-2.5 lg:p-3 bg-gradient-to-br from-green-400 to-green-600 rounded-lg lg:rounded-xl w-fit">
@@ -350,7 +355,37 @@ export default function DashboardPage() {
               </div>
             </div>
           </div>
-          
+
+          {/* Referral Bonus Income (one-time sign-up bonus, separate from top-up commission) */}
+          <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 lg:p-6 shadow-lg border border-gray-100">
+            <div className="flex flex-col lg:flex-row lg:items-center gap-2 lg:gap-4">
+              <div className="p-2 sm:p-2.5 lg:p-3 bg-gradient-to-br from-pink-400 to-pink-600 rounded-lg lg:rounded-xl w-fit">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v8m-4-5h8M5.5 21h13a2 2 0 002-2V8.5L15 3H5.5a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <div className="text-xs text-gray-500 mb-0.5">{t('referralBonusIncome')}</div>
+                <div className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">{formatCurrencyWithSymbol(agent.totalReferralBonusIncome || 0)}</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Referral Bonus Income This Month */}
+          <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 lg:p-6 shadow-lg border border-gray-100">
+            <div className="flex flex-col lg:flex-row lg:items-center gap-2 lg:gap-4">
+              <div className="p-2 sm:p-2.5 lg:p-3 bg-gradient-to-br from-teal-400 to-teal-600 rounded-lg lg:rounded-xl w-fit">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v8m-4-5h8M5.5 21h13a2 2 0 002-2V8.5L15 3H5.5a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <div className="text-xs text-gray-500 mb-0.5">{t('referralBonusIncomeThisMonth')}</div>
+                <div className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">{formatCurrencyWithSymbol(agent.referralBonusIncomeCurrentMonth || 0)}</div>
+              </div>
+            </div>
+          </div>
+
           {/* Total Referrals */}
           <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 lg:p-6 shadow-lg border border-gray-100">
             <div className="flex flex-col lg:flex-row lg:items-center gap-2 lg:gap-4">

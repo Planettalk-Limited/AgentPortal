@@ -702,6 +702,9 @@
     "currentMonth": "This Month",
     "earningsThisMonth": "Earnings This Month",
     "referralsThisMonth": "Referrals This Month",
+    "referralBonusIncome": "Referral Bonus Income",
+    "referralBonusIncomeThisMonth": "Bonus This Month",
+    "totalIncome": "Total Income",
     "shareAndEarn": "Share & Earn Commissions", 
     "shareDescription": "Share the PlanetTalk app with your partner code to earn commissions when customers use it during signup",
     "yourAgentCode": "YOUR PARTNER CODE",
@@ -992,7 +995,7 @@
     "help": {
       "title": "Questions about our terms?",
       "description": "If you have any questions about these terms and conditions, please don't hesitate to contact us.",
-      "email": "agent@planettalk.com"
+      "email": "partnerst@planettalk.com"
     }
   },
   "welcomeMessage": {

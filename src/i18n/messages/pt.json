@@ -613,6 +613,9 @@
     "currentMonth": "Este Mês",
     "earningsThisMonth": "Ganhos Este Mês",
     "referralsThisMonth": "Indicações Este Mês",
+    "referralBonusIncome": "Receita de Bônus de Indicação",
+    "referralBonusIncomeThisMonth": "Bônus Este Mês",
+    "totalIncome": "Receita Total",
     "shareAndEarn": "Compartilhe e Ganhe Comissões",
     "shareDescription": "Compartilhe o app PlanetTalk com seu código de agente para ganhar comissões quando clientes o usarem no cadastro",
     "yourAgentCode": "SEU CÓDIGO DE AGENTE",
@@ -946,7 +949,7 @@
     "help": {
       "title": "Dúvidas sobre nossos termos?",
       "description": "Se você tiver alguma dúvida sobre estes termos e condições, não hesite em nos contatar.",
-      "email": "agent@planettalk.com"
+      "email": "partnerst@planettalk.com"
     }
   },
   "welcomeMessage": {

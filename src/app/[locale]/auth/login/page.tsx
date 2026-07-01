@@ -143,7 +143,7 @@ export default function LoginPage() {
           <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 text-left">
             <p className="text-sm text-gray-700 font-medium">
               If you believe this is an error, please contact us at{' '}
-              <a href="mailto:agent@planettalk.com" className="text-pt-turquoise underline font-bold">agent@planettalk.com</a>
+              <a href="mailto:partnerst@planettalk.com" className="text-pt-turquoise underline font-bold">partnerst@planettalk.com</a>
             </p>
           </div>
           <button
@@ -172,7 +172,7 @@ export default function LoginPage() {
           <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-left">
             <p className="text-sm text-blue-800 font-medium">
               Need to speed things up? Contact us at{' '}
-              <a href="mailto:agent@planettalk.com" className="underline font-bold">agent@planettalk.com</a>
+              <a href="mailto:partnerst@planettalk.com" className="underline font-bold">partnerst@planettalk.com</a>
             </p>
           </div>
           <button
