@@ -8,12 +8,12 @@ interface BulkUploadData {
   agentCode: string
   totalEarnings: number
   earningsForCurrentMonth: number
-  totalReferrals: number
-  referralsForCurrentMonth: number
-  totalReferralBonusIncome: number
-  referralBonusIncomeForCurrentMonth: number
+  totalReferrals?: number
+  referralsForCurrentMonth?: number
+  totalReferralBonusIncome?: number
+  referralBonusIncomeForCurrentMonth?: number
   availableBalance: number
-  totalPayoutAmount: number
+  totalPayoutAmount?: number
 }
 
 // Helper function to derive earning type from description or metadata
@@ -181,12 +181,16 @@ export default function EarningsPage() {
           agentCode: columns[agentCodeIndex],
           totalEarnings: parseFloat(columns[totalEarningsIndex]) || 0,
           earningsForCurrentMonth: parseFloat(columns[currentMonthEarningsIndex]) || 0,
-          totalReferrals: totalReferralsIndex !== -1 ? parseInt(columns[totalReferralsIndex]) || 0 : 0,
-          referralsForCurrentMonth: currentMonthReferralsIndex !== -1 ? parseInt(columns[currentMonthReferralsIndex]) || 0 : 0,
-          totalReferralBonusIncome: totalReferralBonusIndex !== -1 ? parseFloat(columns[totalReferralBonusIndex]) || 0 : 0,
-          referralBonusIncomeForCurrentMonth: currentMonthReferralBonusIndex !== -1 ? parseFloat(columns[currentMonthReferralBonusIndex]) || 0 : 0,
+          // Leave any absent column undefined (not 0) so the backend preserves the
+          // agent's existing value. Sending 0 for an omitted column would WIPE the
+          // stored value for every agent — this is what erased referral bonus income
+          // when a CSV export left those columns out.
+          totalReferrals: totalReferralsIndex !== -1 ? parseInt(columns[totalReferralsIndex]) || 0 : undefined,
+          referralsForCurrentMonth: currentMonthReferralsIndex !== -1 ? parseInt(columns[currentMonthReferralsIndex]) || 0 : undefined,
+          totalReferralBonusIncome: totalReferralBonusIndex !== -1 ? parseFloat(columns[totalReferralBonusIndex]) || 0 : undefined,
+          referralBonusIncomeForCurrentMonth: currentMonthReferralBonusIndex !== -1 ? parseFloat(columns[currentMonthReferralBonusIndex]) || 0 : undefined,
           availableBalance: availableBalanceIndex !== -1 ? parseFloat(columns[availableBalanceIndex]) || 0 : 0,
-          totalPayoutAmount: totalPayoutIndex !== -1 ? parseFloat(columns[totalPayoutIndex]) || 0 : 0
+          totalPayoutAmount: totalPayoutIndex !== -1 ? parseFloat(columns[totalPayoutIndex]) || 0 : undefined
         }
 
         agentsData.push(agentData)
