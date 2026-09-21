@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { api, PartnerHealth, StuckPartner } from '@/lib/api'
+import { api, PartnerHealth, StuckPartner, DeadCodePartner } from '@/lib/api'
 import { withAuth } from '@/contexts/AuthContext'
 import Toast from '@/components/Toast'
 
@@ -28,6 +28,25 @@ function PartnerHealthPage() {
       setToast({ message: err?.message || 'Failed to load partner health', type: 'error' })
     } finally {
       setLoading(false)
+    }
+  }
+
+  const reactivate = async (partner: DeadCodePartner) => {
+    setRestoring(partner.id)
+    try {
+      await api.admin.reactivateAgent(
+        partner.agentId,
+        'Code was not resolving — agent left in a non-active status',
+      )
+      setToast({
+        message: `${partner.agentCode} is live again. Referrals using it will now resolve.`,
+        type: 'success',
+      })
+      await load()
+    } catch (err: any) {
+      setToast({ message: err?.message || 'Failed to reactivate agent', type: 'error' })
+    } finally {
+      setRestoring(null)
     }
   }
 
@@ -60,7 +79,10 @@ function PartnerHealthPage() {
 
   const { codePool, counts } = health
   const allClear =
-    counts.missingProfile === 0 && counts.awaitingApproval === 0 && counts.rejected === 0
+    counts.deadCode === 0 &&
+    counts.missingProfile === 0 &&
+    counts.awaitingApproval === 0 &&
+    counts.rejected === 0
 
   return (
     <div className="p-6 max-w-6xl">
@@ -115,8 +137,70 @@ function PartnerHealthPage() {
         <div className="bg-green-50 border border-green-200 rounded-xl p-5 mb-6">
           <p className="text-sm font-semibold text-green-800">Nothing needs attention</p>
           <p className="text-sm text-green-700 mt-1">
-            No partner is missing a profile, stuck awaiting approval, or locked out by a rejection.
+            No dead codes, no missing profiles, nobody stuck awaiting approval or locked out by a
+            rejection.
           </p>
+        </div>
+      )}
+
+      {counts.deadCode > 0 && (
+        <div className="bg-white rounded-xl border border-gray-200 mb-6 overflow-hidden">
+          <div className="px-6 py-4 border-b border-red-200 bg-red-50 text-red-800">
+            <div className="flex items-center gap-3">
+              <h2 className="text-lg font-semibold">Code not working</h2>
+              <span className="px-2 py-0.5 rounded-md bg-white/70 text-sm font-bold">
+                {counts.deadCode}
+              </span>
+            </div>
+            <p className="text-sm mt-1.5 opacity-90">
+              These partners are active and verified, and their dashboard shows a code — but the
+              agent profile behind it is not active, so every referral that uses it is turned away
+              with &quot;This agent is not currently active&quot;. The partner is never told, and
+              someone whose code is refused does not report it, so this can sit for months.
+            </p>
+          </div>
+
+          <table className="w-full text-sm">
+            <thead className="bg-gray-50 text-left text-gray-600">
+              <tr>
+                <th className="px-6 py-2.5 font-semibold">Partner</th>
+                <th className="px-6 py-2.5 font-semibold">Code</th>
+                <th className="px-6 py-2.5 font-semibold">Agent status</th>
+                <th className="px-6 py-2.5 font-semibold">Since</th>
+                <th className="px-6 py-2.5" />
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {health.deadCode.map((p) => (
+                <tr key={p.id}>
+                  <td className="px-6 py-3">
+                    <div className="font-medium text-gray-900">
+                      {p.companyName || `${p.firstName} ${p.lastName}`}
+                    </div>
+                    <div className="text-xs text-gray-500">{p.email}</div>
+                  </td>
+                  <td className="px-6 py-3 font-mono text-xs text-gray-900">{p.agentCode}</td>
+                  <td className="px-6 py-3">
+                    <span className="px-2 py-1 rounded-md text-xs font-medium bg-red-100 text-red-800">
+                      {p.agentStatus}
+                    </span>
+                  </td>
+                  <td className="px-6 py-3 text-gray-600">
+                    {new Date(p.createdAt).toLocaleDateString()}
+                  </td>
+                  <td className="px-6 py-3 text-right">
+                    <button
+                      onClick={() => reactivate(p)}
+                      disabled={restoring === p.id}
+                      className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-pt-turquoise text-white disabled:opacity-40 hover:bg-pt-turquoise/90 transition-colors"
+                    >
+                      {restoring === p.id ? 'Activating…' : 'Activate code'}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
 

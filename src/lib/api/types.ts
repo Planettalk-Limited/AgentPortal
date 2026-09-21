@@ -754,6 +754,12 @@ export interface StuckPartner {
   companyName: string | null;
 }
 
+export interface DeadCodePartner extends StuckPartner {
+  agentId: string;
+  agentCode: string;
+  agentStatus: string;
+}
+
 export interface PartnerHealth {
   codePool: {
     prefix: string;
@@ -765,11 +771,13 @@ export interface PartnerHealth {
     highestAssigned: string | null;
   };
   counts: {
+    deadCode: number;
     missingProfile: number;
     awaitingApproval: number;
     rejected: number;
     unverified: number;
   };
+  deadCode: DeadCodePartner[];
   missingProfile: StuckPartner[];
   awaitingApproval: StuckPartner[];
   rejected: StuckPartner[];
