@@ -742,6 +742,39 @@ export interface PaginationParams {
   limit?: number;
 }
 
+export interface StuckPartner {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  status: string;
+  emailVerified: boolean;
+  createdAt: string;
+  partnerType: 'individual' | 'business';
+  companyName: string | null;
+}
+
+export interface PartnerHealth {
+  codePool: {
+    prefix: string;
+    min: number;
+    max: number;
+    used: number;
+    available: number;
+    percentUsed: number;
+    highestAssigned: string | null;
+  };
+  counts: {
+    missingProfile: number;
+    awaitingApproval: number;
+    rejected: number;
+    unverified: number;
+  };
+  missingProfile: StuckPartner[];
+  awaitingApproval: StuckPartner[];
+  rejected: StuckPartner[];
+}
+
 export interface UserQueryParams extends PaginationParams {
   role?: string;
   status?: string;

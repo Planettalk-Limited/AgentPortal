@@ -2,12 +2,10 @@
 
 import Link from 'next/link'
 import { useTranslations, useLocale } from 'next-intl'
-import { useState } from 'react'
 
 const Hero = () => {
   const t = useTranslations('hero')
   const locale = useLocale()
-  const [modalOpen, setModalOpen] = useState(false)
 
   // Helper function to create locale-aware links
   const createLocalizedPath = (path: string) => {
@@ -76,17 +74,16 @@ const Hero = () => {
                 </p>
 
                 <div className="mt-6 md:mt-8 opacity-0 animate-slide-up delay-300 flex flex-col sm:flex-row sm:items-center gap-3">
-                  <button 
-                    type="button" 
+                  <Link
+                    href={createLocalizedPath('/auth/register')}
                     className="group relative overflow-hidden rounded-lg inline-flex items-center justify-center px-6 py-3 md:px-8 md:py-4 text-lg md:text-xl font-semibold text-pt-turquoise transition-all duration-300 w-full sm:w-auto"
-                    onClick={() => setModalOpen(true)}
                   >
                     <span className="absolute inset-0 bg-white"></span>
                     <span className="absolute inset-0 bg-white/80 translate-x-full group-hover:translate-x-0 transition-transform duration-500"></span>
                     <span className="relative flex items-center justify-center">
                       {t('signUp') || t('ctaSecondary')}
                     </span>
-                  </button>
+                  </Link>
 
                   <Link
                     href={createLocalizedPath('/auth/login')}
@@ -155,66 +152,6 @@ const Hero = () => {
           </div>
         </div>
       </section>
-
-      {/* Agent Registration Form Modal */}
-      {modalOpen && (
-        <div className="fixed inset-0 z-50 overflow-y-auto">
-          <div className="fixed inset-0 bg-black bg-opacity-50 transition-opacity" onClick={() => setModalOpen(false)} aria-hidden="true"></div>
-          
-          <div className="flex min-h-screen items-center justify-center p-4">
-            <div className="relative bg-white rounded-lg w-full max-w-4xl shadow-2xl transform transition-all">
-              {/* Modal Header */}
-              <div className="flex items-center justify-between p-4 border-b">
-                <h3 className="text-xl md:text-2xl font-semibold text-gray-900">{t('signUp') || 'Sign Up'}</h3>
-                <button onClick={() => setModalOpen(false)} className="text-gray-400 hover:text-gray-500" aria-label="Close modal">
-                  <span className="sr-only">Close</span>
-                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-
-              {/* Modal Content */}
-              <div className="p-6">
-                <div className="mb-4">
-                  <div className="p-4 bg-yellow-50 border-l-4 border-yellow-400 mb-4">
-                    <div className="flex">
-                      <div className="flex-shrink-0">
-                        <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                      <div className="ml-3">
-                        <p className="text-sm text-yellow-700 font-medium">
-                          Please read the terms and conditions before filling out the form
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="p-4 bg-gray-50 rounded-lg border border-gray-100">
-                    <h4 className="text-sm font-semibold text-gray-700 mb-2">Terms and Conditions</h4>
-                    <p className="text-sm text-gray-600">
-                      Please read this before filling out the form. By submitting this form, you agree to our 
-                      <a href="/terms-and-conditions.pdf" target="_blank" className="text-pt-turquoise underline hover:no-underline"> Partner Program Terms and Conditions</a>.
-                      You consent to receive communications about the PlanetTalk Partner Program and understand that your data will be processed in accordance with our Privacy Policy.
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="text-center">
-                  <Link 
-                    href={createLocalizedPath('/auth/register')}
-                    className="inline-block bg-pt-turquoise text-white px-8 py-3 rounded-lg font-semibold hover:bg-pt-turquoise/90 transition-colors"
-                    onClick={() => setModalOpen(false)}
-                  >
-                    Continue to Registration
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </>
   )
 }

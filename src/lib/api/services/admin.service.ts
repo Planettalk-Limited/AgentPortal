@@ -9,6 +9,7 @@ import {
   User,
   UserQueryParams,
   UserStats,
+  PartnerHealth,
   Agent,
   AgentStats,
   Earning,
@@ -106,24 +107,6 @@ export class AdminService extends BaseService {
   // ===== Business Partner Applications =====
 
   /**
-   * List all pending business partner applications
-   */
-  async getPendingBusinessPartners(): Promise<User[]> {
-    return this.execute(() =>
-      this.client.get<User[]>('admin/users/pending-business-partners')
-    );
-  }
-
-  /**
-   * Move a rejected business partner application back to review
-   */
-  async moveBusinessPartnerToReview(id: string, note?: string): Promise<{ success: boolean; user: Partial<User>; message: string }> {
-    return this.execute(() =>
-      this.client.post(`admin/users/${id}/review-business-partner`, note ? { note } : {})
-    );
-  }
-
-  /**
    * Update business partner application details
    */
   async updateBusinessPartnerApplication(
@@ -137,7 +120,6 @@ export class AdminService extends BaseService {
       businessAddress?: string;
       primaryBusinessActivity?: string;
       primarySpecialty?: string;
-      customerInteractionType?: string;
       sellsInternationalGoods?: boolean;
       expectedVolume?: string;
       region?: string;
@@ -150,20 +132,28 @@ export class AdminService extends BaseService {
   }
 
   /**
-   * Approve a business partner and assign a custom partner code
+   * Partner accounts stuck in a state that cannot resolve itself,
+   * plus PTA code pool usage.
    */
-  async approveBusinessPartner(id: string, partnerCode: string): Promise<{ success: boolean; user: Partial<User>; agent: { id: string; agentCode: string; status: string } }> {
-    return this.execute(() =>
-      this.client.post(`admin/users/${id}/approve-business-partner`, { partnerCode })
-    );
+  async getPartnerHealth(): Promise<PartnerHealth> {
+    return this.execute(() => this.client.get<PartnerHealth>('admin/users/partner-health'));
   }
 
   /**
-   * Reject a business partner application
+   * Restore a partner rejected under the old flow: mints their agent profile,
+   * clears the rejection, and activates them if their email is verified.
    */
-  async rejectBusinessPartner(id: string, reason?: string): Promise<{ success: boolean; user: Partial<User>; message: string }> {
+  async restoreBusinessPartner(id: string): Promise<{ status: string; agentCode: string | null }> {
+    return this.execute(() => this.client.post(`admin/users/${id}/restore-business-partner`, {}));
+  }
+
+  /**
+   * Assign a custom partner code in place of the generic PTA code.
+   * The previous code stops resolving as soon as this succeeds.
+   */
+  async changeAgentCode(agentId: string, agentCode: string): Promise<{ id: string; agentCode: string }> {
     return this.execute(() =>
-      this.client.post(`admin/users/${id}/reject-business-partner`, reason ? { reason } : {})
+      this.client.patch(`admin/agents/${agentId}/agent-code`, { agentCode })
     );
   }
 

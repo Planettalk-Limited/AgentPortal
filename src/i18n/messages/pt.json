@@ -344,15 +344,23 @@
         "lastNameRequired": "O sobrenome é obrigatório",
         "countryRequired": "O país é obrigatório",
         "countryInvalid": "Por favor selecione um país válido",
+        "countryNotSupported": "As candidaturas ao Programa de Parceiros Empresariais estão disponíveis apenas no Reino Unido, Estados Unidos, Canadá, França e Irlanda.",
+        "phoneRequired": "O número de telefone é obrigatório",
+        "phoneInvalid": "Por favor introduza um número de telefone válido",
         "emailRequired": "O e-mail é obrigatório",
-        "emailInvalid": "Por favor, digite um endereço de e-mail válido",
+        "emailInvalid": "Por favor introduza um endereço de e-mail válido",
         "passwordRequired": "A senha é obrigatória",
         "passwordMinLength": "A senha deve ter pelo menos 8 caracteres",
         "passwordUppercase": "A senha deve conter pelo menos uma letra maiúscula",
         "passwordSpecialChar": "A senha deve conter pelo menos um caractere especial",
         "passwordRequirements": "A senha deve ter pelo menos 8 caracteres, uma letra maiúscula e um caractere especial",
         "passwordMismatch": "As senhas não coincidem",
-        "termsRequired": "Você deve aceitar os termos e condições"
+        "agentProgramRequired": "Deve aceitar os Termos e Condições do Programa de Parceiros",
+        "partnerProgramRequired": "Deve aceitar os Termos e Condições do Programa de Parceiros",
+        "companyNameRequired": "O nome da empresa é obrigatório",
+        "businessAddressRequired": "A morada do negócio é obrigatória",
+        "primaryActivityRequired": "A atividade principal do negócio é obrigatória",
+        "primarySpecialtyRequired": "A especialidade principal é obrigatória"
       },
       "optIn": {
         "termsPrefix": "Concordo com os",
@@ -399,46 +407,11 @@
         "selectActivity": "Selecionar atividade",
         "primarySpecialty": "Especialidade Principal",
         "selectSpecialty": "Selecionar especialidade",
-        "customerInteraction": "Tipo de Interação com o Cliente",
-        "selectInteraction": "Selecionar tipo de interação",
         "sellsInternational": "Vende Produtos Internacionais",
         "sellsInternationalDescription": "O seu negócio vende produtos importados ou dirigidos a comunidades internacionais?",
-        "scheduleMeeting": "Agendar Reunião de Integração",
-        "bookMeeting": "Marque a Sua Reunião de Integração",
-        "bookMeetingDescription": "Obrigatório antes de submeter a sua candidatura",
-        "meetingScheduled": "Reunião Agendada",
-        "meetingScheduledDescription": "A sua reunião de integração foi marcada",
-        "reschedule": "Reagendar",
-        "mustBookMeeting": "Deve marcar uma reunião antes de submeter o seu registo.",
-        "canReschedule": "Reunião marcada com sucesso.",
         "whatHappensNext": "Próximos passos",
-        "whatHappensNextDescription": "Após o registo, verificará o seu e-mail. A nossa equipa irá então analisar a sua candidatura e ativar a sua conta após aprovação.",
+        "whatHappensNextDescription": "Após o registo, verificará o seu e-mail. Isso ativa a sua conta de imediato e enviar-lhe-emos o seu código de parceiro.",
         "countryRestrictionHint": "As candidaturas ao Programa de Parceiros Empresariais estão atualmente disponíveis apenas no Reino Unido, Estados Unidos, Canadá, França e Irlanda."
-      },
-      "validation": {
-        "firstNameRequired": "O primeiro nome é obrigatório",
-        "lastNameRequired": "O sobrenome é obrigatório",
-        "countryRequired": "O país é obrigatório",
-        "countryInvalid": "Por favor selecione um país válido",
-        "countryNotSupported": "As candidaturas ao Programa de Parceiros Empresariais estão disponíveis apenas no Reino Unido, Estados Unidos, Canadá, França e Irlanda.",
-        "phoneRequired": "O número de telefone é obrigatório",
-        "phoneInvalid": "Por favor introduza um número de telefone válido",
-        "emailRequired": "O e-mail é obrigatório",
-        "emailInvalid": "Por favor introduza um endereço de e-mail válido",
-        "passwordRequired": "A senha é obrigatória",
-        "passwordMinLength": "A senha deve ter pelo menos 8 caracteres",
-        "passwordUppercase": "A senha deve conter pelo menos uma letra maiúscula",
-        "passwordSpecialChar": "A senha deve conter pelo menos um caractere especial",
-        "passwordRequirements": "A senha deve ter pelo menos 8 caracteres, uma letra maiúscula e um caractere especial",
-        "passwordMismatch": "As senhas não coincidem",
-        "agentProgramRequired": "Deve aceitar os Termos e Condições do Programa de Parceiros",
-        "partnerProgramRequired": "Deve aceitar os Termos e Condições do Programa de Parceiros",
-        "companyNameRequired": "O nome da empresa é obrigatório",
-        "businessAddressRequired": "A morada do negócio é obrigatória",
-        "primaryActivityRequired": "A atividade principal do negócio é obrigatória",
-        "primarySpecialtyRequired": "A especialidade principal é obrigatória",
-        "customerInteractionRequired": "O tipo de interação com o cliente é obrigatório",
-        "meetingRequired": "Por favor agende a sua reunião de integração antes de se registar"
       }
     },
     "verifyEmail": {
@@ -590,7 +563,7 @@
     "referrals": "Indicações",
     "balance": "Saldo",
     "availableForPayout": "Disponível para Pagamento",
-    "totalReferrals": "Indicações Totais", 
+    "totalReferrals": "Indicações Totais",
     "activeReferrals": "Indicações Ativas",
     "agentTier": "Nível do Agente",
     "pendingBalance": "Saldo Pendente",
@@ -734,14 +707,14 @@
     "terms": "Termos",
     "privacy": "Privacidade"
   },
-    "referral": {
-      "loading": "Carregando informações de indicação...",
-      "invalidCode": "Código de Indicação Inválido",
-      "invalidMessage": "Este código de indicação não é válido ou expirou.",
-      "visitPlanetTalk": "Visitar PlanetTalk",
-      "processing": "Processando...",
-      "required": "Campo obrigatório"
-    },
+  "referral": {
+    "loading": "Carregando informações de indicação...",
+    "invalidCode": "Código de Indicação Inválido",
+    "invalidMessage": "Este código de indicação não é válido ou expirou.",
+    "visitPlanetTalk": "Visitar PlanetTalk",
+    "processing": "Processando...",
+    "required": "Campo obrigatório"
+  },
   "profile": {
     "title": "Configurações do Perfil",
     "subtitle": "Gerencie as configurações da sua conta e preferências",
@@ -782,7 +755,6 @@
       "notifications": "Notificações",
       "password": "Senha"
     },
-
     "personalInfo": {
       "title": "Informações Pessoais",
       "firstName": "Nome",
@@ -796,7 +768,6 @@
       "userIdCannotBeChanged": "O ID do usuário não pode ser alterado",
       "countryCannotBeChanged": "O país não pode ser alterado uma vez definido"
     },
-
     "preferences": {
       "title": "Preferências Gerais",
       "language": "Idioma",
@@ -815,7 +786,6 @@
         "24hour": "24 horas"
       }
     },
-
     "security": {
       "title": "Configurações de Segurança",
       "twoFactorAuth": "Autenticação de Dois Fatores",
@@ -841,7 +811,6 @@
         "4hours": "4 horas"
       }
     },
-
     "notifications": {
       "title": "Preferências de Notificação",
       "emailNotifications": "Notificações por E-mail",
@@ -861,7 +830,6 @@
         "system": "Notificações do sistema"
       }
     },
-
     "password": {
       "title": "Alterar Senha",
       "currentPassword": "Senha Atual",
@@ -876,7 +844,6 @@
         "unique": "Não reutilize senhas de outras contas"
       }
     },
-
     "personalInformation": "Informações Pessoais",
     "personalInformationDescription": "Atualize seus detalhes pessoais e informações de contato.",
     "accountInformation": "Informações da Conta",
@@ -919,7 +886,6 @@
     "resetForm": "Redefinir Formulário",
     "passwordUpdated": "Senha atualizada com sucesso!"
   },
-
   "termsPage": {
     "pageTitle": "Termos e Condições do Programa de Agentes",
     "metaDescription": "Por favor, leia nossos termos e condições cuidadosamente antes de participar no Programa de Agentes PlanetTalk.",

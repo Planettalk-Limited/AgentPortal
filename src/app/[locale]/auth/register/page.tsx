@@ -9,14 +9,12 @@ import { validatePassword } from '@/lib/passwordValidation'
 import CountryPicker from '@/components/CountryPicker'
 import PhoneNumberInput from '@/components/PhoneNumberInput'
 import { createLocalizedPath } from '@/lib/utils/navigation'
-import MeetingBookingModal from '@/components/MeetingBookingModal'
 import Toast from '@/components/Toast'
 import {
   BUSINESS_PARTNER_PRESENCE_COUNTRIES,
   isBusinessPartnerPresenceCountry,
 } from '@/lib/constants/presenceCountries'
 
-const MEETING_BOOKING_URL = process.env.NEXT_PUBLIC_PARTNER_MEETING_BOOKING_URL || 'https://calendar.app.google/4qT4xSicq7ZQqsvMA'
 
 const countryToPhoneCodeMap: Record<string, string> = {
   'US': '+1', 'CA': '+1', 'GB': '+44', 'AU': '+61', 'DE': '+49', 'FR': '+33', 'IT': '+39', 'ES': '+34',
@@ -62,7 +60,6 @@ interface FormData {
   businessAddress: string
   primaryBusinessActivity: string
   primarySpecialty: string
-  customerInteractionType: string
   sellsInternationalGoods: boolean
 }
 
@@ -81,15 +78,12 @@ function RegisterPageContent() {
     businessAddress: '',
     primaryBusinessActivity: '',
     primarySpecialty: '',
-    customerInteractionType: '',
     sellsInternationalGoods: false
   })
   const [phoneCountryCode, setPhoneCountryCode] = useState('+44')
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [showTermsModal, setShowTermsModal] = useState(false)
-  const [showBookingModal, setShowBookingModal] = useState(false)
-  const [meetingBooked, setMeetingBooked] = useState(false)
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [toast, setToast] = useState<{ message: string; type: 'error' | 'success' } | null>(null)
   const [downloadStatus, setDownloadStatus] = useState<'idle' | 'downloading' | 'downloaded'>('idle')
@@ -177,8 +171,6 @@ function RegisterPageContent() {
       if (!formData.businessAddress.trim()) errors.businessAddress = t('validation.businessAddressRequired')
       if (!formData.primaryBusinessActivity) errors.primaryBusinessActivity = t('validation.primaryActivityRequired')
       if (!formData.primarySpecialty) errors.primarySpecialty = t('validation.primarySpecialtyRequired')
-      if (!formData.customerInteractionType) errors.customerInteractionType = t('validation.customerInteractionRequired')
-      if (!meetingBooked) errors.meeting = t('validation.meetingRequired')
     }
     return errors
   }
@@ -192,7 +184,6 @@ function RegisterPageContent() {
     if (partnerType === 'business') {
       if (!formData.companyName.trim() || !formData.businessAddress.trim()) return false
       if (!formData.primaryBusinessActivity || !formData.primarySpecialty) return false
-      if (!formData.customerInteractionType || !meetingBooked) return false
     }
     return true
   })()
@@ -227,7 +218,6 @@ function RegisterPageContent() {
         payload.businessAddress = formData.businessAddress.trim()
         payload.primaryBusinessActivity = formData.primaryBusinessActivity
         payload.primarySpecialty = formData.primarySpecialty
-        payload.customerInteractionType = formData.customerInteractionType
         payload.sellsInternationalGoods = formData.sellsInternationalGoods
       }
 
@@ -239,7 +229,6 @@ function RegisterPageContent() {
       if (result.success) {
         const params = new URLSearchParams({ email: formData.email })
         if (partnerType === 'business') params.set('partnerType', 'business')
-        if (result.meetingBookingUrl) params.set('meetingBookingUrl', result.meetingBookingUrl)
         router.push(`/${locale}/auth/verify-email?${params.toString()}`)
       }
     } catch (err: any) {
@@ -348,7 +337,7 @@ function RegisterPageContent() {
       {/* Back Button + Header */}
       <div className="mb-6 sm:mb-8">
         <button
-          onClick={() => { setPartnerType(null); clearError(); setMeetingBooked(false) }}
+          onClick={() => { setPartnerType(null); clearError() }}
           className="inline-flex items-center text-sm text-gray-500 hover:text-pt-turquoise transition-colors mb-4"
         >
           <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -495,25 +484,6 @@ function RegisterPageContent() {
               </div>
             </div>
 
-            <div className="group" {...(fieldErrors.customerInteractionType ? {'data-field-error': 'true'} : {})}>
-              <label htmlFor="customerInteractionType" className="block text-sm sm:text-base font-semibold text-gray-800 mb-2">
-                {t('business.customerInteraction')} <span className="text-red-500">*</span>
-              </label>
-              <select
-                id="customerInteractionType"
-                name="customerInteractionType"
-                value={formData.customerInteractionType}
-                onChange={handleChange}
-                className={`w-full px-4 sm:px-6 py-3 sm:py-4 border-2 rounded-xl sm:rounded-2xl focus:ring-0 transition-colors duration-200 bg-white text-base sm:text-lg ${fieldErrors.customerInteractionType ? 'border-red-400 focus:border-red-500' : 'border-gray-200 focus:border-pt-turquoise'}`}
-              >
-                <option value="">{t('business.selectInteraction')}</option>
-                <option value="sit_down_table_service">Sit-down / Table Service</option>
-                <option value="grab_and_go">Grab-and-go / Over the counter</option>
-                <option value="appointment_based">Appointment based</option>
-              </select>
-              {fieldErrors.customerInteractionType && <p className="text-xs text-red-500 mt-1.5">{fieldErrors.customerInteractionType}</p>}
-            </div>
-
             <div className="flex items-start space-x-3 bg-white rounded-xl p-4 border border-pt-turquoise/20">
               <input
                 type="checkbox"
@@ -531,58 +501,6 @@ function RegisterPageContent() {
               </label>
             </div>
 
-            {/* Schedule Meeting — required before registration */}
-            <div className="group">
-              <label className="block text-sm sm:text-base font-semibold text-gray-800 mb-2">
-                {t('business.scheduleMeeting')} <span className="text-red-500">*</span>
-              </label>
-              {meetingBooked ? (
-                <div className="w-full flex items-center px-4 sm:px-6 py-3 sm:py-4 border-2 border-green-300 rounded-xl sm:rounded-2xl bg-green-50/60">
-                  <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0 mr-4">
-                    <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <span className="block text-base font-semibold text-green-800">{t('business.meetingScheduled')}</span>
-                    <span className="block text-sm text-green-600 mt-0.5">{t('business.meetingScheduledDescription')}</span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setShowBookingModal(true)}
-                    className="text-sm text-green-700 underline font-medium ml-3 flex-shrink-0 hover:text-green-800"
-                  >
-                    {t('business.reschedule')}
-                  </button>
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => setShowBookingModal(true)}
-                  className="w-full flex items-center px-4 sm:px-6 py-3 sm:py-4 border-2 border-pt-turquoise/40 rounded-xl sm:rounded-2xl bg-pt-turquoise/5 hover:border-pt-turquoise hover:bg-pt-turquoise/10 transition-colors duration-200 text-left group"
-                >
-                  <div className="w-10 h-10 bg-pt-turquoise/10 rounded-xl flex items-center justify-center flex-shrink-0 mr-4 group-hover:bg-pt-turquoise/20 transition-colors">
-                    <svg className="w-5 h-5 text-pt-turquoise" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <span className="block text-base sm:text-lg font-semibold text-pt-dark-gray">
-                      {t('business.bookMeeting')}
-                    </span>
-                    <span className="block text-sm text-pt-turquoise mt-0.5">
-                      {t('business.bookMeetingDescription')}
-                    </span>
-                  </div>
-                  <svg className="w-5 h-5 text-pt-turquoise/50 flex-shrink-0 ml-3 group-hover:text-pt-turquoise transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-              )}
-              <p className={`text-xs mt-1.5 ml-1 ${fieldErrors.meeting ? 'text-red-500 font-medium' : 'text-gray-500'}`}>
-                {fieldErrors.meeting || (meetingBooked ? t('business.canReschedule') : t('business.mustBookMeeting'))}
-              </p>
-            </div>
           </div>
         )}
 
@@ -870,17 +788,6 @@ function RegisterPageContent() {
         </div>
       )}
 
-      {/* Meeting Booking Modal */}
-      {partnerType === 'business' && (
-        <MeetingBookingModal
-          isOpen={showBookingModal}
-          onClose={() => {
-            setShowBookingModal(false)
-            setMeetingBooked(true)
-          }}
-          bookingUrl={MEETING_BOOKING_URL}
-        />
-      )}
     </div>
   )
 }
