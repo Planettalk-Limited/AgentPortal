@@ -1,7 +1,7 @@
 {
-  "name": "PlanetTalk Agent Portal",
-  "short_name": "PT Agent",
-  "description": "PlanetTalk Agent Portal - Join Our Global Telecommunications Network",
+  "name": "PlanetTalk Partner Portal",
+  "short_name": "PT Partner",
+  "description": "PlanetTalk Partner Portal - Join Our Global Telecommunications Network",
   "icons": [
     {
       "src": "/icon-192x192.png",

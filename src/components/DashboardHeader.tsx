@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from 'next-intl'
 import { useAuth } from '@/contexts/AuthContext'
 import Link from 'next/link'
 import LanguageSelector from './LanguageSelector'
+import { roleLabel } from '@/lib/utils/roleLabel'
 
 interface DashboardHeaderProps {
   onToggleMobileMenu?: () => void
@@ -101,8 +102,8 @@ const DashboardHeader = ({ onToggleMobileMenu }: DashboardHeaderProps) => {
                 <div className="text-sm font-medium text-gray-900 truncate">
                   {user.firstName} {user.lastName}
                 </div>
-                <div className="text-xs text-gray-500 capitalize truncate">
-                  {user.role}
+                <div className="text-xs text-gray-500 truncate">
+                  {roleLabel(user.role)}
                 </div>
               </div>
               <svg 
@@ -138,8 +139,8 @@ const DashboardHeader = ({ onToggleMobileMenu }: DashboardHeaderProps) => {
                       <div className="text-xs text-gray-500 truncate">
                         {user.email}
                       </div>
-                      <div className="text-xs text-pt-turquoise font-medium capitalize mt-0.5">
-                        {user.role}
+                      <div className="text-xs text-pt-turquoise font-medium mt-0.5">
+                        {roleLabel(user.role)}
                       </div>
                     </div>
                   </div>
