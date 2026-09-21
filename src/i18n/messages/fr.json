@@ -371,12 +371,6 @@
       },
       "submit": "Créer le Compte",
       "submitting": "Création du Compte...",
-      "success": {
-        "title": "Inscription Réussie !",
-        "subtitle": "Et Ensuite ?",
-        "description": "Veuillez vérifier votre e-mail pour vos identifiants de connexion. Notre équipe examinera votre candidature et vous enverra votre mot de passe temporaire et votre code agent.",
-        "loginButton": "Aller à la Connexion"
-      },
       "alreadyHaveAccount": "Vous avez déjà un compte ?",
       "signInLink": "Connectez-vous ici",
       "passwordRequirement": "Doit contenir au moins 8 caractères, une lettre majuscule et un caractère spécial",
@@ -388,12 +382,12 @@
       "individualDescription": "Idéal pour les particuliers souhaitant gagner des commissions en partageant PlanetTalk avec leur réseau.",
       "businessDescription": "Pour les entreprises et organisations souhaitant intégrer les services PlanetTalk à grande échelle.",
       "individualBenefits": {
-        "instantCode": "Code partenaire instantané à l'approbation",
+        "instantCode": "Code partenaire dès que vous vérifiez votre e-mail",
         "commissions": "Commissions pendant 24 mois",
         "simpleSetup": "Configuration rapide et simple"
       },
       "businessBenefits": {
-        "customCode": "Code partenaire personnalisé",
+        "customCode": "Code partenaire personnalisé sur demande",
         "accountManagement": "Gestion de compte dédiée",
         "volumeTiers": "Niveaux de commission basés sur le volume"
       },
