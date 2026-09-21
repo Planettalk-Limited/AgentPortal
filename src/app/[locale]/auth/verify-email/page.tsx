@@ -14,9 +14,6 @@ function VerifyEmailContent() {
   const [success, setSuccess] = useState(false)
   const [resendLoading, setResendLoading] = useState(false)
   const [resendMessage, setResendMessage] = useState<string | null>(null)
-  const [requiresPartnerApproval, setRequiresPartnerApproval] = useState(false)
-  const [meetingBookingUrl, setMeetingBookingUrl] = useState<string | null>(null)
-  const [partnerType, setPartnerType] = useState<string | null>(null)
 
   const searchParams = useSearchParams()
   const locale = useLocale()
@@ -26,11 +23,6 @@ function VerifyEmailContent() {
     const emailParam = searchParams.get('email')
     if (emailParam) setEmail(emailParam)
 
-    const ptParam = searchParams.get('partnerType')
-    if (ptParam) setPartnerType(ptParam)
-
-    const meetingUrl = searchParams.get('meetingBookingUrl')
-    if (meetingUrl) setMeetingBookingUrl(meetingUrl)
   }, [searchParams])
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -56,12 +48,6 @@ function VerifyEmailContent() {
 
       if (response.success) {
         setSuccess(true)
-        if (response.requiresPartnerApproval) {
-          setRequiresPartnerApproval(true)
-        }
-        if (response.meetingBookingUrl) {
-          setMeetingBookingUrl(response.meetingBookingUrl)
-        }
       } else {
         setError(response.message || t('verificationFailed'))
       }
@@ -99,75 +85,7 @@ function VerifyEmailContent() {
 
   const createLocalizedPath = (path: string) => `/${locale}${path}`
 
-  // ── Success: Business partner awaiting approval ──
-  // Only show this screen when the API explicitly says approval is still needed.
-  // partnerType query param alone is not enough — an already-approved partner
-  // verifying a stale OTP must land on the generic success screen instead.
-  if (success && requiresPartnerApproval) {
-    return (
-      <div className="text-center">
-        <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-          <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        </div>
-        <h1 className="text-2xl font-bold text-pt-dark-gray mb-2">Email Verified!</h1>
-        <p className="text-pt-light-gray mb-6">
-          Your business partner application is now awaiting administrator approval. 
-          You&apos;ll receive an email once your account is active.
-        </p>
-
-        {/* Meeting booked confirmation */}
-        <div className="mb-6 flex items-center px-5 py-4 bg-green-50 border border-green-200 rounded-xl text-left">
-          <div className="w-9 h-9 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0 mr-3">
-            <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-          </div>
-          <div>
-            <p className="text-sm font-semibold text-green-800">Onboarding meeting scheduled</p>
-            <p className="text-xs text-green-600">Our team will reach out at the booked time.</p>
-          </div>
-        </div>
-
-        {/* Timeline */}
-        <div className="bg-gray-50 rounded-xl p-5 mb-6 text-left">
-          <h3 className="font-semibold text-gray-800 mb-3 text-sm uppercase tracking-wider">What happens next</h3>
-          <div className="space-y-3">
-            <div className="flex items-start space-x-3">
-              <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-              <p className="text-sm text-gray-700">Email verified</p>
-            </div>
-            <div className="flex items-start space-x-3">
-              <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-              </div>
-              <p className="text-sm text-gray-700">Application under review by our team</p>
-            </div>
-            <div className="flex items-start space-x-3">
-              <div className="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                <span className="text-white text-xs font-bold">3</span>
-              </div>
-              <p className="text-sm text-gray-500">Custom partner code assigned & account activated</p>
-            </div>
-          </div>
-        </div>
-
-        <Link
-          href={createLocalizedPath('/auth/login')}
-          className="inline-block w-full bg-pt-turquoise text-white py-4 px-6 rounded-2xl font-semibold text-lg hover:bg-pt-turquoise-600 transition-all duration-200 text-center"
-        >
-          Back to Login
-        </Link>
-      </div>
-    )
-  }
-
-  // ── Success: Individual partner (active) ──
+  // ── Success: account is active ──
   if (success) {
     return (
       <div className="text-center">

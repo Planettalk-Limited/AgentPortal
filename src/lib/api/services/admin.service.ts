@@ -9,6 +9,7 @@ import {
   User,
   UserQueryParams,
   UserStats,
+  PartnerHealth,
   Agent,
   AgentStats,
   Earning,
@@ -128,6 +129,22 @@ export class AdminService extends BaseService {
     return this.execute(() =>
       this.client.patch(`admin/users/${id}/business-partner-application`, data)
     );
+  }
+
+  /**
+   * Partner accounts stuck in a state that cannot resolve itself,
+   * plus PTA code pool usage.
+   */
+  async getPartnerHealth(): Promise<PartnerHealth> {
+    return this.execute(() => this.client.get<PartnerHealth>('admin/users/partner-health'));
+  }
+
+  /**
+   * Restore a partner rejected under the old flow: mints their agent profile,
+   * clears the rejection, and activates them if their email is verified.
+   */
+  async restoreBusinessPartner(id: string): Promise<{ status: string; agentCode: string | null }> {
+    return this.execute(() => this.client.post(`admin/users/${id}/restore-business-partner`, {}));
   }
 
   /**
