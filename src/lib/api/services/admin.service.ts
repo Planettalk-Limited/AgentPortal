@@ -132,6 +132,16 @@ export class AdminService extends BaseService {
   }
 
   /**
+   * Reactivate an agent whose profile is not active. Accepts any non-active
+   * status, unlike activateAgent which requires CREDENTIALS_SENT.
+   */
+  async reactivateAgent(agentId: string, reason?: string): Promise<{ success: boolean; message: string }> {
+    return this.execute(() =>
+      this.client.patch(`admin/agents/${agentId}/reactivate`, reason ? { reason } : {})
+    );
+  }
+
+  /**
    * Partner accounts stuck in a state that cannot resolve itself,
    * plus PTA code pool usage.
    */
