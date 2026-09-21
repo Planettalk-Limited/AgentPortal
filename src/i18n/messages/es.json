@@ -344,6 +344,9 @@
         "lastNameRequired": "El apellido es requerido",
         "countryRequired": "El país es requerido",
         "countryInvalid": "Por favor seleccione un país válido",
+        "countryNotSupported": "Las solicitudes del Programa de Socios Empresariales solo están disponibles en el Reino Unido, Estados Unidos, Canadá, Francia e Irlanda.",
+        "phoneRequired": "El número de teléfono es requerido",
+        "phoneInvalid": "Por favor ingrese un número de teléfono válido",
         "emailRequired": "El correo electrónico es requerido",
         "emailInvalid": "Por favor ingrese una dirección de correo electrónico válida",
         "passwordRequired": "La contraseña es requerida",
@@ -352,9 +355,12 @@
         "passwordSpecialChar": "La contraseña debe contener al menos un carácter especial",
         "passwordRequirements": "La contraseña debe tener al menos 8 caracteres, una letra mayúscula y un carácter especial",
         "passwordMismatch": "Las contraseñas no coinciden",
-        "phoneRequired": "El número de teléfono es requerido",
-        "phoneInvalid": "Por favor ingrese un número de teléfono válido",
-        "agentProgramRequired": "Debe aceptar los Términos y Condiciones del Programa de Agentes"
+        "agentProgramRequired": "Debe aceptar los Términos y Condiciones del Programa de Socios",
+        "partnerProgramRequired": "Debe aceptar los Términos y Condiciones del Programa de Socios",
+        "companyNameRequired": "El nombre de la empresa es requerido",
+        "businessAddressRequired": "La dirección del negocio es requerida",
+        "primaryActivityRequired": "La actividad principal del negocio es requerida",
+        "primarySpecialtyRequired": "La especialidad principal es requerida"
       },
       "optIn": {
         "termsPrefix": "Acepto los",
@@ -401,46 +407,11 @@
         "selectActivity": "Seleccionar actividad",
         "primarySpecialty": "Especialidad Principal",
         "selectSpecialty": "Seleccionar especialidad",
-        "customerInteraction": "Tipo de Interacción con el Cliente",
-        "selectInteraction": "Seleccionar tipo de interacción",
         "sellsInternational": "Vende Productos Internacionales",
         "sellsInternationalDescription": "¿Su negocio vende productos importados o dirigidos a comunidades internacionales?",
-        "scheduleMeeting": "Programar Reunión de Incorporación",
-        "bookMeeting": "Reserve Su Reunión de Incorporación",
-        "bookMeetingDescription": "Obligatorio antes de enviar su solicitud",
-        "meetingScheduled": "Reunión Programada",
-        "meetingScheduledDescription": "Su reunión de incorporación ha sido reservada",
-        "reschedule": "Reprogramar",
-        "mustBookMeeting": "Debe reservar una reunión antes de enviar su registro.",
-        "canReschedule": "Reunión reservada exitosamente.",
         "whatHappensNext": "Próximos pasos",
-        "whatHappensNextDescription": "Después de registrarse, verificará su correo electrónico. Nuestro equipo revisará su solicitud y activará su cuenta una vez aprobada.",
+        "whatHappensNextDescription": "Después de registrarse, verificará su correo electrónico. Eso activa su cuenta de inmediato y le enviaremos su código de socio.",
         "countryRestrictionHint": "Las solicitudes del Programa de Socios Empresariales solo están disponibles actualmente en el Reino Unido, Estados Unidos, Canadá, Francia e Irlanda."
-      },
-      "validation": {
-        "firstNameRequired": "El nombre es requerido",
-        "lastNameRequired": "El apellido es requerido",
-        "countryRequired": "El país es requerido",
-        "countryInvalid": "Por favor seleccione un país válido",
-        "countryNotSupported": "Las solicitudes del Programa de Socios Empresariales solo están disponibles en el Reino Unido, Estados Unidos, Canadá, Francia e Irlanda.",
-        "phoneRequired": "El número de teléfono es requerido",
-        "phoneInvalid": "Por favor ingrese un número de teléfono válido",
-        "emailRequired": "El correo electrónico es requerido",
-        "emailInvalid": "Por favor ingrese una dirección de correo electrónico válida",
-        "passwordRequired": "La contraseña es requerida",
-        "passwordMinLength": "La contraseña debe tener al menos 8 caracteres",
-        "passwordUppercase": "La contraseña debe contener al menos una letra mayúscula",
-        "passwordSpecialChar": "La contraseña debe contener al menos un carácter especial",
-        "passwordRequirements": "La contraseña debe tener al menos 8 caracteres, una letra mayúscula y un carácter especial",
-        "passwordMismatch": "Las contraseñas no coinciden",
-        "agentProgramRequired": "Debe aceptar los Términos y Condiciones del Programa de Socios",
-        "partnerProgramRequired": "Debe aceptar los Términos y Condiciones del Programa de Socios",
-        "companyNameRequired": "El nombre de la empresa es requerido",
-        "businessAddressRequired": "La dirección del negocio es requerida",
-        "primaryActivityRequired": "La actividad principal del negocio es requerida",
-        "primarySpecialtyRequired": "La especialidad principal es requerida",
-        "customerInteractionRequired": "El tipo de interacción con el cliente es requerido",
-        "meetingRequired": "Por favor programe su reunión de incorporación antes de registrarse"
       }
     },
     "verifyEmail": {
@@ -602,7 +573,7 @@
     "welcomeTitle": "🎉 ¡Bienvenido al Portal de Agentes PlanetTalk!",
     "welcomeDescription": "Te has conectado exitosamente como {name}. Tu panel de agente está listo con todas las herramientas que necesitas para hacer crecer tu negocio de telecomunicaciones.",
     "nextSteps": "Próximos Pasos:",
-    "shareAgentCode": "Comparte Tu Código de Agente",
+    "shareAgentCode": "Comparte tu código de agente con amigos y familiares",
     "shareAgentCodeDescription": "Usa el código {code} para empezar a ganar",
     "shareToEarn": "Comparte con amigos y familiares para empezar a ganar comisiones",
     "trackEarnings": "Rastrea Tus Ganancias",
@@ -618,7 +589,6 @@
     "referralBonusIncome": "Ingresos por Bono de Referidos",
     "referralBonusIncomeThisMonth": "Bono Este Mes",
     "totalIncome": "Ingreso Total",
-    "totalReferrals": "Referencias Totales",
     "shareAndEarn": "Comparte y Gana Comisiones",
     "shareDescription": "Comparte la app PlanetTalk con tu código de agente para ganar comisiones cuando los clientes lo usen al registrarse",
     "yourAgentCode": "TU CÓDIGO DE AGENTE",
@@ -633,7 +603,7 @@
     "payoutUnavailable": "Pago No Disponible",
     "almostThere": "¡Casi llegamos!",
     "needMore": "Necesitas {amount} más para solicitar un pago",
-    "progressTo": "Progreso a ${amount}",
+    "progressTo": "Progreso a",
     "minimum": "mínimo",
     "readyForPayout": "¡Listo para pago!",
     "balanceMeetsRequirement": "Tu saldo cumple con el requisito mínimo de pago",
@@ -644,7 +614,6 @@
     "payoutRequirements": "Requisitos de Pago",
     "minimumBalance": "Saldo mínimo: {amount}",
     "howToReachMinimum": "Cómo Alcanzar el Mínimo",
-    "shareAgentCode": "Comparte tu código de agente con amigos y familiares",
     "postOnSocialMedia": "Publica en redes sociales usando los botones de compartir arriba",
     "earnCommission": "Gana {rate}% de comisión en toda actividad de referidos",
     "quickStats": "Estadísticas Rápidas",
@@ -683,7 +652,6 @@
     "shareReferralLink": "Compartir Enlace de Referencia",
     "referralUrl": "URL de Referencia:",
     "thisMonth": "este mes",
-    "progressTo": "Progreso a",
     "sharing": "Compartiendo...",
     "failedToShareLink": "Error al compartir enlace",
     "justNow": "Ahora mismo",
@@ -738,14 +706,14 @@
     "terms": "Términos",
     "privacy": "Privacidad"
   },
-    "referral": {
-      "loading": "Cargando información de referencia...",
-      "invalidCode": "Código de Referencia Inválido",
-      "invalidMessage": "Este código de referencia no es válido o ha expirado.",
-      "visitPlanetTalk": "Visitar PlanetTalk",
-      "processing": "Procesando...",
-      "required": "Campo requerido"
-    },
+  "referral": {
+    "loading": "Cargando información de referencia...",
+    "invalidCode": "Código de Referencia Inválido",
+    "invalidMessage": "Este código de referencia no es válido o ha expirado.",
+    "visitPlanetTalk": "Visitar PlanetTalk",
+    "processing": "Procesando...",
+    "required": "Campo requerido"
+  },
   "profile": {
     "title": "Configuración del Perfil",
     "subtitle": "Gestiona la configuración de tu cuenta y preferencias",
@@ -771,15 +739,13 @@
     "emailNotificationsEnabled": "¡Notificaciones por email habilitadas!",
     "emailNotificationsDisabled": "¡Notificaciones por email deshabilitadas!",
     "failedToToggleEmailNotifications": "Error al alternar notificaciones por email",
-    
     "tabs": {
       "profile": "Perfil",
-      "preferences": "Preferencias", 
+      "preferences": "Preferencias",
       "security": "Seguridad",
       "notifications": "Notificaciones",
       "password": "Contraseña"
     },
-
     "personalInfo": {
       "title": "Información Personal",
       "firstName": "Nombre",
@@ -793,7 +759,6 @@
       "userIdCannotBeChanged": "El ID de usuario no se puede cambiar",
       "countryCannotBeChanged": "El país no se puede cambiar una vez establecido"
     },
-
     "preferences": {
       "title": "Preferencias Generales",
       "language": "Idioma",
@@ -812,7 +777,6 @@
         "24hour": "24 horas"
       }
     },
-
     "security": {
       "title": "Configuración de Seguridad",
       "twoFactorAuth": "Autenticación de Dos Factores",
@@ -832,13 +796,12 @@
       "sessionTimeout": "Tiempo de Espera de Sesión",
       "sessionTimeouts": {
         "15min": "15 minutos",
-        "30min": "30 minutos", 
+        "30min": "30 minutos",
         "1hour": "1 hora",
         "2hours": "2 horas",
         "4hours": "4 horas"
       }
     },
-
     "notifications": {
       "title": "Preferencias de Notificación",
       "emailNotifications": "Notificaciones por Email",
@@ -858,7 +821,6 @@
         "system": "Notificaciones del sistema"
       }
     },
-
     "password": {
       "title": "Cambiar Contraseña",
       "currentPassword": "Contraseña Actual",
@@ -873,15 +835,13 @@
         "unique": "No reutilices contraseñas de otras cuentas"
       }
     },
-
     "saveProfile": "Guardar Perfil",
-    "savePreferences": "Guardar Preferencias", 
+    "savePreferences": "Guardar Preferencias",
     "saveSecuritySettings": "Guardar Configuración de Seguridad",
     "saveNotificationPreferences": "Guardar Preferencias de Notificación",
     "changePassword": "Cambiar Contraseña",
     "changingPassword": "Cambiando Contraseña..."
   },
-
   "termsPage": {
     "pageTitle": "Términos y Condiciones del Programa de Agentes",
     "metaDescription": "Por favor lea nuestros términos y condiciones cuidadosamente antes de participar en el Programa de Agentes de PlanetTalk.",

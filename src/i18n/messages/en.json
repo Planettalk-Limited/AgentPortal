@@ -48,8 +48,8 @@
           "description": "Receive commissions on each customer for 24 months from their first successful top-up."
         },
         {
-        "title": "Unique Partner Code",
-        "description": "Share your unique code with your network, they use it once and you earn commission every time they top up."
+          "title": "Unique Partner Code",
+          "description": "Share your unique code with your network, they use it once and you earn commission every time they top up."
         },
         {
           "title": "Make a Positive Impact",
@@ -488,20 +488,10 @@
         "selectActivity": "Select activity",
         "primarySpecialty": "Primary Specialty",
         "selectSpecialty": "Select specialty",
-        "customerInteraction": "Customer Interaction Type",
-        "selectInteraction": "Select interaction type",
         "sellsInternational": "Sells International Goods",
         "sellsInternationalDescription": "Does your business sell goods imported from or targeted at international communities?",
-        "scheduleMeeting": "Schedule Onboarding Meeting",
-        "bookMeeting": "Book Your Onboarding Meeting",
-        "bookMeetingDescription": "Required before you can submit your application",
-        "meetingScheduled": "Meeting Scheduled",
-        "meetingScheduledDescription": "Your onboarding meeting has been booked",
-        "reschedule": "Reschedule",
-        "mustBookMeeting": "You must book a meeting before submitting your registration.",
-        "canReschedule": "Meeting booked successfully.",
         "whatHappensNext": "What happens next",
-        "whatHappensNextDescription": "After registering you'll verify your email. Our team will then review your application and activate your account once approved.",
+        "whatHappensNextDescription": "After registering you'll verify your email. That activates your account straight away and we'll send you your partner code.",
         "countryRestrictionHint": "Business Partner applications are currently only available in the United Kingdom, United States, Canada, France, and Ireland."
       },
       "validation": {
@@ -525,9 +515,7 @@
         "companyNameRequired": "Company name is required",
         "businessAddressRequired": "Business address is required",
         "primaryActivityRequired": "Primary business activity is required",
-        "primarySpecialtyRequired": "Primary specialty is required",
-        "customerInteractionRequired": "Customer interaction type is required",
-        "meetingRequired": "Please schedule your onboarding meeting before registering"
+        "primarySpecialtyRequired": "Primary specialty is required"
       }
     },
     "verifyEmail": {
@@ -676,13 +664,13 @@
     "agentId": "Partner ID",
     "totalEarnings": "Total Earnings",
     "earnings": "Earnings",
-    "referrals": "Referrals", 
+    "referrals": "Referrals",
     "balance": "Balance",
     "availableForPayout": "Available for Payout",
     "totalReferrals": "Total Referrals",
     "activeReferrals": "Active Referrals",
     "agentTier": "Partner Tier",
-    "pendingBalance": "Pending Balance", 
+    "pendingBalance": "Pending Balance",
     "agentStatus": "Partner Status",
     "availableBalance": "Available Balance",
     "agentCode": "Partner Code",
@@ -705,7 +693,7 @@
     "referralBonusIncome": "Referral Bonus Income",
     "referralBonusIncomeThisMonth": "Bonus This Month",
     "totalIncome": "Total Income",
-    "shareAndEarn": "Share & Earn Commissions", 
+    "shareAndEarn": "Share & Earn Commissions",
     "shareDescription": "Share the PlanetTalk app with your partner code to earn commissions when customers use it during signup",
     "yourAgentCode": "YOUR PARTNER CODE",
     "copyCode": "Copy Code",
@@ -822,14 +810,14 @@
     "terms": "Terms",
     "privacy": "Privacy"
   },
-    "referral": {
-      "loading": "Loading referral information...",
-      "invalidCode": "Invalid Referral Code",
-      "invalidMessage": "This referral code is not valid or has expired.",
-      "visitPlanetTalk": "Visit PlanetTalk",
-      "processing": "Processing...",
-      "required": "Required field"
-    },
+  "referral": {
+    "loading": "Loading referral information...",
+    "invalidCode": "Invalid Referral Code",
+    "invalidMessage": "This referral code is not valid or has expired.",
+    "visitPlanetTalk": "Visit PlanetTalk",
+    "processing": "Processing...",
+    "required": "Required field"
+  },
   "profile": {
     "title": "Profile Settings",
     "subtitle": "Manage your account settings and preferences",
@@ -855,15 +843,13 @@
     "emailNotificationsEnabled": "Email notifications enabled!",
     "emailNotificationsDisabled": "Email notifications disabled!",
     "failedToToggleEmailNotifications": "Failed to toggle email notifications",
-    
     "tabs": {
       "profile": "Profile",
-      "preferences": "Preferences", 
+      "preferences": "Preferences",
       "security": "Security",
       "notifications": "Notifications",
       "password": "Password"
     },
-
     "personalInfo": {
       "title": "Personal Information",
       "firstName": "First Name",
@@ -877,7 +863,6 @@
       "userIdCannotBeChanged": "User ID cannot be changed",
       "countryCannotBeChanged": "Country cannot be changed once set"
     },
-
     "preferences": {
       "title": "General Preferences",
       "language": "Language",
@@ -896,7 +881,6 @@
         "24hour": "24-hour"
       }
     },
-
     "security": {
       "title": "Security Settings",
       "twoFactorAuth": "Two-Factor Authentication",
@@ -916,13 +900,12 @@
       "sessionTimeout": "Session Timeout",
       "sessionTimeouts": {
         "15min": "15 minutes",
-        "30min": "30 minutes", 
+        "30min": "30 minutes",
         "1hour": "1 hour",
         "2hours": "2 hours",
         "4hours": "4 hours"
       }
     },
-
     "notifications": {
       "title": "Notification Preferences",
       "emailNotifications": "Email Notifications",
@@ -942,7 +925,6 @@
         "system": "System notifications"
       }
     },
-
     "password": {
       "title": "Change Password",
       "currentPassword": "Current Password",
@@ -957,15 +939,13 @@
         "unique": "Don't reuse passwords from other accounts"
       }
     },
-
     "saveProfile": "Save Profile",
-    "savePreferences": "Save Preferences", 
+    "savePreferences": "Save Preferences",
     "saveSecuritySettings": "Save Security Settings",
     "saveNotificationPreferences": "Save Notification Preferences",
     "changePassword": "Change Password",
     "changingPassword": "Changing Password..."
   },
-
   "termsPage": {
     "pageTitle": "Partner Program Terms & Conditions",
     "metaDescription": "Please read our terms and conditions carefully before participating in the PlanetTalk Partner Program.",
