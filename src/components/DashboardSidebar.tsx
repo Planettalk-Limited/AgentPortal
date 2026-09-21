@@ -5,6 +5,7 @@ import { useRouter, usePathname } from 'next/navigation'
 import { useTranslations, useLocale } from 'next-intl'
 import { useAuth } from '@/contexts/AuthContext'
 import PlanetTalkLogo from './PlanetTalkLogo'
+import { roleLabel } from '@/lib/utils/roleLabel'
 
 interface DashboardSidebarProps {
   collapsed: boolean
@@ -405,8 +406,8 @@ const DashboardSidebar = ({ collapsed, onToggle, isMobile = false, isOpen = true
                   <div className="text-sm font-medium text-pt-dark-gray truncate">
                     {user.firstName} {user.lastName}
                   </div>
-                  <div className="text-xs text-pt-light-gray capitalize">
-                    {user.role}
+                  <div className="text-xs text-pt-light-gray">
+                    {roleLabel(user.role)}
                   </div>
                 </div>
               )}
