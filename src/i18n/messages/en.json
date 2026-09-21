@@ -453,12 +453,6 @@
       "passwordRequirement": "Must be at least 8 characters, contain one uppercase letter and one special character",
       "submit": "Create Account",
       "submitting": "Creating Account...",
-      "success": {
-        "title": "Registration Successful!",
-        "subtitle": "What's Next?",
-        "description": "Please check your email for your login credentials. Our team will review your application and send you your temporary password and partner code.",
-        "loginButton": "Go to Login"
-      },
       "alreadyHaveAccount": "Already have an account?",
       "signInLink": "Sign in here",
       "partnerTypeTitle": "Become a Partner",
@@ -469,12 +463,12 @@
       "individualDescription": "Perfect for individuals looking to earn commissions by sharing PlanetTalk with their network.",
       "businessDescription": "For companies and organisations looking to integrate PlanetTalk services at scale.",
       "individualBenefits": {
-        "instantCode": "Instant partner code on approval",
+        "instantCode": "Partner code as soon as you verify your email",
         "commissions": "Earn commissions for 24 months",
         "simpleSetup": "Quick and simple setup"
       },
       "businessBenefits": {
-        "customCode": "Custom partner code",
+        "customCode": "Custom partner code on request",
         "accountManagement": "Dedicated account management",
         "volumeTiers": "Volume-based commission tiers"
       },

@@ -371,12 +371,6 @@
       },
       "submit": "Criar Conta",
       "submitting": "Criando Conta...",
-      "success": {
-        "title": "Registro Bem-sucedido!",
-        "subtitle": "O Que Vem a Seguir?",
-        "description": "Por favor, verifique seu e-mail para suas credenciais de login. Nossa equipe revisará sua candidatura e enviará sua senha temporária e código de agente.",
-        "loginButton": "Ir para Login"
-      },
       "alreadyHaveAccount": "Já tem uma conta?",
       "signInLink": "Faça login aqui",
       "passwordRequirement": "Deve ter pelo menos 8 caracteres, uma letra maiúscula e um caractere especial",
@@ -388,12 +382,12 @@
       "individualDescription": "Ideal para pessoas que procuram ganhar comissões partilhando o PlanetTalk com a sua rede.",
       "businessDescription": "Para empresas e organizações que procuram integrar os serviços PlanetTalk em grande escala.",
       "individualBenefits": {
-        "instantCode": "Código de parceiro instantâneo após aprovação",
+        "instantCode": "Código de parceiro assim que verificar o seu e-mail",
         "commissions": "Comissões durante 24 meses",
         "simpleSetup": "Configuração rápida e simples"
       },
       "businessBenefits": {
-        "customCode": "Código de parceiro personalizado",
+        "customCode": "Código de parceiro personalizado mediante pedido",
         "accountManagement": "Gestão de conta dedicada",
         "volumeTiers": "Níveis de comissão baseados em volume"
       },
