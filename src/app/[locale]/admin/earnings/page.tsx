@@ -3,18 +3,8 @@
 import { useState, useEffect } from 'react'
 import { api, Earning, BulkAgentDataUploadResponse } from '@/lib/api'
 import { formatCurrencyWithSymbol } from '@/lib/utils/currency'
+import { parseEarningsCsv } from '@/lib/utils/earningsCsv'
 
-interface BulkUploadData {
-  agentCode: string
-  totalEarnings: number
-  earningsForCurrentMonth: number
-  totalReferrals?: number
-  referralsForCurrentMonth?: number
-  totalReferralBonusIncome?: number
-  referralBonusIncomeForCurrentMonth?: number
-  availableBalance: number
-  totalPayoutAmount?: number
-}
 
 // Helper function to derive earning type from description or metadata
 const deriveEarningType = (earning: Earning): string => {
@@ -49,6 +39,7 @@ export default function EarningsPage() {
   const [batchDescription, setBatchDescription] = useState('')
   const [autoConfirm, setAutoConfirm] = useState(true)
   const [isUploading, setIsUploading] = useState(false)
+  const [uploadProblems, setUploadProblems] = useState<string[]>([])
   const [isExporting, setIsExporting] = useState(false)
   const [lastUploadResult, setLastUploadResult] = useState<BulkAgentDataUploadResponse | null>(null)
   const [showResultsModal, setShowResultsModal] = useState(false)
@@ -148,59 +139,16 @@ export default function EarningsPage() {
       setIsUploading(true)
       setError(null)
       
-      const text = await csvFile.text()
-      const lines = text.split('\n').filter(line => line.trim())
-      const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/ /g, '_'))
-      
-      // Find required columns
-      const agentCodeIndex = headers.findIndex(h => h.includes('agent'))
-      const totalEarningsIndex = headers.findIndex(h => h.includes('total') && h.includes('earning'))
-      const currentMonthEarningsIndex = headers.findIndex(h => h.includes('current') && h.includes('month') && h.includes('earning'))
-      // Bonus columns are checked before the plain referral-count columns below, since
-      // "Total Referral Bonus Income" would otherwise also match "total" + "referral"
-      const totalReferralBonusIndex = headers.findIndex(h => h.includes('referral') && h.includes('bonus') && !(h.includes('current') && h.includes('month')))
-      const currentMonthReferralBonusIndex = headers.findIndex(h => h.includes('current') && h.includes('month') && h.includes('referral') && h.includes('bonus'))
-      const totalReferralsIndex = headers.findIndex(h => h.includes('total') && h.includes('referral') && !h.includes('bonus'))
-      const currentMonthReferralsIndex = headers.findIndex(h => h.includes('current') && h.includes('month') && h.includes('referral') && !h.includes('bonus'))
-      const availableBalanceIndex = headers.findIndex(h => h.includes('available') || h.includes('balance'))
-      const totalPayoutIndex = headers.findIndex(h => h.includes('payout'))
+      setUploadProblems([])
 
-      if (agentCodeIndex === -1 || totalEarningsIndex === -1 || currentMonthEarningsIndex === -1) {
-        setError('CSV must contain columns: Agent Code, Total Earnings, Earnings for Current Month')
+      // Nothing is sent unless every row is readable: a blank or unreadable required
+      // cell used to be uploaded as 0 and wiped partners' total earnings.
+      const { rows: agentsData, problems } = parseEarningsCsv(await csvFile.text())
+      if (problems.length > 0) {
+        setUploadProblems(problems)
         return
       }
 
-      // Parse CSV data
-      const agentsData: BulkUploadData[] = []
-
-      for (let i = 1; i < lines.length; i++) {
-        const columns = lines[i].split(',').map(col => col.trim())
-        if (columns.length < 3) continue
-
-        const agentData: BulkUploadData = {
-          agentCode: columns[agentCodeIndex],
-          totalEarnings: parseFloat(columns[totalEarningsIndex]) || 0,
-          earningsForCurrentMonth: parseFloat(columns[currentMonthEarningsIndex]) || 0,
-          // Leave any absent column undefined (not 0) so the backend preserves the
-          // agent's existing value. Sending 0 for an omitted column would WIPE the
-          // stored value for every agent — this is what erased referral bonus income
-          // when a CSV export left those columns out.
-          totalReferrals: totalReferralsIndex !== -1 ? parseInt(columns[totalReferralsIndex]) || 0 : undefined,
-          referralsForCurrentMonth: currentMonthReferralsIndex !== -1 ? parseInt(columns[currentMonthReferralsIndex]) || 0 : undefined,
-          totalReferralBonusIncome: totalReferralBonusIndex !== -1 ? parseFloat(columns[totalReferralBonusIndex]) || 0 : undefined,
-          referralBonusIncomeForCurrentMonth: currentMonthReferralBonusIndex !== -1 ? parseFloat(columns[currentMonthReferralBonusIndex]) || 0 : undefined,
-          availableBalance: availableBalanceIndex !== -1 ? parseFloat(columns[availableBalanceIndex]) || 0 : 0,
-          totalPayoutAmount: totalPayoutIndex !== -1 ? parseFloat(columns[totalPayoutIndex]) || 0 : undefined
-        }
-
-        agentsData.push(agentData)
-      }
-      
-      if (agentsData.length === 0) {
-        setError('No valid agent data found in CSV file')
-        return
-      }
-      
       // Upload via new API endpoint
       const response = await api.admin.bulkUploadAgentData({
         agentsData: agentsData,
@@ -220,7 +168,10 @@ export default function EarningsPage() {
       await loadEarnings()
     } catch (error) {
       console.error('Error with bulk upload:', error)
-      setError(error instanceof Error ? error.message : 'Failed to upload earnings')
+      const message = error instanceof Error ? error.message : 'Failed to upload earnings'
+      setError(message)
+      // The page-level error banner sits behind the modal, so show it inside the modal too
+      setUploadProblems([`Upload failed: ${message}`])
     } finally {
       setIsUploading(false)
     }
@@ -909,6 +860,7 @@ export default function EarningsPage() {
                   onClick={() => {
                   setShowBulkUpload(false)
                   setCsvFile(null)
+                  setUploadProblems([])
                   setBatchDescription('')
                   setAutoConfirm(false)
                 }}
@@ -1002,7 +954,10 @@ export default function EarningsPage() {
                   <input
                     type="file"
                     accept=".csv"
-                    onChange={(e) => setCsvFile(e.target.files?.[0] || null)}
+                    onChange={(e) => {
+                      setCsvFile(e.target.files?.[0] || null)
+                      setUploadProblems([])
+                    }}
                     className="hidden"
                     id="csv-upload"
                   />
@@ -1094,12 +1049,26 @@ export default function EarningsPage() {
                 </div>
               </div>
 
+              {uploadProblems.length > 0 && (
+                <div role="alert" className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <h4 className="font-medium text-red-900 mb-1">
+                    Nothing was uploaded. Fix {uploadProblems.length === 1 ? 'this problem' : `these ${uploadProblems.length} problems`} in the file and try again:
+                  </h4>
+                  <ul className="list-disc ml-5 text-sm text-red-800 space-y-0.5 max-h-48 overflow-y-auto">
+                    {uploadProblems.map((problem, idx) => (
+                      <li key={idx}>{problem}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
               {/* Modal Actions */}
               <div className="flex justify-end space-x-3">
                 <button
                   onClick={() => {
                     setShowBulkUpload(false)
                     setCsvFile(null)
+                    setUploadProblems([])
                     setBatchDescription('')
                     setAutoConfirm(true)
                   }}
