@@ -979,3 +979,68 @@ export interface BulkAgentDataUploadResponse {
   uploadedBy?: string;
   description?: string;
 }
+
+// ── Partner lifecycle emails (admin dashboard) ──────────────────────────────
+
+export interface LifecycleTemplateStats {
+  templateKey: string;
+  segment: string;
+  subject: string;
+  sent: number;
+  simulated: number;
+  failed: number;
+  suppressed: number;
+  delivered: number;
+  opened: number;
+  clicked: number;
+  converted: number;
+  unsubscribed: number;
+  openRate: number | null;
+  clickRate: number | null;
+  conversionRate: number | null;
+}
+
+export interface LifecycleSegmentStats {
+  sent: number;
+  opened: number;
+  clicked: number;
+  converted: number;
+  openRate: number | null;
+  clickRate: number | null;
+  conversionRate: number | null;
+  conversionDefinition: string;
+}
+
+export interface LifecycleEmailStats {
+  range: { from: string | null; to: string | null };
+  notes: string[];
+  audience: { partnersTracked: number; quietList: number; unsubscribed: number; inInactiveTrack: number };
+  segments: Record<string, LifecycleSegmentStats>;
+  templates: LifecycleTemplateStats[];
+  catalogue: { key: string; segment: string; subject: string; draft: boolean; managedElsewhere: string | null }[];
+}
+
+export interface LifecyclePlannedEmail {
+  agentId: string;
+  agentCode: string;
+  partnerName: string;
+  email: string;
+  templateKey: string;
+  dedupeKey: string;
+  segment: string;
+  subject: string;
+  outcome: string;
+  error?: string;
+}
+
+export interface LifecycleRunReport {
+  dryRun: boolean;
+  startedAt: string;
+  skipped?: string;
+  partnersEvaluated: number;
+  partnersFirstSeen: number;
+  emails: LifecyclePlannedEmail[];
+  suppressed: { agentCode: string; dedupeKey: string; reason: string }[];
+  transitions: { welcomeBack: string[]; enteredQuiet: string[] };
+  errors: { agentCode: string; error: string }[];
+}
