@@ -1017,7 +1017,45 @@ export interface LifecycleEmailStats {
   audience: { partnersTracked: number; quietList: number; unsubscribed: number; inInactiveTrack: number };
   segments: Record<string, LifecycleSegmentStats>;
   templates: LifecycleTemplateStats[];
+  partners: LifecyclePartnerMeasures;
   catalogue: { key: string; segment: string; subject: string; draft: boolean; managedElsewhere: string | null }[];
+}
+
+export type LifecyclePartnerGroup =
+  | 'new'
+  | 'active'
+  | 'referring'
+  | 'previously_active'
+  | 'not_referring'
+  | 'inactive'
+  | 'quiet'
+  | 'unsubscribed';
+
+export interface LifecyclePartnerMeasures {
+  groups: { group: LifecyclePartnerGroup; count: number; definition: string }[];
+  milestones: { milestone: number; reached: number; newInRange: number }[];
+  comebacks: {
+    month: string;
+    total: number;
+    byLastEmail: { inactive_30: number; inactive_60: number; inactive_90: number; none: number };
+  }[];
+  notes: string[];
+}
+
+export interface LifecycleGroupMembers {
+  group: LifecyclePartnerGroup;
+  total: number;
+  limit: number;
+  partners: {
+    agentId: string;
+    agentCode: string;
+    name: string;
+    email: string;
+    referrals: number;
+    lastReferralAt: string | null;
+    lastLoginAt: string | null;
+    joinedAt: string;
+  }[];
 }
 
 export interface LifecyclePlannedEmail {

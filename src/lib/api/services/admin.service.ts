@@ -11,6 +11,8 @@ import {
   UserStats,
   PartnerHealth,
   LifecycleEmailStats,
+  LifecycleGroupMembers,
+  LifecyclePartnerGroup,
   LifecycleRunReport,
   Agent,
   AgentStats,
@@ -155,6 +157,13 @@ export class AdminService extends BaseService {
   async getLifecycleEmailStats(params?: { from?: string; to?: string }): Promise<LifecycleEmailStats> {
     return this.execute(() =>
       this.client.get<LifecycleEmailStats>('admin/lifecycle-emails/stats', params)
+    );
+  }
+
+  /** Partners currently in one lifecycle group (up to 500). */
+  async getLifecycleGroupMembers(group: LifecyclePartnerGroup): Promise<LifecycleGroupMembers> {
+    return this.execute(() =>
+      this.client.get<LifecycleGroupMembers>(`admin/lifecycle-emails/groups/${encodeURIComponent(group)}`)
     );
   }
 
